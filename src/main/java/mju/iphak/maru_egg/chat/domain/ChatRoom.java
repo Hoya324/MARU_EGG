@@ -18,8 +18,8 @@ import mju.iphak.maru_egg.user.domain.User;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-@Table(name = "chats")
-public class Chat extends BaseEntity {
+@Table(name = "chat_rooms")
+public class ChatRoom extends BaseEntity {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id")
