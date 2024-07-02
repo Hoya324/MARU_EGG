@@ -29,7 +29,7 @@ public abstract class BaseEntity {
 	@CreatedDate
 	@Column(name = "created_at", updatable = false)
 	@JsonFormat(shape = STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "Asia/Seoul")
-	private LocalDateTime createAt;
+	private LocalDateTime createdAt;
 
 	@LastModifiedDate
 	@Column(name = "updated_at")
