@@ -21,7 +21,7 @@ public class UserRepositoryTest extends RepositoryTest {
 	@BeforeEach
 	public void setUp() throws Exception {
 		email = "maru@gmail.com";
-		saveUser = userRepository.save(User.builder().name("maruegg").email(email).role(Role.GUEST).build());
+		saveUser = userRepository.save(User.builder().email(email).role(Role.GUEST).build());
 	}
 
 	@Test
