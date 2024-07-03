@@ -121,7 +121,7 @@ jobs:
             services:
               maru-egg-app:
                 container_name: maru-egg
-                \image: ${{ secrets.DOCKER_REPO }}:${{ steps.meta.outputs.tags }}-${{ github.run_number }}
+                image: ${{ secrets.DOCKER_REPO }}:develop-${{ github.run_number }}
                 ports:
                   - '8080:8080'
                 expose:
