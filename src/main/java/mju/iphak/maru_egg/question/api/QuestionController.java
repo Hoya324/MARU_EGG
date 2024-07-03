@@ -13,6 +13,6 @@ public class QuestionController {
 
 	@GetMapping()
 	public String getQuestion() {
-		return "아 됐다.";
+		return "아 됐다. 휴";
 	}
 }
