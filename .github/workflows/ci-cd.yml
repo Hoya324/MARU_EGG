@@ -108,7 +108,7 @@ jobs:
           host: ${{ secrets.PUBLIC_DNS }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.PEM_KEY }}
-          source: "./MARU_EGG_BE/compose-dev.yml"
+          source: "./compose-dev.yml"
           target: "/home/${{ secrets.USERNAME }}"
           strip_components: 3
           overwrite: true
