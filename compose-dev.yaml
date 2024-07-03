@@ -4,15 +4,5 @@ services:
     image: ${DOCKER_REPO}
     ports:
       - "8080:8080"
-    links:
-      - maru-egg-db
-    depends_on:
-      - maru-egg-db
-    environment:
-      - SPRING_DATASOURCE_URL=${DB_URL}
-      - SPRING_DATASOURCE_USERNAME=${DB_USERNAME}
-      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
-    networks:
-      - maru-egg-dev-network
-networks:
-  maru-egg-dev-network:
+    expose:
+      - "8080"
