@@ -40,6 +40,13 @@ jobs:
           echo "${{ secrets.YML_DEV }}" > ./application-dev.yml
         shell: bash
 
+      # docker compose 파일 생성 - dev
+      - name: Create compose-dev.yaml file
+        if: contains(github.ref, 'develop')
+        run: |
+          echo "${{ secrets.COMPOSE_YML_DEV }}" > compose-dev.yaml
+        shell: bash
+
       # Gradle 패키지 캐시
       - name: Cache Gradle packages
         uses: actions/cache@v3
@@ -95,21 +102,15 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Create compose-dev.yaml file
-        if: contains(github.ref, 'develop')
-        run: |
-          touch compose-dev.yaml
-          echo "${{ secrets.COMPOSE_YML_DEV }}" > compose-dev.yaml
-        shell: bash
-
       # EC2로 compose-dev.yaml 파일 전송
       - name: Copy compose-dev.yaml to EC2
         uses: appleboy/scp-action@v0.1.0
+        if: contains(github.ref, 'develop')
         with:
           host: ${{ secrets.PUBLIC_DNS }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.PEM_KEY }}
-          source: "./compose-dev.yaml"
+          source: "compose-dev.yaml"
           target: "~/compose-dev.yaml"
 
       # Docker를 통해 EC2로 배포
