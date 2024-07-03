@@ -102,13 +102,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Copy docker-compose into instance   #내 인스턴스로 docker-compose.yml파일 복사.
-        uses: appleboy/scp-action@master          #이미 존재하는 경우 덮어씀
+      - name: Copy docker-compose into instance
+        uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.PUBLIC_DNS }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.PEM_KEY }}
-          source: "./compose-dev.yaml"
+          source: "compose-dev.yaml"  # 직접 파일명을 입력합니다.
           target: "/home/${{ secrets.USERNAME }}"
           strip_components: 3
           overwrite: true
@@ -127,6 +127,6 @@ jobs:
             sudo docker stop $(docker ps -a -q)
             sudo docker rm $(docker ps -a -q) 
             sudo docker pull ${{ secrets.DOCKER_REPO }}:${{ steps.meta.outputs.tags }}-${{ github.run_number }}
-            cd MARU_EGG_BE/
+            cd /home/${{ secrets.USERNAME }}
             sudo docker-compose up -d
             sudo docker image prune -f
