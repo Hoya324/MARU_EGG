@@ -40,20 +40,6 @@ jobs:
           echo "${{ secrets.YML_DEV }}" > ./application-dev.yml
         shell: bash
 
-      # docker compose 파일 생성 - dev
-      - name: Create docker-compose.yml file
-        if: contains(github.ref, 'develop')
-        run: |
-          echo "services:
-            maru-egg-app:
-              container_name: maru-egg
-              image: \${{ secrets.DOCKER_REPO }}:${{ steps.meta.outputs.tags }}-${{ github.run_number }}
-              ports:
-                - '8080:8080'
-              expose:
-                - '8080'" > docker-compose.yml
-        shell: bash
-
       # Gradle 패키지 캐시
       - name: Cache Gradle packages
         uses: actions/cache@v3
@@ -130,7 +116,17 @@ jobs:
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.PEM_KEY }}
           script: |
-            echo ${{ secrets.DOCKER_PASSWORD }} | sudo docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+            cd /home/${{ secrets.USERNAME }}
+            echo "services:
+                  maru-egg-app:
+                    container_name: maru-egg
+                    image: \${{ secrets.DOCKER_REPO }}:${{ steps.meta.outputs.tags }}-${{ github.run_number }}
+                    ports:
+                      - "8080:8080"
+                    expose:
+                      - "8080"
+                  " > docker-compose.yml
+            sudo docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
             if [ "$(sudo docker ps -q)" ]; then sudo docker stop $(sudo docker ps -q); fi
             if [ "$(sudo docker ps -a -q)" ]; then sudo docker rm $(sudo docker ps -a -q); fi
             sudo docker pull ${{ secrets.DOCKER_REPO }}:${{ steps.meta.outputs.tags }}-${{ github.run_number }}
