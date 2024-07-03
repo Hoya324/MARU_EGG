@@ -122,5 +122,7 @@ jobs:
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.PEM_KEY }}
           script: |
-            docker-compose -f ~/compose-dev.yaml pull
-            docker-compose -f ~/compose-dev.yaml up -d --build
+            sudo docker rm $(docker ps -a -q)
+            sudo docker rmi ${{ secrets.DOCKER_REPO }}
+            sudo docker pull ${{ secrets.DOCKER_REPO }}
+            sudo docker-compose up -d
