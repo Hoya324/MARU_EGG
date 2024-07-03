@@ -44,7 +44,6 @@ jobs:
       - name: make compose-dev.yaml
         if: contains(github.ref, 'develop')
         run: |
-          cd ....
           touch ./compose-dev.yaml
           echo "${{ secrets.COMPOSE_YML_DEV }}" > ./compose-dev.yaml
         shell: bash
