@@ -44,7 +44,14 @@ jobs:
       - name: Create docker-compose.yml file
         if: contains(github.ref, 'develop')
         run: |
-          echo "${{ secrets.COMPOSE_YML_DEV }}" > docker-compose.yml
+          echo "services:
+            maru-egg-app:
+              container_name: maru-egg
+              image: \${{ secrets.DOCKER_REPO }}:${{ steps.meta.outputs.tags }}-${{ github.run_number }}
+              ports:
+                - '8080:8080'
+              expose:
+                - '8080'" > docker-compose.yml
         shell: bash
 
       # Gradle 패키지 캐시
@@ -123,9 +130,9 @@ jobs:
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.PEM_KEY }}
           script: |
-            sudo docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-            sudo docker stop $(sudo docker ps -q)
-            sudo docker rm $(sudo docker ps -a -q) 
+            echo ${{ secrets.DOCKER_PASSWORD }} | sudo docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+            if [ "$(sudo docker ps -q)" ]; then sudo docker stop $(sudo docker ps -q); fi
+            if [ "$(sudo docker ps -a -q)" ]; then sudo docker rm $(sudo docker ps -a -q); fi
             sudo docker pull ${{ secrets.DOCKER_REPO }}:${{ steps.meta.outputs.tags }}-${{ github.run_number }}
             cd /home/${{ secrets.USERNAME }}
             sudo docker-compose up -d
