@@ -41,10 +41,10 @@ jobs:
         shell: bash
 
       # docker compose 파일 생성 - dev
-      - name: Create compose-dev.yaml file
+      - name: Create docker-compose.yml file
         if: contains(github.ref, 'develop')
         run: |
-          echo "${{ secrets.COMPOSE_YML_DEV }}" > compose-dev.yaml
+          echo "${{ secrets.COMPOSE_YML_DEV }}" > docker-compose.yml
         shell: bash
 
       # Gradle 패키지 캐시
@@ -108,7 +108,7 @@ jobs:
           host: ${{ secrets.PUBLIC_DNS }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.PEM_KEY }}
-          source: "compose-dev.yaml"  # 직접 파일명을 입력합니다.
+          source: "docker-compose.yml"  # 직접 파일명을 입력합니다.
           target: "/home/${{ secrets.USERNAME }}"
           strip_components: 3
           overwrite: true
