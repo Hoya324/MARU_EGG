@@ -30,7 +30,7 @@ public class ChatMessageRepositoryImpl implements ChatMessageCustomRepository {
 				chatMessage.id.eq(chatId),
 				cursorId != null ? chatMessage.id.lt(cursorId) : null
 			)
-			.orderBy(chatMessage.createAt.desc())
+			.orderBy(chatMessage.createdAt.desc())
 			.limit(pageable.getPageSize() + 1)
 			.fetch();
 
