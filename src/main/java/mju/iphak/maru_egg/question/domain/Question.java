@@ -20,4 +20,5 @@ public class Question extends BaseEntity {
 	private String content;
 	private QuestionType questionType;
 	private QuestionCategory questionCategory;
+	private String lastUpdatedYear;
 }

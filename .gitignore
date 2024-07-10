@@ -38,4 +38,5 @@ out/
 
 .ap
 
-./resurces/application-dev.yml
+./resurces/application-dev.yml!/docker/db/
+!/db/
