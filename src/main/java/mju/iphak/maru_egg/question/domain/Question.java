@@ -20,5 +20,16 @@ public class Question extends BaseEntity {
 	private String content;
 	private QuestionType questionType;
 	private QuestionCategory questionCategory;
-	private String lastUpdatedYear;
+
+	public String getDateInformation() {
+		return "생성일자: %s, 마지막 DB 갱신일자: %s".formatted(this.getCreatedAt(), this.getUpdatedAt());
+	}
+
+	public static Question of(String content, QuestionType questionType, QuestionCategory questionCategory) {
+		return Question.builder()
+			.content(content)
+			.questionType(questionType)
+			.questionCategory(questionCategory)
+			.build();
+	}
 }
