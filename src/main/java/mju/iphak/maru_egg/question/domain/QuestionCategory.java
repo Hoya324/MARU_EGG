@@ -1,7 +1,9 @@
 package mju.iphak.maru_egg.question.domain;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+@Getter
 @RequiredArgsConstructor
 public enum QuestionCategory {
 	ADMISSION_GUIDELINE("모집요강"),

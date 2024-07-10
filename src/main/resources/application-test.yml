@@ -4,7 +4,7 @@ spring:
   jpa:
     open-in-view: true
     hibernate:
-      ddl-auto: update # 변경: 테스트 중에 필요한 테이블을 생성하도록 설정합니다.
+      ddl-auto: update
     show-sql: true
     properties:
       hibernate:
@@ -13,7 +13,7 @@ spring:
         dialect: org.hibernate.dialect.MySQLDialect
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:tc:mysql:8.0.26:///testdb # Testcontainers URL 포맷
+    url: jdbc:tc:mysql:8.0.26:///testdb
     username: test
     password: test
 
