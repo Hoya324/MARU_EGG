@@ -28,7 +28,7 @@ public class Answer extends BaseEntity {
 	private String content;
 
 	@Column(name = "renewal_year")
-	private int renewalYear;
+	private Integer renewalYear;
 
 	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "question_id", nullable = false)
