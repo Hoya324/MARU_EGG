@@ -14,9 +14,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
 import jakarta.persistence.EntityNotFoundException;
+import mju.iphak.maru_egg.answer.application.AnswerService;
 import mju.iphak.maru_egg.answer.domain.Answer;
 import mju.iphak.maru_egg.answer.dto.response.AnswerResponse;
-import mju.iphak.maru_egg.answer.repository.AnswerRepository;
 import mju.iphak.maru_egg.common.MockTest;
 import mju.iphak.maru_egg.question.domain.Question;
 import mju.iphak.maru_egg.question.domain.QuestionCategory;
@@ -30,7 +30,7 @@ class QuestionServiceTest extends MockTest {
 	private QuestionRepository questionRepository;
 
 	@Mock
-	private AnswerRepository answerRepository;
+	private AnswerService answerService;
 
 	@InjectMocks
 	private QuestionService questionService;
@@ -55,8 +55,8 @@ class QuestionServiceTest extends MockTest {
 		when(questionRepository.findByContentAndQuestionCategoryAndQuestionType(content, category, type))
 			.thenReturn(Optional.of(question));
 
-		when(answerRepository.findByQuestionId(question.getId()))
-			.thenReturn(Optional.of(answer));
+		when(answerService.getAnswerByQuestionId(question.getId()))
+			.thenReturn(answer);
 
 		// when
 		QuestionResponse result = questionService.getQuestionResponse(type, category, content);
