@@ -27,7 +27,7 @@ public class Answer extends BaseEntity {
 	@Column(nullable = false, length = 4000)
 	private String content;
 
-	@Column(nullable = false)
+	@Column(name = "renewal_year")
 	private int renewalYear;
 
 	@OneToOne(fetch = FetchType.LAZY)
