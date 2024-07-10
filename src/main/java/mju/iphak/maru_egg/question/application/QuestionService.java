@@ -7,9 +7,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import mju.iphak.maru_egg.answer.application.AnswerService;
 import mju.iphak.maru_egg.answer.domain.Answer;
 import mju.iphak.maru_egg.answer.dto.response.AnswerResponse;
-import mju.iphak.maru_egg.answer.repository.AnswerRepository;
 import mju.iphak.maru_egg.question.domain.Question;
 import mju.iphak.maru_egg.question.domain.QuestionCategory;
 import mju.iphak.maru_egg.question.domain.QuestionType;
@@ -22,7 +22,7 @@ import mju.iphak.maru_egg.question.repository.QuestionRepository;
 public class QuestionService {
 
 	private final QuestionRepository questionRepository;
-	private final AnswerRepository answerRepository;
+	private final AnswerService answerService;
 
 	// TODO: 질문이 이미 존재하는지 확인 (유사도 검사)
 	public QuestionResponse getQuestionResponse(final QuestionType type, final QuestionCategory category,
@@ -33,9 +33,7 @@ public class QuestionService {
 			.orElseThrow(() -> new EntityNotFoundException(
 				String.format(NOT_FOUND_QUESTION.getMessage(), type, category, content)));
 
-		Answer answer = answerRepository.findByQuestionId(question.getId())
-			.orElseThrow(() -> new EntityNotFoundException(
-				String.format(NOT_FOUND_ANSWER.getMessage(), question.getId())));
+		Answer answer = answerService.getAnswerByQuestionId(question.getId());
 
 		AnswerResponse answerResponse = AnswerResponse.from(answer);
 		return QuestionResponse.of(question, answerResponse);
