@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import mju.iphak.maru_egg.question.application.QuestionService;
 import mju.iphak.maru_egg.question.dto.request.QuestionRequest;
@@ -21,13 +22,13 @@ public class QuestionController {
 
 	private final QuestionService questionService;
 
-	@Tag(name = "question")
 	@Operation(summary = "질문 요청", description = "질문하는 API", responses = {
 		@ApiResponse(responseCode = "200", description = "질문 성공"),
 		@ApiResponse(responseCode = "404", description = "질문 또는 답변을 찾지 못한 경우"),
+		@ApiResponse(responseCode = "500", description = "내부 서버 오류")
 	})
 	@PostMapping()
-	public QuestionResponse question(@RequestBody QuestionRequest request) {
+	public QuestionResponse question(@Valid @RequestBody QuestionRequest request) {
 		return questionService.getQuestionResponse(request.type(), request.category(), request.content());
 	}
 }
