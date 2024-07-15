@@ -145,6 +145,7 @@ class QuestionServiceTest extends MockTest {
 		assertThat(result).isEqualTo(QuestionResponse.of(question, AnswerResponse.from(answer)));
 	}
 
+	// TODO: 추후 test
 	// @DisplayName("유사한 질문을 찾지 못한 경우 새로운 질문을 생성")
 	// @Test
 	// void 유사한_질문_없음_새로운_질문_생성() {
