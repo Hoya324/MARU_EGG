@@ -28,7 +28,7 @@ public class Answer extends BaseEntity {
 	private String content;
 
 	@Column(name = "renewal_year")
-	private Integer renewalYear;
+	private int renewalYear;
 
 	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "question_id", nullable = false)
@@ -46,8 +46,18 @@ public class Answer extends BaseEntity {
 			.build();
 	}
 
+	@Override
+	public String toString() {
+		return "Answer{" +
+			"content='" + content + '\'' +
+			", renewalYear=" + renewalYear +
+			", question=" + question +
+			'}';
+	}
+
 	private static int getNowYear() {
 		LocalDate nowDate = LocalDate.now();
 		return Integer.parseInt(String.valueOf(nowDate.getYear()));
 	}
+
 }

@@ -1,85 +1,248 @@
 package mju.iphak.maru_egg.question.application;
 
-import static mju.iphak.maru_egg.common.exception.ErrorCode.*;
-import static org.assertj.core.api.AssertionsForClassTypes.*;
+import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
+import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.http.MediaType;
+import org.springframework.http.client.reactive.ClientHttpConnector;
+import org.springframework.http.client.reactive.ReactorClientHttpConnector;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.reactive.function.client.WebClient;
 
-import jakarta.persistence.EntityNotFoundException;
+import com.google.gson.Gson;
+
 import mju.iphak.maru_egg.answer.application.AnswerService;
 import mju.iphak.maru_egg.answer.domain.Answer;
+import mju.iphak.maru_egg.answer.dto.request.LLMAskQuestionRequest;
 import mju.iphak.maru_egg.answer.dto.response.AnswerResponse;
+import mju.iphak.maru_egg.answer.dto.response.LLMAnswerResponse;
+import mju.iphak.maru_egg.answer.repository.AnswerRepository;
 import mju.iphak.maru_egg.common.MockTest;
 import mju.iphak.maru_egg.question.domain.Question;
 import mju.iphak.maru_egg.question.domain.QuestionCategory;
 import mju.iphak.maru_egg.question.domain.QuestionType;
+import mju.iphak.maru_egg.question.dto.response.QuestionCoreDTO;
 import mju.iphak.maru_egg.question.dto.response.QuestionResponse;
 import mju.iphak.maru_egg.question.repository.QuestionRepository;
+import mju.iphak.maru_egg.question.utils.PhraseExtractionUtils;
+import okhttp3.mockwebserver.MockResponse;
+import okhttp3.mockwebserver.MockWebServer;
+import reactor.core.publisher.Mono;
 
+@TestPropertySource(properties = {
+	"web-client.base-url=http://localhost:8080"
+})
 class QuestionServiceTest extends MockTest {
 
 	@Mock
 	private QuestionRepository questionRepository;
 
 	@Mock
+	private AnswerRepository answerRepository;
+
+	@Mock
 	private AnswerService answerService;
+	private MockWebServer mockWebServer;
 
 	@InjectMocks
 	private QuestionService questionService;
+
+	private LLMAnswerResponse mockAskQuestion(LLMAskQuestionRequest request) {
+		startServer(new ReactorClientHttpConnector());
+		MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
+		formData.add("questionType", request.questionType());
+		formData.add("questionCategory", request.questionCategory());
+		formData.add("question", request.question());
+		Question testQuestion = Question.of("새로운 질문입니다.", "새로운 질문", QuestionType.SUSI,
+			QuestionCategory.ADMISSION_GUIDELINE);
+		LLMAnswerResponse expectedResponse = LLMAnswerResponse.from(Answer.of(testQuestion, "새로운 답변입니다."));
+
+		mockWebServer.enqueue(new MockResponse()
+			.setHeader("Content-type", MediaType.APPLICATION_JSON_VALUE)
+			.setHeader("Accept", MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+			.setResponseCode(200)
+			.setBody(new Gson().toJson(expectedResponse))
+		);
+
+		return answerService.askQuestion(request).block();
+	}
+
+	void startServer(ClientHttpConnector connector) {
+		this.mockWebServer = new MockWebServer();
+		answerService = new AnswerService(answerRepository, WebClient
+			.builder()
+			.baseUrl(this.mockWebServer.url("/").toString())
+			.clientConnector(connector).build()
+		);
+	}
+
+	@AfterEach
+	void shutdown() throws IOException {
+		if (mockWebServer != null) {
+			this.mockWebServer.shutdown();
+		}
+	}
 
 	private Question question;
 	private Answer answer;
 
 	@BeforeEach
 	void setUp() {
-		question = Question.of("테스트 질문입니다.", QuestionType.JEONGSI, QuestionCategory.ADMISSION_GUIDELINE);
-		answer = Answer.of(question, "테스트 답변입니다.");
+		MockitoAnnotations.openMocks(this);
+
+		question = mock(Question.class);
+		answer = mock(Answer.class);
+
+		when(question.getId()).thenReturn(1L);
+		when(answer.getId()).thenReturn(1L);
+		when(answerService.getAnswerByQuestionId(1L)).thenReturn(answer);
+		when(answerRepository.findByQuestionId(anyLong())).thenReturn(Optional.of(answer));
+		when(questionRepository.searchQuestionsByContentTokenAndTypeAndCategory(anyString(), any(QuestionType.class),
+			any(QuestionCategory.class)))
+			.thenReturn(Optional.of(List.of(QuestionCoreDTO.of(1L, "테스트 질문입니다."))));
+		when(questionRepository.findById(1L)).thenReturn(Optional.of(question));
+		questionService = new QuestionService(questionRepository, answerService);
+
+		doAnswer(invocation -> {
+			LLMAskQuestionRequest request = invocation.getArgument(0);
+			return Mono.just(mockAskQuestion(request));
+		}).when(answerService).askQuestion(any(LLMAskQuestionRequest.class));
 	}
 
 	@DisplayName("질문을 조회하는데 성공한 경우")
 	@Test
 	void 질문_조회_성공() {
 		// given
-		QuestionType type = QuestionType.JEONGSI;
+		startServer(new ReactorClientHttpConnector());
+		QuestionType type = QuestionType.SUSI;
 		QuestionCategory category = QuestionCategory.ADMISSION_GUIDELINE;
 		String content = "테스트 질문입니다.";
+		String contentToken = PhraseExtractionUtils.extractPhrases(content);
 
-		when(questionRepository.findByContentAndQuestionCategoryAndQuestionType(content, category, type))
-			.thenReturn(Optional.of(question));
-
-		when(answerService.getAnswerByQuestionId(question.getId()))
-			.thenReturn(answer);
+		when(questionRepository.searchQuestionsByContentTokenAndTypeAndCategory(anyString(), eq(type), eq(category)))
+			.thenReturn(Optional.of(List.of(QuestionCoreDTO.of(1L, contentToken))));
 
 		// when
-		QuestionResponse result = questionService.getQuestionResponse(type, category, content);
+		QuestionResponse result = questionService.question(type, category, content);
 
 		// then
 		assertThat(result).isEqualTo(QuestionResponse.of(question, AnswerResponse.from(answer)));
 	}
 
-	@DisplayName("질문을 조회하는데 실패한 경우-question을 못 찾은 경우")
+	// @DisplayName("유사한 질문을 찾지 못한 경우 새로운 질문을 생성")
+	// @Test
+	// void 유사한_질문_없음_새로운_질문_생성() {
+	// 	// given
+	// 	QuestionType type = QuestionType.SUSI;
+	// 	QuestionCategory category = QuestionCategory.ADMISSION_GUIDELINE;
+	// 	String content = "새로운 질문입니다.";
+	// 	String contentToken = "새로운 질문";
+	// 	Question testQuestion = Question.of(content, contentToken, type, category);
+	// 	Answer testAnswer = Answer.of(testQuestion, "새로운 답변입니다.");
+	//
+	// 	when(questionRepository.searchQuestionsByContentTokenAndTypeAndCategory(contentToken, type, category))
+	// 		.thenReturn(Optional.of(Collections.emptyList()));
+	// 	when(questionRepository.save(any(Question.class))).thenReturn(testQuestion);
+	// 	when(answerService.saveAnswer(any(Answer.class))).thenReturn(testAnswer);
+	// 	doAnswer(invocation -> {
+	// 		LLMAskQuestionRequest request = invocation.getArgument(0);
+	// 		return Mono.just(mockAskQuestion(request));
+	// 	}).when(answerService).askQuestion(any(LLMAskQuestionRequest.class));
+	//
+	// 	// when
+	// 	QuestionResponse result = questionService.question(type, category, content);
+	//
+	// 	// then
+	// 	verify(questionRepository, times(1)).searchQuestionsByContentTokenAndTypeAndCategory(anyString(), eq(type),
+	// 		eq(category));
+	// 	verify(answerService, times(1)).askQuestion(any(LLMAskQuestionRequest.class));
+	// }
+
+	// @DisplayName("유사한 질문이 있는 경우 기존 질문을 반환")
+	// @Test
+	// void 유사한_질문_있음_기존_질문_반환() throws Exception {
+	// 	// given
+	// 	QuestionType type = QuestionType.SUSI;
+	// 	QuestionCategory category = QuestionCategory.ADMISSION_GUIDELINE;
+	// 	String content = "유사한 테스트 질문입니다.";
+	// 	String contentToken = PhraseExtractionUtils.extractPhrases(content);
+	// 	double similarityScore = 0.98;
+	// 	Map<CharSequence, Integer> tfIdfDummyMap = new HashMap<>();
+	// 	tfIdfDummyMap.put("질문", 1);
+	//
+	// 	when(questionRepository.searchQuestionsByContentTokenAndTypeAndCategory(anyString(), eq(type), eq(category)))
+	// 		.thenReturn(Optional.of(List.of(QuestionCoreDTO.of(1L, contentToken))));
+	// 	when(TextSimilarityUtils.computeTfIdf(anyList(), anyString())).thenReturn(tfIdfDummyMap);
+	// 	when(TextSimilarityUtils.computeCosineSimilarity(anyMap(), anyMap())).thenReturn(similarityScore);
+	// 	// when
+	// 	QuestionResponse result = questionService.question(type, category, content);
+	//
+	// 	// then
+	// 	assertNotNull(result);
+	// 	assertEquals("테스트 답변입니다.", result.answer().content());
+	// }
+
+	@DisplayName("질문이 없을 때 새로운 질문을 요청하는지 확인")
 	@Test
-	void 질문_조회_실패_NOTFOUND() {
+	void 질문_없을_때_새로운_질문_요청() {
 		// given
-		QuestionType invalidType = QuestionType.SUSI;
+		QuestionType type = QuestionType.SUSI;
 		QuestionCategory category = QuestionCategory.ADMISSION_GUIDELINE;
-		String invalidContent = "invalid 질문";
+		String content = "새로운 질문입니다.";
+		String contentToken = PhraseExtractionUtils.extractPhrases(content);
+		Question testQuestion = Question.of(content, contentToken, type, category);
+		Answer testAnswer = Answer.of(testQuestion, "새로운 답변입니다.");
+		LLMAnswerResponse expectedResponse = LLMAnswerResponse.from(testAnswer);
 
-		// when & then
-		EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> {
-			questionService.getQuestionResponse(invalidType, category, invalidContent);
-		});
+		when(questionRepository.searchQuestionsByContentTokenAndTypeAndCategory(contentToken, type, category))
+			.thenReturn(Optional.of(Collections.emptyList()));
+		when(questionRepository.save(any(Question.class))).thenReturn(testQuestion);
+		when(answerService.saveAnswer(any(Answer.class))).thenReturn(testAnswer);
+		doAnswer(invocation -> {
+			LLMAskQuestionRequest request = invocation.getArgument(0);
+			return Mono.just(mockAskQuestion(request));
+		}).when(answerService).askQuestion(any(LLMAskQuestionRequest.class));
 
-		// when & then
-		assertThat(exception.getMessage()).isEqualTo(
-			String.format(NOT_FOUND_QUESTION.getMessage(), invalidType, category, invalidContent));
+		// when
+		QuestionResponse result = questionService.question(type, category, content);
+
+		// then
+		assertNotNull(result);
+		assertThat(result.answer().content()).isEqualTo(expectedResponse.answer());
+	}
+
+	@DisplayName("MOCK LLM 서버에 질문을 요청합니다.")
+	@Test
+	public void MOCK_LLM_질문_요청() {
+		// given
+		startServer(new ReactorClientHttpConnector());
+		LLMAskQuestionRequest request = LLMAskQuestionRequest.of(QuestionType.SUSI.toString(),
+			QuestionCategory.ADMISSION_GUIDELINE.toString(),
+			question.getContent());
+		Question testQuestion = Question.of("새로운 질문입니다.", "새로운 질문", QuestionType.SUSI,
+			QuestionCategory.ADMISSION_GUIDELINE);
+		LLMAnswerResponse expectedResponse = LLMAnswerResponse.from(Answer.of(testQuestion, "새로운 답변입니다."));
+
+		// when
+		LLMAnswerResponse result = mockAskQuestion(request);
+
+		// then
+		assertThat(result).isEqualTo(expectedResponse);
 	}
 }

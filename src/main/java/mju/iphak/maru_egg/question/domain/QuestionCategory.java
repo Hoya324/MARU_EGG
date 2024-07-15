@@ -14,4 +14,9 @@ public enum QuestionCategory {
 	ETC("기타");
 
 	private final String questionCategory;
+
+	@Override
+	public String toString() {
+		return this.questionCategory;
+	}
 }

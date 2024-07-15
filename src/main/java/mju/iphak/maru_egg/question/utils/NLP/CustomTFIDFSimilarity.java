@@ -1,4 +1,4 @@
-package mju.iphak.maru_egg.question.utils;
+package mju.iphak.maru_egg.question.utils.NLP;
 
 import org.apache.lucene.index.FieldInvertState;
 import org.apache.lucene.search.similarities.TFIDFSimilarity;

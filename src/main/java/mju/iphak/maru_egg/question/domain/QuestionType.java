@@ -10,4 +10,9 @@ public enum QuestionType {
 	JAEOEGUGMIN("재외국민");
 
 	private final String questionType;
+
+	@Override
+	public String toString() {
+		return this.questionType;
+	}
 }
