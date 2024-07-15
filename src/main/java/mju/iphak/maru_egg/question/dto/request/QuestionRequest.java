@@ -2,6 +2,7 @@ package mju.iphak.maru_egg.question.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import mju.iphak.maru_egg.question.domain.QuestionCategory;
 import mju.iphak.maru_egg.question.domain.QuestionType;
 
@@ -15,6 +16,7 @@ import mju.iphak.maru_egg.question.domain.QuestionType;
 public record QuestionRequest(
 
 	@Schema(description = "질문 타입(수시, 정시, 편입학, 재외국민)")
+	@NotNull(message = "질문 타입은 비어있을 수 없습니다.")
 	QuestionType type,
 
 	@Schema(description = "질문 카테고리(모집요강, 입시결과, 기출 문제)")
