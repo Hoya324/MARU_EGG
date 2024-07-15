@@ -13,8 +13,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.transaction.Transactional;
 import mju.iphak.maru_egg.TestcontainersConfiguration;
+import mju.iphak.maru_egg.common.config.QueryDslConfig;
+import mju.iphak.maru_egg.common.config.WebClientConfig;
 
-@Import(TestcontainersConfiguration.class)
+@Import({TestcontainersConfiguration.class, QueryDslConfig.class, WebClientConfig.class})
 @RunWith(SpringRunner.class)
 @SpringBootTest()
 @AutoConfigureMockMvc
