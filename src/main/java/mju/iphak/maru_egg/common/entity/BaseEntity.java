@@ -1,14 +1,10 @@
 package mju.iphak.maru_egg.common.entity;
 
-import static com.fasterxml.jackson.annotation.JsonFormat.Shape.*;
-
 import java.time.LocalDateTime;
 
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import com.fasterxml.jackson.annotation.JsonFormat;
 
 import io.hypersistence.utils.hibernate.id.Tsid;
 import jakarta.persistence.Column;
@@ -27,12 +23,10 @@ public abstract class BaseEntity {
 	private Long id;
 
 	@CreatedDate
-	@Column(name = "created_at", updatable = false)
-	@JsonFormat(shape = STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "Asia/Seoul")
+	@Column(columnDefinition = "TIMESTAMP", name = "created_at", updatable = false)
 	private LocalDateTime createdAt;
 
 	@LastModifiedDate
-	@Column(name = "updated_at")
-	@JsonFormat(shape = STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "Asia/Seoul")
+	@Column(columnDefinition = "TIMESTAMP", name = "updated_at")
 	private LocalDateTime updatedAt;
 }
