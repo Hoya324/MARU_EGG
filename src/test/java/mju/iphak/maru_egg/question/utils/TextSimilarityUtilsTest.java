@@ -15,6 +15,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import mju.iphak.maru_egg.question.utils.NLP.TextSimilarityUtils;
+
 public class TextSimilarityUtilsTest {
 
 	private static List<String> documents;
@@ -45,6 +47,10 @@ public class TextSimilarityUtilsTest {
 		double maxSimilarity = -1;
 		String mostSimilarDocument = null;
 
+		documents = documents.stream()
+			.map(PhraseExtractionUtils::extractPhrases)
+			.toList();
+
 		for (String document : documents) {
 			Map<CharSequence, Integer> tfIdf1 = TextSimilarityUtils.computeTfIdf(documents, inputPhrases);
 			Map<CharSequence, Integer> tfIdf2 = TextSimilarityUtils.computeTfIdf(documents, document);
@@ -58,7 +64,7 @@ public class TextSimilarityUtilsTest {
 		}
 
 		System.out.println("============================================================");
-		System.out.println("Input: " + input);
+		System.out.println("Input: " + extractPhrases(input));
 		System.out.println("Most Similar Document: " + mostSimilarDocument);
 		System.out.println("Similarity: " + maxSimilarity);
 		System.out.println("============================================================\n");
