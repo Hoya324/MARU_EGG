@@ -13,8 +13,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.ExchangeFunction;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -49,7 +47,7 @@ public class AnswerServiceTest extends MockTest {
 
 	@Before
 	public void setUp() {
-		question = new Question("수시 일정 알려주세요.", "수시 일정", QuestionType.JEONGSI,
+		question = Question.of("수시 일정 알려주세요.", "수시 일정", QuestionType.JEONGSI,
 			QuestionCategory.ADMISSION_GUIDELINE);
 		answer = Answer.of(question,
 			"수시 일정은 2024년 12월 19일(목)부터 2024년 12월 26일(목) 18:00까지 최초합격자 발표가 있고, 2025년 2월 10일(월) 10:00부터 2025년 2월 12일(수) 15:00까지 문서등록 및 등록금 납부가 진행됩니다. 등록금 납부 기간은 2024년 12월 16일(월) 10:00부터 2024년 12월 18일(수) 15:00까지이며, 방법은 입학처 홈페이지를 통한 문서등록 및 등록금 납부를 하시면 됩니다. 상세 안내는 추후 입학처 홈페이지를 통해 공지될 예정입니다.");
@@ -104,10 +102,6 @@ public class AnswerServiceTest extends MockTest {
 		LLMAskQuestionRequest request = LLMAskQuestionRequest.of(QuestionType.SUSI.toString(),
 			QuestionCategory.ADMISSION_GUIDELINE.toString(),
 			question.getContent());
-		MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
-		formData.add("questionType", request.questionType());
-		formData.add("questionCategory", request.questionCategory());
-		formData.add("question", request.question());
 
 		// when
 		LLMAnswerResponse expectedResponse = LLMAnswerResponse.from(answer);
