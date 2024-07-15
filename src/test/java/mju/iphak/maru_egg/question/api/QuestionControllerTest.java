@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.ResultActions;
 
 import mju.iphak.maru_egg.answer.domain.Answer;
@@ -20,6 +21,9 @@ import mju.iphak.maru_egg.question.domain.QuestionType;
 import mju.iphak.maru_egg.question.dto.request.QuestionRequest;
 import mju.iphak.maru_egg.question.dto.response.QuestionResponse;
 
+@TestPropertySource(properties = {
+	"web-client.base-url=http://localhost:8080"
+})
 class QuestionControllerTest extends IntegrationTest {
 
 	@MockBean
