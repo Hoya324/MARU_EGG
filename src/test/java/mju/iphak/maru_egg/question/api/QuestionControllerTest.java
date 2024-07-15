@@ -6,12 +6,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import mju.iphak.maru_egg.answer.domain.Answer;
 import mju.iphak.maru_egg.answer.dto.response.AnswerResponse;
@@ -25,9 +22,6 @@ import mju.iphak.maru_egg.question.dto.response.QuestionResponse;
 
 class QuestionControllerTest extends IntegrationTest {
 
-	@Autowired
-	private ObjectMapper objectMapper;
-
 	@MockBean
 	private QuestionService questionService;
 
@@ -37,8 +31,8 @@ class QuestionControllerTest extends IntegrationTest {
 		QuestionType type = QuestionType.SUSI;
 		QuestionCategory category = QuestionCategory.ADMISSION_GUIDELINE;
 		String content = "content";
-		Question question = Question.of(content, type, category);
-
+		String contentToken = "content";
+		Question question = Question.of(content, contentToken, type, category);
 		Answer answer = Answer.of(question, content);
 
 		AnswerResponse answerResponse = AnswerResponse.from(answer);
@@ -47,7 +41,7 @@ class QuestionControllerTest extends IntegrationTest {
 		QuestionResponse response = QuestionResponse.of(question, answerResponse);
 
 		// when
-		when(questionService.getQuestionResponse(type, category, content)).thenReturn(response);
+		when(questionService.question(type, category, content)).thenReturn(response);
 		ResultActions resultActions = requestCreateQuestion(request);
 
 		// then
