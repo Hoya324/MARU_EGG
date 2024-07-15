@@ -29,6 +29,6 @@ public class QuestionController {
 	})
 	@PostMapping()
 	public QuestionResponse question(@Valid @RequestBody QuestionRequest request) {
-		return questionService.getQuestionResponse(request.type(), request.category(), request.content());
+		return questionService.question(request.type(), request.category(), request.content());
 	}
 }
