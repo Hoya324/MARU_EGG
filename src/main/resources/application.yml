@@ -4,3 +4,20 @@ spring:
 
 web-client:
   base-url: ${LLM_BASE_URL}
+
+springdoc:
+  api-docs:
+    path: /maru-egg/api-docs
+    groups:
+      enabled: true
+  swagger-ui:
+    path: /maru-egg/api-docs.html
+    enabled: true
+    groups-order: ASC
+    tags-sorter: alpha
+    operations-sorter: alpha
+    display-request-duration: true
+    doc-expansion: none
+    cache:
+      disabled: true
+    model-and-view-allowed: true
