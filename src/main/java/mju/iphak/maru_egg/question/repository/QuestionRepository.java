@@ -8,8 +8,9 @@ import mju.iphak.maru_egg.question.domain.Question;
 import mju.iphak.maru_egg.question.domain.QuestionCategory;
 import mju.iphak.maru_egg.question.domain.QuestionType;
 
-public interface QuestionRepository extends JpaRepository<Question, Long> {
-	Optional<Question> findByContentAndQuestionCategoryAndQuestionType(final String content,
+public interface QuestionRepository extends JpaRepository<Question, Long>, QuestionRepositoryCustom {
+	Optional<Question> findByQuestionTypeAndQuestionCategoryAndContent(
+		final QuestionType questionType,
 		final QuestionCategory questionCategory,
-		final QuestionType questionType);
+		final String content);
 }
