@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import mju.iphak.maru_egg.answer.application.AnswerService;
 import mju.iphak.maru_egg.answer.domain.Answer;
 import mju.iphak.maru_egg.answer.dto.request.LLMAskQuestionRequest;
@@ -26,6 +27,7 @@ import mju.iphak.maru_egg.question.repository.QuestionRepository;
 import mju.iphak.maru_egg.question.utils.NLP.TextSimilarityUtils;
 import mju.iphak.maru_egg.question.utils.PhraseExtractionUtils;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 @Transactional(readOnly = true)
@@ -42,15 +44,18 @@ public class QuestionService {
 		List<QuestionCoreDTO> questionCores = getQuestionCores(type, category, contentToken);
 
 		if (questionCores.isEmpty()) {
+			log.info("저장된 질문이 없어 새롭게 LLM서버에 질문을 요청합니다.");
 			return askNewQuestion(type, category, content, contentToken);
 		}
 
 		Long mostSimilarQuestionId = getMostSimilarQuestionId(questionCores, contentToken);
 
 		if (mostSimilarQuestionId != null) {
+			log.info("유사한 질문이 있어 DB에서 질문을 재사용합니다.");
 			return getExistingQuestionResponse(mostSimilarQuestionId);
 		}
 
+		log.info("유사한 질문이 없어 새롭게 LLM서버에 질문을 요청합니다.");
 		return askNewQuestion(type, category, content, contentToken);
 	}
 
