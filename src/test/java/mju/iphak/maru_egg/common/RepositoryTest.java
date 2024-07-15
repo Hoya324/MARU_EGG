@@ -8,8 +8,9 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import mju.iphak.maru_egg.TestcontainersConfiguration;
+import mju.iphak.maru_egg.common.config.QueryDslConfig;
 
-@Import(TestcontainersConfiguration.class)
+@Import({TestcontainersConfiguration.class, QueryDslConfig.class})
 @ExtendWith(SpringExtension.class)
 @DataJpaTest
 @ActiveProfiles("test")
