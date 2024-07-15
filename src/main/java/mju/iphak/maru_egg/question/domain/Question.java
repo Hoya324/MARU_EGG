@@ -38,7 +38,12 @@ public class Question extends BaseEntity {
 		return "생성일자: %s, 마지막 DB 갱신일자: %s".formatted(this.getCreatedAt(), this.getUpdatedAt());
 	}
 
-	public static Question of(String content, QuestionType questionType, QuestionCategory questionCategory) {
+	public void incrementViewCount() {
+		this.viewCount++;
+	}
+
+	public static Question of(String content, String contentToken, QuestionType questionType,
+		QuestionCategory questionCategory) {
 		return Question.builder()
 			.content(content)
 			.contentToken(contentToken)
