@@ -18,7 +18,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import mju.iphak.maru_egg.question.domain.QuestionCategory;
 import mju.iphak.maru_egg.question.domain.QuestionType;
-import mju.iphak.maru_egg.question.dto.response.QuestionCoreDTO;
+import mju.iphak.maru_egg.question.dto.response.QuestionCore;
 
 @Repository
 @RequiredArgsConstructor
@@ -27,7 +27,7 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
 	private final JPAQueryFactory queryFactory;
 
 	@Override
-	public Optional<List<QuestionCoreDTO>> searchQuestionsByContentTokenAndType(final String contentToken,
+	public Optional<List<QuestionCore>> searchQuestionsByContentTokenAndType(final String contentToken,
 		final QuestionType type) {
 		BooleanTemplate matchExpression = booleanTemplate("function('match_against', {0}, {1}) > 0", question.content,
 			contentToken);
@@ -37,15 +37,15 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
 			.where(matchExpression.and(question.questionType.eq(type)))
 			.fetch();
 
-		List<QuestionCoreDTO> result = tuples.stream()
-			.map(tuple -> QuestionCoreDTO.of(tuple.get(question.id), tuple.get(question.contentToken)))
+		List<QuestionCore> result = tuples.stream()
+			.map(tuple -> QuestionCore.of(tuple.get(question.id), tuple.get(question.contentToken)))
 			.collect(Collectors.toList());
 
 		return Optional.of(result);
 	}
 
 	@Override
-	public Optional<List<QuestionCoreDTO>> searchQuestionsByContentTokenAndTypeAndCategory(final String contentToken,
+	public Optional<List<QuestionCore>> searchQuestionsByContentTokenAndTypeAndCategory(final String contentToken,
 		final QuestionType type, final QuestionCategory category) {
 		NumberTemplate<Double> booleanTemplate = Expressions.numberTemplate(Double.class, "function('match', {0}, {1})",
 			question.content,
@@ -57,8 +57,8 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
 				booleanTemplate.gt(0))
 			.fetch();
 
-		List<QuestionCoreDTO> result = tuples.stream()
-			.map(tuple -> QuestionCoreDTO.of(tuple.get(question.id), tuple.get(question.contentToken)))
+		List<QuestionCore> result = tuples.stream()
+			.map(tuple -> QuestionCore.of(tuple.get(question.id), tuple.get(question.contentToken)))
 			.collect(Collectors.toList());
 		return Optional.of(result);
 	}

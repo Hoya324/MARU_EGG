@@ -21,7 +21,7 @@ import mju.iphak.maru_egg.answer.dto.response.LLMAnswerResponse;
 import mju.iphak.maru_egg.question.domain.Question;
 import mju.iphak.maru_egg.question.domain.QuestionCategory;
 import mju.iphak.maru_egg.question.domain.QuestionType;
-import mju.iphak.maru_egg.question.dto.response.QuestionCoreDTO;
+import mju.iphak.maru_egg.question.dto.response.QuestionCore;
 import mju.iphak.maru_egg.question.dto.response.QuestionResponse;
 import mju.iphak.maru_egg.question.repository.QuestionRepository;
 import mju.iphak.maru_egg.question.utils.NLP.TextSimilarityUtils;
@@ -41,7 +41,7 @@ public class QuestionService {
 	@Transactional
 	public QuestionResponse question(final QuestionType type, final QuestionCategory category, final String content) {
 		String contentToken = PhraseExtractionUtils.extractPhrases(content);
-		List<QuestionCoreDTO> questionCores = getQuestionCores(type, category, contentToken);
+		List<QuestionCore> questionCores = getQuestionCores(type, category, contentToken);
 
 		if (questionCores.isEmpty()) {
 			log.info("저장된 질문이 없어 새롭게 LLM서버에 질문을 요청합니다.");
@@ -57,6 +57,14 @@ public class QuestionService {
 
 		log.info("유사한 질문이 없어 새롭게 LLM서버에 질문을 요청합니다.");
 		return askNewQuestion(type, category, content, contentToken);
+	}
+
+	public List<QuestionResponse> getQuestions(final QuestionType type, final QuestionCategory category) {
+		List<Question> questions = questionRepository.findAllByQuestionTypeAndQuestionCategory(
+			type, category);
+		return questions.stream()
+			.map((question) -> createQuestionResponse(question, answerService.getAnswerByQuestionId(question.getId())))
+			.collect(Collectors.toList());
 	}
 
 	private QuestionResponse askNewQuestion(QuestionType type, QuestionCategory category, String content,
@@ -93,15 +101,15 @@ public class QuestionService {
 				String.format(NOT_FOUND_QUESTION_BY_ID.getMessage(), questionId)));
 	}
 
-	private Long getMostSimilarQuestionId(final List<QuestionCoreDTO> questionCores, final String contentToken) {
+	private Long getMostSimilarQuestionId(final List<QuestionCore> questionCores, final String contentToken) {
 		double maxSimilarity = -1;
 		Long mostSimilarContentId = null;
 		List<String> contentTokens = questionCores.stream()
-			.map(QuestionCoreDTO::contentToken)
+			.map(QuestionCore::contentToken)
 			.collect(Collectors.toList());
 		Map<CharSequence, Integer> tfIdf1 = computeTfIdf(contentTokens, contentToken);
 
-		for (QuestionCoreDTO questionCore : questionCores) {
+		for (QuestionCore questionCore : questionCores) {
 			Map<CharSequence, Integer> tfIdf2 = computeTfIdf(contentTokens, questionCore.contentToken());
 
 			double similarity = TextSimilarityUtils.computeCosineSimilarity(tfIdf1, tfIdf2);
@@ -126,7 +134,7 @@ public class QuestionService {
 		}
 	}
 
-	private List<QuestionCoreDTO> getQuestionCores(final QuestionType type, final QuestionCategory category,
+	private List<QuestionCore> getQuestionCores(final QuestionType type, final QuestionCategory category,
 		final String contentToken) {
 		if (category == null) {
 			return questionRepository.searchQuestionsByContentTokenAndType(contentToken, type)
