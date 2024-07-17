@@ -1,8 +1,10 @@
 package mju.iphak.maru_egg.question.domain;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+@Schema(description = "질문 카테고리", enumAsRef = true)
 @Getter
 @RequiredArgsConstructor
 public enum QuestionCategory {

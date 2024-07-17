@@ -8,4 +8,8 @@ public enum Role {
 	ADMIN("ROLE_ADMIN");
 
 	private final String role;
+
+	public String getRoleName() {
+		return role;
+	}
 }

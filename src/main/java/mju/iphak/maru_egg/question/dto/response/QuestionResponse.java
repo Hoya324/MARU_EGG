@@ -9,6 +9,7 @@ import mju.iphak.maru_egg.question.domain.Question;
 @Schema(description = "질문 응답 DTO", example = """
 	{
 	  "id": 600697396846981500,
+	  "content": "수시 일정 알려주세요."
 	  "dateInformation": "생성일자: 2024-07-15T23:36:59.834804, 마지막 DB 갱신일자: 2024-07-15T23:36:59.834804",
 	  "answer": {
 	    "id": 600697396935061600,
@@ -22,6 +23,9 @@ public record QuestionResponse(
 	@Schema(description = "질문 id")
 	Long id,
 
+	@Schema(description = "질문")
+	String content,
+
 	@Schema(description = "답변 DB 생성 및 업데이트 날짜")
 	String dateInformation,
 
@@ -32,6 +36,7 @@ public record QuestionResponse(
 	public static QuestionResponse of(Question question, AnswerResponse answer) {
 		return QuestionResponse.builder()
 			.id(question.getId())
+			.content(question.getContent())
 			.dateInformation(question.getDateInformation())
 			.answer(answer)
 			.build();

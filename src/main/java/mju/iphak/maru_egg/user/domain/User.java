@@ -2,6 +2,8 @@ package mju.iphak.maru_egg.user.domain;
 
 import static mju.iphak.maru_egg.common.regex.UserRegex.*;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -27,8 +29,26 @@ public class User extends BaseEntity {
 
 	private String password;
 
+	private String refreshToken;
+
 	@Enumerated(EnumType.STRING)
 	private Role role;
+
+	public void passwordEncode(PasswordEncoder passwordEncoder) {
+		this.password = passwordEncoder.encode(this.password);
+	}
+
+	public void updateRefreshToken(String updateRefreshToken) {
+		this.refreshToken = updateRefreshToken;
+	}
+
+	public static User of(String email, String password) {
+		return User.builder()
+			.email(email)
+			.password(password)
+			.role(Role.ADMIN)
+			.build();
+	}
 }
 
 

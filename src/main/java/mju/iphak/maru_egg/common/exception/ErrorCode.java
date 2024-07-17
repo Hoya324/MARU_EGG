@@ -17,7 +17,9 @@ public enum ErrorCode {
 	NOT_FOUND_QUESTION(NOT_FOUND, "type: %s, category: %s, content: %s인 질문을 찾을 수 없습니다."),
 	NOT_FOUND_QUESTION_BY_ID(NOT_FOUND, "id: %s인 질문을 찾을 수 없습니다."),
 	NOT_FOUND_QUESTION_WITHOUT_CATEGORY(NOT_FOUND, "type: %s, content: %s인 질문을 찾을 수 없습니다."),
+	NOT_FOUND_QUESTION_BY_TYPE_CATEGORY(NOT_FOUND, "type: %s, category: %s인 질문을 찾을 수 없습니다."),
 	NOT_FOUND_ANSWER(NOT_FOUND, "질문 id가 %s인 답변을 찾을 수 없습니다."),
+	NOT_FOUND_USER(NOT_FOUND, "유저 이메일이 %s인 유저를 찾을 수 없습니다."),
 
 	// 500 error
 	INTERNAL_ERROR_SIMILARITY(NOT_FOUND, "contentToken: %s, question: %s인 질문의 유사도를 검사하는 도중 오류가 발생했습니다.");

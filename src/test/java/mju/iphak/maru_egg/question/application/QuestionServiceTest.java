@@ -37,7 +37,7 @@ import mju.iphak.maru_egg.common.MockTest;
 import mju.iphak.maru_egg.question.domain.Question;
 import mju.iphak.maru_egg.question.domain.QuestionCategory;
 import mju.iphak.maru_egg.question.domain.QuestionType;
-import mju.iphak.maru_egg.question.dto.response.QuestionCoreDTO;
+import mju.iphak.maru_egg.question.dto.response.QuestionCore;
 import mju.iphak.maru_egg.question.dto.response.QuestionResponse;
 import mju.iphak.maru_egg.question.repository.QuestionRepository;
 import mju.iphak.maru_egg.question.utils.PhraseExtractionUtils;
@@ -115,7 +115,7 @@ class QuestionServiceTest extends MockTest {
 		when(answerRepository.findByQuestionId(anyLong())).thenReturn(Optional.of(answer));
 		when(questionRepository.searchQuestionsByContentTokenAndTypeAndCategory(anyString(), any(QuestionType.class),
 			any(QuestionCategory.class)))
-			.thenReturn(Optional.of(List.of(QuestionCoreDTO.of(1L, "테스트 질문입니다."))));
+			.thenReturn(Optional.of(List.of(QuestionCore.of(1L, "테스트 질문입니다."))));
 		when(questionRepository.findById(1L)).thenReturn(Optional.of(question));
 		questionService = new QuestionService(questionRepository, answerService);
 
@@ -136,7 +136,7 @@ class QuestionServiceTest extends MockTest {
 		String contentToken = PhraseExtractionUtils.extractPhrases(content);
 
 		when(questionRepository.searchQuestionsByContentTokenAndTypeAndCategory(anyString(), eq(type), eq(category)))
-			.thenReturn(Optional.of(List.of(QuestionCoreDTO.of(1L, contentToken))));
+			.thenReturn(Optional.of(List.of(QuestionCore.of(1L, contentToken))));
 
 		// when
 		QuestionResponse result = questionService.question(type, category, content);
