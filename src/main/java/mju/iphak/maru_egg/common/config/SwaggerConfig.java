@@ -15,6 +15,10 @@ import io.swagger.v3.oas.models.media.MediaType;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
+import io.swagger.v3.oas.models.security.SecurityScheme.In;
+import io.swagger.v3.oas.models.security.SecurityScheme.Type;
 import mju.iphak.maru_egg.common.exception.ErrorResponse;
 
 @Configuration
@@ -23,8 +27,16 @@ public class SwaggerConfig {
 	@Bean
 	public OpenAPI openAPI() {
 		return new OpenAPI()
-			.components(new Components().addSchemas("ErrorResponse", createErrorResponseSchema()))
-			.info(apiInfo());
+			.components(new Components()
+				.addSecuritySchemes("bearerAuth", new SecurityScheme()
+					.type(Type.HTTP)
+					.scheme("bearer")
+					.bearerFormat("JWT")
+					.in(In.HEADER)
+					.name("Authorization"))
+				.addSchemas("ErrorResponse", createErrorResponseSchema()))
+			.info(apiInfo())
+			.addSecurityItem(new SecurityRequirement().addList("bearerAuth"));
 	}
 
 	private Info apiInfo() {
