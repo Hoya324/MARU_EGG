@@ -7,6 +7,7 @@ import java.time.format.DateTimeFormatter;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -52,6 +53,14 @@ public class GlobalExceptionHandler {
 		String errorMessage = "Invalid input format: " + e.getLocalizedMessage();
 		return ResponseEntity.status(BAD_REQUEST)
 			.body(ErrorResponse.of(e.getClass().getSimpleName(), BAD_REQUEST.value(), errorMessage));
+	}
+
+	@ExceptionHandler(UsernameNotFoundException.class)
+	protected ResponseEntity<ErrorResponse> handleUsernameNotFoundException(UsernameNotFoundException e) {
+		String timestamp = getCurrentTimestamp();
+		log.error(LOG_FORMAT, timestamp, e.getClass().getSimpleName(), e.getMessage());
+		return ResponseEntity.status(NOT_FOUND)
+			.body(ErrorResponse.of(e.getClass().getSimpleName(), NOT_FOUND.value(), e.getMessage()));
 	}
 
 	private String getCurrentTimestamp() {
