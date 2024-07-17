@@ -1,4 +1,4 @@
-package mju.iphak.maru_egg.question.meta;
+package mju.iphak.maru_egg.common.meta;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

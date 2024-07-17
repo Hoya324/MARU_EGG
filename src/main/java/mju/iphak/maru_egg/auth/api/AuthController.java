@@ -14,7 +14,7 @@ import lombok.RequiredArgsConstructor;
 import mju.iphak.maru_egg.auth.application.AuthService;
 import mju.iphak.maru_egg.auth.dto.request.SignInRequest;
 import mju.iphak.maru_egg.auth.dto.request.SignUpRequest;
-import mju.iphak.maru_egg.question.meta.LoginUser;
+import mju.iphak.maru_egg.common.meta.LoginUser;
 import mju.iphak.maru_egg.user.domain.User;
 
 @Tag(name = "Auth API", description = "인증 관련 API입니다.")

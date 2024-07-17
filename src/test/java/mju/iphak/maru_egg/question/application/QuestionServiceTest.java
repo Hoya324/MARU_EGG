@@ -46,7 +46,8 @@ import okhttp3.mockwebserver.MockWebServer;
 import reactor.core.publisher.Mono;
 
 @TestPropertySource(properties = {
-	"web-client.base-url=http://localhost:8080"
+	"web-client.base-url=http://localhost:8080",
+	"JWT_SECRET=my_test_secret_key"
 })
 class QuestionServiceTest extends MockTest {
 
@@ -143,6 +144,27 @@ class QuestionServiceTest extends MockTest {
 
 		// then
 		assertThat(result).isEqualTo(QuestionResponse.of(question, AnswerResponse.from(answer)));
+	}
+
+	@DisplayName("질문 목록을 조회하는데 성공한 경우")
+	@Test
+	void 질문_목록_조회_성공() {
+		// given
+		QuestionType type = QuestionType.SUSI;
+		QuestionCategory category = QuestionCategory.ADMISSION_GUIDELINE;
+
+		List<Question> questions = List.of(question);
+		when(questionRepository.findAllByQuestionTypeAndQuestionCategory(type, category)).thenReturn(questions);
+		when(answerService.getAnswerByQuestionId(question.getId())).thenReturn(answer);
+
+		// when
+		List<QuestionResponse> result = questionService.getQuestions(type, category);
+
+		// then
+		assertNotNull(result);
+		assertFalse(result.isEmpty());
+		assertThat(result.get(0).content()).isEqualTo(question.getContent());
+		assertThat(result.get(0).answer().content()).isEqualTo(answer.getContent());
 	}
 
 	// TODO: 추후 test
@@ -246,4 +268,5 @@ class QuestionServiceTest extends MockTest {
 		// then
 		assertThat(result).isEqualTo(expectedResponse);
 	}
+
 }
