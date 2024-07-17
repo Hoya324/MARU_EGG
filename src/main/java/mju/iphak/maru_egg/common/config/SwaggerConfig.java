@@ -1,11 +1,12 @@
 package mju.iphak.maru_egg.common.config;
 
-import java.util.LinkedHashMap;
+import java.lang.reflect.Method;
 import java.util.Map;
 
 import org.springdoc.core.customizers.OperationCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.method.HandlerMethod;
 
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
@@ -20,6 +21,8 @@ import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.security.SecurityScheme.In;
 import io.swagger.v3.oas.models.security.SecurityScheme.Type;
 import mju.iphak.maru_egg.common.exception.ErrorResponse;
+import mju.iphak.maru_egg.common.meta.CustomApiResponse;
+import mju.iphak.maru_egg.common.meta.CustomApiResponses;
 
 @Configuration
 public class SwaggerConfig {
@@ -54,32 +57,32 @@ public class SwaggerConfig {
 				apiResponses = new ApiResponses();
 				operation.setResponses(apiResponses);
 			}
-			apiResponses.putAll(getCommonResponses());
+			handleCustomApiResponses(apiResponses, handlerMethod);
 			return operation;
 		};
 	}
 
-	private Map<String, ApiResponse> getCommonResponses() {
-		LinkedHashMap<String, ApiResponse> responses = new LinkedHashMap<>();
-		responses.put("404", notFoundResponse());
-		responses.put("500", internalServerResponse());
-		return responses;
-	}
-
-	private ApiResponse notFoundResponse() {
-		ApiResponse apiResponse = new ApiResponse();
-		apiResponse.setDescription("Not Found - 요청한 URI가 올바른지 확인한다.");
-		addContent(apiResponse, "EntityNotFoundException", 404,
-			"type: SUSI, category: PAST_QUESTIONS, content: 수시 입학 요강에 대해 알려주세요.인 질문을 찾을 수 없습니다.");
-		return apiResponse;
-	}
-
-	private ApiResponse internalServerResponse() {
-		ApiResponse apiResponse = new ApiResponse();
-		apiResponse.setDescription("Internal Server Error (Unchecked Exception) - API 담당자에게 오류 확인을 요청한다.");
-		addContent(apiResponse, "HttpMessageNotReadableException", 500,
-			"JSON parse error: Cannot deserialize value of type `mju.iphak.maru_egg.question.domain.QuestionCategory` from String \\\"PAST_QUESTION\\\": not one of the values accepted for Enum class: [PAST_QUESTIONS, ETC, UNIV_LIFE, INTERVIEW_PRACTICAL_TEST, PASSING_RESULT, ADMISSION_GUIDELINE]");
-		return apiResponse;
+	private void handleCustomApiResponses(ApiResponses apiResponses, HandlerMethod handlerMethod) {
+		Method method = handlerMethod.getMethod();
+		CustomApiResponses customApiResponses = method.getAnnotation(CustomApiResponses.class);
+		if (customApiResponses != null) {
+			for (CustomApiResponse customApiResponse : customApiResponses.value()) {
+				ApiResponse apiResponse = new ApiResponse();
+				apiResponse.setDescription(customApiResponse.description());
+				addContent(apiResponse, customApiResponse.error(), customApiResponse.status(),
+					customApiResponse.message());
+				apiResponses.addApiResponse(String.valueOf(customApiResponse.status()), apiResponse);
+			}
+		} else {
+			CustomApiResponse customApiResponse = method.getAnnotation(CustomApiResponse.class);
+			if (customApiResponse != null) {
+				ApiResponse apiResponse = new ApiResponse();
+				apiResponse.setDescription(customApiResponse.description());
+				addContent(apiResponse, customApiResponse.error(), customApiResponse.status(),
+					customApiResponse.message());
+				apiResponses.addApiResponse(String.valueOf(customApiResponse.status()), apiResponse);
+			}
+		}
 	}
 
 	private void addContent(ApiResponse apiResponse, String error, int status, String message) {
