@@ -1,6 +1,6 @@
 package mju.iphak.maru_egg.question.repository;
 
-import java.util.Optional;
+import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -9,8 +9,5 @@ import mju.iphak.maru_egg.question.domain.QuestionCategory;
 import mju.iphak.maru_egg.question.domain.QuestionType;
 
 public interface QuestionRepository extends JpaRepository<Question, Long>, QuestionRepositoryCustom {
-	Optional<Question> findByQuestionTypeAndQuestionCategoryAndContent(
-		final QuestionType questionType,
-		final QuestionCategory questionCategory,
-		final String content);
+	List<Question> findAllByQuestionTypeAndQuestionCategory(QuestionType type, QuestionCategory category);
 }
