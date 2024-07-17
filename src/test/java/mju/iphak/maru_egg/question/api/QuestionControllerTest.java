@@ -17,6 +17,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import mju.iphak.maru_egg.answer.domain.Answer;
 import mju.iphak.maru_egg.answer.dto.response.AnswerResponse;
 import mju.iphak.maru_egg.common.IntegrationTest;
+import mju.iphak.maru_egg.question.application.QuestionProcessingService;
 import mju.iphak.maru_egg.question.application.QuestionService;
 import mju.iphak.maru_egg.question.domain.Question;
 import mju.iphak.maru_egg.question.domain.QuestionCategory;
@@ -32,7 +33,11 @@ import mju.iphak.maru_egg.question.dto.response.QuestionResponse;
 class QuestionControllerTest extends IntegrationTest {
 
 	@MockBean
+	private QuestionProcessingService questionProcessingService;
+
+	@MockBean
 	private QuestionService questionService;
+
 	private Question question;
 	private Answer answer;
 	private QuestionType type;
@@ -59,7 +64,7 @@ class QuestionControllerTest extends IntegrationTest {
 		QuestionResponse response = QuestionResponse.of(question, answerResponse);
 
 		// when
-		when(questionService.question(type, category, content)).thenReturn(response);
+		when(questionProcessingService.question(type, category, content)).thenReturn(response);
 		ResultActions resultActions = requestCreateQuestion(request);
 
 		// then
