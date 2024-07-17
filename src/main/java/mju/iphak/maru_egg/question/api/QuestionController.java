@@ -16,6 +16,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import mju.iphak.maru_egg.common.meta.CustomApiResponse;
 import mju.iphak.maru_egg.common.meta.CustomApiResponses;
+import mju.iphak.maru_egg.question.application.QuestionProcessingService;
 import mju.iphak.maru_egg.question.application.QuestionService;
 import mju.iphak.maru_egg.question.dto.request.FindQuestionsRequest;
 import mju.iphak.maru_egg.question.dto.request.QuestionRequest;
@@ -27,6 +28,7 @@ import mju.iphak.maru_egg.question.dto.response.QuestionResponse;
 @RequestMapping("/api/questions")
 public class QuestionController {
 
+	private final QuestionProcessingService questionProcessingService;
 	private final QuestionService questionService;
 
 	@Operation(summary = "질문 요청", description = "질문하는 API", responses = {
@@ -39,7 +41,7 @@ public class QuestionController {
 	})
 	@PostMapping()
 	public QuestionResponse question(@Valid @RequestBody QuestionRequest request) {
-		return questionService.question(request.type(), request.category(), request.content());
+		return questionProcessingService.question(request.type(), request.category(), request.content());
 	}
 
 	@Operation(summary = "질문 목록 요청", description = "질문 목록을 보내주는 API", responses = {
