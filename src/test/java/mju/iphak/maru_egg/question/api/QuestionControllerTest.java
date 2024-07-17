@@ -93,6 +93,26 @@ class QuestionControllerTest extends IntegrationTest {
 			.andExpect(jsonPath("$[0].answer.renewalYear").value(answerResponse.renewalYear()));
 	}
 
+	@Test
+	void 질문_목록_조회_API_카테고리_없이() throws Exception {
+		// given
+		AnswerResponse answerResponse = AnswerResponse.from(answer);
+
+		FindQuestionsRequest request = new FindQuestionsRequest(type, null);
+		QuestionResponse response = QuestionResponse.of(question, answerResponse);
+
+		// when
+		when(questionService.getQuestions(type, null)).thenReturn(List.of(response));
+		ResultActions resultActions = requestFindQuestionsWithoutCategory(request);
+
+		// then
+		resultActions
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$[0].content").value(content))
+			.andExpect(jsonPath("$[0].answer.content").value(answerResponse.content()))
+			.andExpect(jsonPath("$[0].answer.renewalYear").value(answerResponse.renewalYear()));
+	}
+
 	private ResultActions requestCreateQuestion(QuestionRequest dto) throws Exception {
 		return mvc.perform(post("/api/questions")
 				.contentType(MediaType.APPLICATION_JSON)
@@ -104,6 +124,13 @@ class QuestionControllerTest extends IntegrationTest {
 		return mvc.perform(get("/api/questions")
 				.param("type", dto.type().name())
 				.param("category", dto.category().name())
+				.contentType(MediaType.APPLICATION_JSON))
+			.andDo(print());
+	}
+
+	private ResultActions requestFindQuestionsWithoutCategory(FindQuestionsRequest dto) throws Exception {
+		return mvc.perform(get("/api/questions")
+				.param("type", dto.type().name())
 				.contentType(MediaType.APPLICATION_JSON))
 			.andDo(print());
 	}

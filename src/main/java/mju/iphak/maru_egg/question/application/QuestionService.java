@@ -60,11 +60,17 @@ public class QuestionService {
 	}
 
 	public List<QuestionResponse> getQuestions(final QuestionType type, final QuestionCategory category) {
-		List<Question> questions = questionRepository.findAllByQuestionTypeAndQuestionCategory(
-			type, category);
+		List<Question> questions = findQuestionsByTypeAndCategory(type, category);
 		return questions.stream()
-			.map((question) -> createQuestionResponse(question, answerService.getAnswerByQuestionId(question.getId())))
+			.map(question -> createQuestionResponse(question, answerService.getAnswerByQuestionId(question.getId())))
 			.collect(Collectors.toList());
+	}
+
+	private List<Question> findQuestionsByTypeAndCategory(final QuestionType type, final QuestionCategory category) {
+		if (category == null) {
+			return questionRepository.findAllByQuestionType(type);
+		}
+		return questionRepository.findAllByQuestionTypeAndQuestionCategory(type, category);
 	}
 
 	private QuestionResponse askNewQuestion(QuestionType type, QuestionCategory category, String content,

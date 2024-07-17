@@ -250,6 +250,26 @@ class QuestionServiceTest extends MockTest {
 		assertThat(result.answer().content()).isEqualTo(expectedResponse.answer());
 	}
 
+	@DisplayName("질문 목록을 조회하는데 성공한 경우 - category 없이 type으로 조회")
+	@Test
+	void 질문_목록_조회_성공_카테고리_없이() {
+		// given
+		QuestionType type = QuestionType.SUSI;
+
+		List<Question> questions = List.of(question);
+		when(questionRepository.findAllByQuestionType(type)).thenReturn(questions);
+		when(answerService.getAnswerByQuestionId(question.getId())).thenReturn(answer);
+
+		// when
+		List<QuestionResponse> result = questionService.getQuestions(type, null);
+
+		// then
+		assertNotNull(result);
+		assertFalse(result.isEmpty());
+		assertThat(result.get(0).content()).isEqualTo(question.getContent());
+		assertThat(result.get(0).answer().content()).isEqualTo(answer.getContent());
+	}
+
 	@DisplayName("MOCK LLM 서버에 질문을 요청합니다.")
 	@Test
 	public void MOCK_LLM_질문_요청() {

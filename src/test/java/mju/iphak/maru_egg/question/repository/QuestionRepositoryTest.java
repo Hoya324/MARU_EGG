@@ -67,4 +67,31 @@ class QuestionRepositoryTest extends RepositoryTest {
 		// then
 		assertThat(questions.isEmpty()).isTrue();
 	}
+
+	@DisplayName("질문을 조회하는데 성공 - category 없이 type으로 조회")
+	@Test
+	void 질문_조회_성공_카테고리_없이() {
+		// given
+		QuestionType type = QuestionType.SUSI;
+
+		// when
+		List<Question> questions = questionRepository.findAllByQuestionType(type);
+
+		// then
+		assertThat(questions).isNotEmpty();
+		assertThat(questions).isEqualTo(List.of(question));
+	}
+
+	@DisplayName("질문을 조회하는데 실패한 경우 - type만으로 조회할 때")
+	@Test
+	void 질문_조회_실패_타입만으로() {
+		// given
+		QuestionType invalidType = QuestionType.JEONGSI;
+
+		// when
+		List<Question> questions = questionRepository.findAllByQuestionType(invalidType);
+
+		// then
+		assertThat(questions.isEmpty()).isTrue();
+	}
 }
