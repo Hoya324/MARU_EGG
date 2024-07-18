@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import mju.iphak.maru_egg.answer.domain.Answer;
 import mju.iphak.maru_egg.answer.repository.AnswerRepository;
@@ -24,20 +25,37 @@ class QuestionRepositoryTest extends RepositoryTest {
 	@Autowired
 	private AnswerRepository answerRepository;
 
+	@Autowired
+	private JdbcTemplate jdbcTemplate;
+
 	private Question question;
 	private Answer answer;
 
 	@BeforeEach
 	public void setUp() throws Exception {
+		jdbcTemplate.execute("ALTER TABLE questions ADD FULLTEXT INDEX idx_ft_question_content(content)");
+
 		question = new Question("테스트 질문입니다.", "테스트 질문", QuestionType.SUSI,
 			QuestionCategory.ADMISSION_GUIDELINE, 0);
 		questionRepository.save(question);
+		Question additionalQuestion1 = Question.of("추가1 테스트 질문입니다.", "추가 테스트 질문", QuestionType.SUSI,
+			QuestionCategory.ADMISSION_GUIDELINE);
+		questionRepository.save(additionalQuestion1);
+		Question additionalQuestion2 = Question.of("추가2 테스트 질문입니다.", "추가 테스트 질문", QuestionType.SUSI,
+			QuestionCategory.ADMISSION_GUIDELINE);
+		questionRepository.save(additionalQuestion2);
+		Question additionalQuestion3 = Question.of("추가3 테스트 질문입니다.", "추가 테스트 질문", QuestionType.SUSI,
+			QuestionCategory.ADMISSION_GUIDELINE);
+		questionRepository.save(additionalQuestion3);
+		Question additionalQuestion4 = Question.of("추가4 테스트 질문입니다.", "추가 테스트 질문", QuestionType.SUSI,
+			QuestionCategory.ADMISSION_GUIDELINE);
+		questionRepository.save(additionalQuestion4);
 
 		answer = Answer.of(question, "테스트 답변입니다.");
 		answerRepository.save(answer);
 	}
 
-	@DisplayName("질문을 조회하는데 설공")
+	@DisplayName("질문을 조회하는데 성공")
 	@Test
 	void 질문_조회_성공() {
 		// given
@@ -45,15 +63,14 @@ class QuestionRepositoryTest extends RepositoryTest {
 		QuestionCategory category = QuestionCategory.ADMISSION_GUIDELINE;
 
 		// when
-		List<Question> questions = questionRepository.findAllByQuestionTypeAndQuestionCategory(
-			type, category);
+		List<Question> questions = questionRepository.findAllByQuestionTypeAndQuestionCategory(type, category);
 
 		// then
 		assertThat(questions).isNotEmpty();
 		assertThat(questions).isEqualTo(List.of(question));
 	}
 
-	@DisplayName("질문을 조회하는데 실패한 경우-type, category 를 못 찾은 경우")
+	@DisplayName("질문을 조회하는데 실패한 경우 - type, category를 못 찾은 경우")
 	@Test
 	void 질문_조회_실패() {
 		// given
@@ -61,8 +78,7 @@ class QuestionRepositoryTest extends RepositoryTest {
 		QuestionCategory category = QuestionCategory.ADMISSION_GUIDELINE;
 
 		// when
-		List<Question> questions = questionRepository.findAllByQuestionTypeAndQuestionCategory(
-			invalidType, category);
+		List<Question> questions = questionRepository.findAllByQuestionTypeAndQuestionCategory(invalidType, category);
 
 		// then
 		assertThat(questions.isEmpty()).isTrue();
