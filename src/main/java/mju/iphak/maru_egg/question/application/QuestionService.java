@@ -3,6 +3,8 @@ package mju.iphak.maru_egg.question.application;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -11,10 +13,12 @@ import lombok.extern.slf4j.Slf4j;
 import mju.iphak.maru_egg.answer.application.AnswerService;
 import mju.iphak.maru_egg.answer.domain.Answer;
 import mju.iphak.maru_egg.answer.dto.response.AnswerResponse;
+import mju.iphak.maru_egg.common.dto.pagination.SliceQuestionResponse;
 import mju.iphak.maru_egg.question.domain.Question;
 import mju.iphak.maru_egg.question.domain.QuestionCategory;
 import mju.iphak.maru_egg.question.domain.QuestionType;
 import mju.iphak.maru_egg.question.dto.response.QuestionResponse;
+import mju.iphak.maru_egg.question.dto.response.SearchedQuestionsResponse;
 import mju.iphak.maru_egg.question.repository.QuestionRepository;
 
 @Slf4j
@@ -31,6 +35,14 @@ public class QuestionService {
 		return questions.stream()
 			.map(question -> createQuestionResponse(question, answerService.getAnswerByQuestionId(question.getId())))
 			.collect(Collectors.toList());
+	}
+
+	public SliceQuestionResponse<SearchedQuestionsResponse> searchQuestionsOfCursorPaging(final String content,
+		final Integer cursorViewCount, final Long questionId, final Integer size) {
+		Pageable pageable = PageRequest.of(0, size);
+		return questionRepository.searchQuestionsOfCursorPagingByContent(
+			content,
+			cursorViewCount, questionId, pageable);
 	}
 
 	private List<Question> findQuestionsByTypeAndCategory(final QuestionType type, final QuestionCategory category) {
