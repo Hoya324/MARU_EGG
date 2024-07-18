@@ -16,6 +16,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.reactive.ClientHttpConnector;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
@@ -32,11 +34,13 @@ import mju.iphak.maru_egg.answer.dto.request.LLMAskQuestionRequest;
 import mju.iphak.maru_egg.answer.dto.response.LLMAnswerResponse;
 import mju.iphak.maru_egg.answer.repository.AnswerRepository;
 import mju.iphak.maru_egg.common.MockTest;
+import mju.iphak.maru_egg.common.dto.pagination.SliceQuestionResponse;
 import mju.iphak.maru_egg.question.domain.Question;
 import mju.iphak.maru_egg.question.domain.QuestionCategory;
 import mju.iphak.maru_egg.question.domain.QuestionType;
 import mju.iphak.maru_egg.question.dto.response.QuestionCore;
 import mju.iphak.maru_egg.question.dto.response.QuestionResponse;
+import mju.iphak.maru_egg.question.dto.response.SearchedQuestionsResponse;
 import mju.iphak.maru_egg.question.repository.QuestionRepository;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -164,4 +168,32 @@ class QuestionServiceTest extends MockTest {
 		assertThat(result.get(0).answer().content()).isEqualTo(answer.getContent());
 	}
 
+	@DisplayName("질문 자동완성 조회에 성공한 경우")
+	@Test
+	void 질문_자동완성_조회_성공() {
+		// given
+		String content = "example content";
+		Integer cursorViewCount = 0;
+		Long questionId = 0L;
+		Integer size = 5;
+		Pageable pageable = PageRequest.of(0, size);
+
+		List<Question> questions = List.of(question);
+		SearchedQuestionsResponse searchedQuestionsResponse = new SearchedQuestionsResponse(1L, "example content");
+		SliceQuestionResponse<SearchedQuestionsResponse> expectedResponse = new SliceQuestionResponse<>(
+			List.of(searchedQuestionsResponse), 0, size, false, null, null);
+
+		when(questionRepository.searchQuestionsOfCursorPagingByContent(content, cursorViewCount, questionId, pageable))
+			.thenReturn(expectedResponse);
+
+		// when
+		SliceQuestionResponse<SearchedQuestionsResponse> result = questionService.searchQuestionsOfCursorPaging(content,
+			cursorViewCount, questionId, size);
+
+		// then
+		assertNotNull(result);
+		assertFalse(result.data().isEmpty());
+		assertThat(result.data().get(0).content()).isEqualTo("example content");
+		assertThat(result.hasNext()).isFalse();
+	}
 }
