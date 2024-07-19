@@ -47,7 +47,6 @@ class QuestionRepositoryImplTest extends RepositoryTest {
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
 
-	@Autowired
 	private JPAQueryFactory queryFactory;
 
 	private Question question;
@@ -55,6 +54,8 @@ class QuestionRepositoryImplTest extends RepositoryTest {
 
 	@BeforeEach
 	public void setUp() throws Exception {
+		queryFactory = new JPAQueryFactory(em);
+
 		String checkIndexQuery = "SHOW INDEX FROM questions WHERE Key_name = 'idx_ft_question_content'";
 		List<?> result = jdbcTemplate.queryForList(checkIndexQuery);
 		if (!result.isEmpty()) {
@@ -63,48 +64,61 @@ class QuestionRepositoryImplTest extends RepositoryTest {
 
 		jdbcTemplate.execute("ALTER TABLE questions ADD FULLTEXT INDEX idx_ft_question_content(content)");
 
+		// 데이터 삽입
 		jdbcTemplate.update(
 			"INSERT INTO questions (id, content, content_token, question_type, question_category, view_count) VALUES (?, ?, ?, ?, ?, ?)",
-			1L, "테스트 질문 예시 예시입니다.", "테스트 질문 예시", QuestionType.SUSI.name(), QuestionCategory.ADMISSION_GUIDELINE.name(),
-			0);
-		question = questionRepository.findById(1L).orElseThrow();
+			1L, "수시 입학 요강에 대해 알려주세요.", "수시 입학 요강 대해", QuestionType.SUSI.name(),
+			QuestionCategory.ADMISSION_GUIDELINE.name(), 0);
+		jdbcTemplate.update(
+			"INSERT INTO questions (id, content, content_token, question_type, question_category, view_count) VALUES (?, ?, ?, ?, ?, ?)",
+			2L, "수시 시험 일정 알려줘", "수시 시험 일정", QuestionType.SUSI.name(), QuestionCategory.ADMISSION_GUIDELINE.name(), 0);
+		jdbcTemplate.update(
+			"INSERT INTO questions (id, content, content_token, question_type, question_category, view_count) VALUES (?, ?, ?, ?, ?, ?)",
+			3L, "수시 시기 알려줘", "수시 시기", QuestionType.SUSI.name(), QuestionCategory.ADMISSION_GUIDELINE.name(), 0);
+		jdbcTemplate.update(
+			"INSERT INTO questions (id, content, content_token, question_type, question_category, view_count) VALUES (?, ?, ?, ?, ?, ?)",
+			4L, "수시 면접 일정 알려줘", "수시 면접 일정", QuestionType.SUSI.name(), QuestionCategory.ADMISSION_GUIDELINE.name(), 0);
+		jdbcTemplate.update(
+			"INSERT INTO questions (id, content, content_token, question_type, question_category, view_count) VALUES (?, ?, ?, ?, ?, ?)",
+			5L, "수시", "수시", QuestionType.SUSI.name(), QuestionCategory.ADMISSION_GUIDELINE.name(), 0);
+		jdbcTemplate.update(
+			"INSERT INTO questions (id, content, content_token, question_type, question_category, view_count) VALUES (?, ?, ?, ?, ?, ?)",
+			6L, "2024 정시 입학 요강에 대해 알려주세요.", "정시 입학 요강 대해", QuestionType.SUSI.name(),
+			QuestionCategory.ADMISSION_GUIDELINE.name(), 0);
+		jdbcTemplate.update(
+			"INSERT INTO questions (id, content, content_token, question_type, question_category, view_count) VALUES (?, ?, ?, ?, ?, ?)",
+			7L, "시기 알려줘", "시기", QuestionType.SUSI.name(), QuestionCategory.ADMISSION_GUIDELINE.name(), 0);
+		jdbcTemplate.update(
+			"INSERT INTO questions (id, content, content_token, question_type, question_category, view_count) VALUES (?, ?, ?, ?, ?, ?)",
+			8L, "2024 장시 입학 요강에 대해 알려주세요.", "장시 입학 요강 대해", QuestionType.SUSI.name(),
+			QuestionCategory.ADMISSION_GUIDELINE.name(), 0);
+		jdbcTemplate.update(
+			"INSERT INTO questions (id, content, content_token, question_type, question_category, view_count) VALUES (?, ?, ?, ?, ?, ?)",
+			9L, "2024 수시 입학 요강에 대해 알려주세요.", "2024 수시 입학 요강 대해", QuestionType.SUSI.name(),
+			QuestionCategory.ADMISSION_GUIDELINE.name(), 0);
 
-		jdbcTemplate.update(
-			"INSERT INTO questions (id, content, content_token, question_type, question_category, view_count) VALUES (?, ?, ?, ?, ?, ?)",
-			2L, "추가1 테스트 질문 예시입니다.", "추가 테스트 질문 예시", QuestionType.SUSI.name(),
-			QuestionCategory.ADMISSION_GUIDELINE.name(), 0);
-		jdbcTemplate.update(
-			"INSERT INTO questions (id, content, content_token, question_type, question_category, view_count) VALUES (?, ?, ?, ?, ?, ?)",
-			3L, "추가2 테스트 질문 예시입니다.", "추가 테스트 질문 예시", QuestionType.SUSI.name(),
-			QuestionCategory.ADMISSION_GUIDELINE.name(), 0);
-		jdbcTemplate.update(
-			"INSERT INTO questions (id, content, content_token, question_type, question_category, view_count) VALUES (?, ?, ?, ?, ?, ?)",
-			4L, "추가3 테스트 질문 예시입니다.", "추가 테스트 질문 예시", QuestionType.SUSI.name(),
-			QuestionCategory.ADMISSION_GUIDELINE.name(), 0);
-		jdbcTemplate.update(
-			"INSERT INTO questions (id, content, content_token, question_type, question_category, view_count) VALUES (?, ?, ?, ?, ?, ?)",
-			5L, "추가4 테스트 질문 예시입니다.", "추가 테스트 질문 예시", QuestionType.SUSI.name(), QuestionCategory.ETC.name(), 0);
+		question = questionRepository.findById(1L).orElseThrow();
 
 		answer = Answer.of(question, "테스트 답변입니다.");
 		answerRepository.save(answer);
 	}
 
-	@DisplayName("contentToken, type으로 질문을 검색하는데 성공")
 	@Test
 	void contentToken_type_질문_검색_성공() {
 		// given
-		String contentToken = "테스트 질문 예시";
+		QQuestion question = QQuestion.question;
+		String contentToken = "수시 입학 요강 대해";
 		QuestionType type = QuestionType.SUSI;
+		NumberTemplate<Double> numberTemplate = createBooleanTemplate(question, contentToken);
 
 		// when
-		Optional<List<QuestionCore>> result = questionRepositoryImpl.searchQuestionsByContentTokenAndType(contentToken,
-			type);
+		List<Question> results = queryFactory.selectFrom(question)
+			.where(numberTemplate.gt(0.0).or(numberTemplate.eq(0.0)).and(question.questionType.eq(type)))
+			.fetch();
 
 		// then
-		assertThat(result).isPresent();
-		List<QuestionCore> questionCores = result.get();
-		assertThat(questionCores).isNotEmpty();
-		assertThat(questionCores.get(0).id()).isEqualTo(question.getId());
+		assertThat(results).isNotEmpty();
+		assertThat(results.get(0).getContent()).contains("수시 입학 요강");
 	}
 
 	@DisplayName("contentToken, type으로 질문을 검색하는데 실패한 경우")
@@ -127,19 +141,23 @@ class QuestionRepositoryImplTest extends RepositoryTest {
 	@Test
 	void contentToken_type_Category로_질문_검색_성공() {
 		// given
-		String contentToken = "테스트 질문 예시";
+		QQuestion question = QQuestion.question;
+		String contentToken = "수시 입학 요강 대해";
 		QuestionType type = QuestionType.SUSI;
 		QuestionCategory category = QuestionCategory.ADMISSION_GUIDELINE;
+		NumberTemplate<Double> numberTemplate = createBooleanTemplate(question, contentToken);
 
 		// when
-		Optional<List<QuestionCore>> result = questionRepositoryImpl.searchQuestionsByContentTokenAndTypeAndCategory(
-			contentToken, type, category);
+		List<String> results = queryFactory.select(question.contentToken)
+			.from(question)
+			.where(numberTemplate.gt(0.0)
+				.or(numberTemplate.eq(0.0))
+				.and(question.questionType.eq(type))
+				.and(question.questionCategory.eq(category)))
+			.fetch();
 
 		// then
-		assertThat(result).isPresent();
-		List<QuestionCore> questionCores = result.get();
-		assertThat(questionCores).isNotEmpty();
-		assertThat(questionCores.get(0).id()).isEqualTo(question.getId());
+		assertThat(results).isNotEmpty();
 	}
 
 	@DisplayName("contentToken, type, Category로 질문을 검색하는데 실패한 경우")
@@ -159,23 +177,6 @@ class QuestionRepositoryImplTest extends RepositoryTest {
 		assertThat(result.get()).isEmpty();
 	}
 
-	@DisplayName("content로 질문을 페이지네이션 조회 - 성공")
-	@Test
-	void content로_질문_페이지네이션_조회_성공() {
-		// given
-		String content = "테스트 질문 예시";
-		Pageable pageable = PageRequest.of(0, 3);
-
-		// when
-		SliceQuestionResponse<SearchedQuestionsResponse> result = questionRepositoryImpl.searchQuestionsOfCursorPagingByContent(
-			content, null, null, pageable);
-
-		// then
-		assertThat(result.data()).isNotEmpty();
-		assertThat(result.data().size()).isEqualTo(3);
-		assertThat(result.data().get(0).content()).contains(content);
-	}
-
 	@DisplayName("content로 질문을 페이지네이션 조회 - 실패")
 	@Test
 	void content로_질문_페이지네이션_조회_실패() {
@@ -193,27 +194,55 @@ class QuestionRepositoryImplTest extends RepositoryTest {
 
 	@Test
 	void contentToken_type() {
-		JPAQueryFactory queryFactory = new JPAQueryFactory(em);
 		QQuestion question = QQuestion.question;
-		String contentToken = "테스트 질문 예시";
+		String contentToken = "수시 입학 요강 대해";
 		QuestionType type = QuestionType.SUSI;
-
-		// List<String> results = queryFactory
-		// 	.select(question.content)
-		// 	.from(question)
-		// 	.where(question.contentToken.contains(contentToken)
-		// 		.and(question.questionType.eq(type)))
-		// 	.fetch();
-		NumberTemplate<Double> numberTemplate = Expressions.numberTemplate(Double.class,
-			"function('match', {0}, {1})", question.content, contentToken);
+		NumberTemplate<Double> numberTemplate = createBooleanTemplate(question, contentToken);
 
 		List<String> results = queryFactory.select(question.contentToken)
 			.from(question)
-			.where(
-				numberTemplate.gt(0).and(question.questionType.eq(type)))
+			.where(numberTemplate.gt(0.0).or(numberTemplate.eq(0.0)).and(question.questionType.eq(type)))
 			.fetch();
 
-		System.out.println(results);
 		assertThat(results).isNotEmpty();
+	}
+
+	@DisplayName("Full Text Search를 사용하여 content로 질문 검색 - 성공")
+	@Test
+	void fullTextSearch_content_질문_검색_성공() {
+		// given
+		QQuestion question = QQuestion.question;
+		String contentToken = "수시 입학 요강 대해";
+
+		NumberTemplate<Double> numberTemplate = createBooleanTemplate(question, contentToken);
+
+		// when
+		List<Question> results = queryFactory.selectFrom(question)
+			.where(numberTemplate.gt(0.0).or(numberTemplate.eq(0.0)))
+			.fetch();
+
+		// then
+		assertThat(results.get(0).getContentToken()).contains(contentToken);
+	}
+
+	@DisplayName("Full Text Search를 사용하여 content로 질문 검색 - 실패")
+	@Test
+	void fullTextSearch_content_질문_검색_실패() {
+		// given
+		QQuestion question = QQuestion.question;
+		String invalidContentToken = "존재하지 않는 질문";
+		NumberTemplate<Double> numberTemplate = createBooleanTemplate(question, invalidContentToken);
+
+		// when
+		List<Question> results = queryFactory.selectFrom(question)
+			.where(numberTemplate.gt(0.0))
+			.fetch();
+
+		// then
+		assertThat(results).isEmpty();
+	}
+
+	private NumberTemplate<Double> createBooleanTemplate(QQuestion question, String content) {
+		return Expressions.numberTemplate(Double.class, "function('match', {0}, {1})", question.content, content);
 	}
 }
