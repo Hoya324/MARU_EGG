@@ -12,7 +12,7 @@ import scala.collection.Seq;
 public class PhraseExtractionUtils {
 	public static List<String> extractTokens(List<KoreanTokenizer.KoreanToken> tokens) {
 		return tokens.stream()
-			.filter(token -> token.pos().toString().equals("Noun"))
+			.filter(token -> token.pos().toString().equals("Noun") || token.pos().toString().equals("Number"))
 			.map(token -> token.text().toString())
 			.collect(Collectors.toList());
 	}

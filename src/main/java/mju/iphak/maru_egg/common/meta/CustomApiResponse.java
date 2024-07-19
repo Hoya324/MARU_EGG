@@ -19,4 +19,6 @@ public @interface CustomApiResponse {
 	String message() default "서버에 오류가 발생했습니다. 담당자에게 연락주세요.";
 
 	String description() default "내부 서버 오류";
+
+	boolean isArray() default false;
 }
