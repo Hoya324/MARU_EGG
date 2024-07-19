@@ -87,3 +87,36 @@ tasks.named('test') {
 jar {
     enabled = false
 }
+
+test {
+    finalizedBy jacocoTestReport
+}
+jacocoTestReport {
+    dependsOn test
+}
+
+
+jacocoTestReport {
+    reports {
+        xml.required = false
+        csv.required = false
+        html.outputLocation = layout.buildDirectory.dir('jacocoHtml')
+    }
+}
+
+// 테스트 커버리지 검사
+jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            element 'CLASS'
+            limit {
+                counter = 'BRANCH'
+                value = 'COVEREDRATIO'
+                minimum = 0.5
+            }
+
+            // 커버리지 체크를 제외할 클래스들
+            excludes = ['*.*Controller', '*.dto.*', '*.config.*', '*.domain.Q*']
+        }
+    }
+}

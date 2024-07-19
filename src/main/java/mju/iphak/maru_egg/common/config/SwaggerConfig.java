@@ -1,6 +1,7 @@
 package mju.iphak.maru_egg.common.config;
 
 import java.lang.reflect.Method;
+import java.util.List;
 import java.util.Map;
 
 import org.springdoc.core.customizers.OperationCustomizer;
@@ -70,7 +71,7 @@ public class SwaggerConfig {
 				ApiResponse apiResponse = new ApiResponse();
 				apiResponse.setDescription(customApiResponse.description());
 				addContent(apiResponse, customApiResponse.error(), customApiResponse.status(),
-					customApiResponse.message());
+					customApiResponse.message(), customApiResponse.isArray());
 				apiResponses.addApiResponse(String.valueOf(customApiResponse.status()), apiResponse);
 			}
 		} else {
@@ -79,19 +80,27 @@ public class SwaggerConfig {
 				ApiResponse apiResponse = new ApiResponse();
 				apiResponse.setDescription(customApiResponse.description());
 				addContent(apiResponse, customApiResponse.error(), customApiResponse.status(),
-					customApiResponse.message());
+					customApiResponse.message(), customApiResponse.isArray());
 				apiResponses.addApiResponse(String.valueOf(customApiResponse.status()), apiResponse);
 			}
 		}
 	}
 
-	private void addContent(ApiResponse apiResponse, String error, int status, String message) {
+	private void addContent(ApiResponse apiResponse, String error, int status, String message, boolean isArray) {
 		Content content = new Content();
 		MediaType mediaType = new MediaType();
-		Schema<ErrorResponse> schema = new Schema<>();
-		schema.$ref("#/components/schemas/ErrorResponse");
+		Schema<?> schema;
+		if (isArray) {
+			schema = new Schema<List<ErrorResponse>>()
+				.type("array")
+				.items(new Schema<ErrorResponse>().$ref("#/components/schemas/ErrorResponse"));
+		} else {
+			schema = new Schema<ErrorResponse>()
+				.$ref("#/components/schemas/ErrorResponse");
+		}
 		mediaType.schema(schema)
-			.example(new ErrorResponse(error, status, message));
+			.example(isArray ? List.of(new ErrorResponse(error, status, message)) :
+				new ErrorResponse(error, status, message));
 		content.addMediaType("application/json", mediaType);
 		apiResponse.setContent(content);
 	}

@@ -17,13 +17,17 @@ import org.springframework.test.web.servlet.ResultActions;
 import mju.iphak.maru_egg.answer.domain.Answer;
 import mju.iphak.maru_egg.answer.dto.response.AnswerResponse;
 import mju.iphak.maru_egg.common.IntegrationTest;
+import mju.iphak.maru_egg.common.dto.pagination.SliceQuestionResponse;
+import mju.iphak.maru_egg.question.application.QuestionProcessingService;
 import mju.iphak.maru_egg.question.application.QuestionService;
 import mju.iphak.maru_egg.question.domain.Question;
 import mju.iphak.maru_egg.question.domain.QuestionCategory;
 import mju.iphak.maru_egg.question.domain.QuestionType;
 import mju.iphak.maru_egg.question.dto.request.FindQuestionsRequest;
 import mju.iphak.maru_egg.question.dto.request.QuestionRequest;
+import mju.iphak.maru_egg.question.dto.request.SearchQuestionsRequest;
 import mju.iphak.maru_egg.question.dto.response.QuestionResponse;
+import mju.iphak.maru_egg.question.dto.response.SearchedQuestionsResponse;
 
 @TestPropertySource(properties = {
 	"web-client.base-url=http://localhost:8080",
@@ -32,7 +36,11 @@ import mju.iphak.maru_egg.question.dto.response.QuestionResponse;
 class QuestionControllerTest extends IntegrationTest {
 
 	@MockBean
+	private QuestionProcessingService questionProcessingService;
+
+	@MockBean
 	private QuestionService questionService;
+
 	private Question question;
 	private Answer answer;
 	private QuestionType type;
@@ -59,7 +67,7 @@ class QuestionControllerTest extends IntegrationTest {
 		QuestionResponse response = QuestionResponse.of(question, answerResponse);
 
 		// when
-		when(questionService.question(type, category, content)).thenReturn(response);
+		when(questionProcessingService.question(type, category, content)).thenReturn(response);
 		ResultActions resultActions = requestCreateQuestion(request);
 
 		// then
@@ -113,6 +121,27 @@ class QuestionControllerTest extends IntegrationTest {
 			.andExpect(jsonPath("$[0].answer.renewalYear").value(answerResponse.renewalYear()));
 	}
 
+	@Test
+	void 질문_자동완성_API() throws Exception {
+		// given
+		SearchQuestionsRequest request = new SearchQuestionsRequest("example content", 5, 0, 0L);
+		SearchedQuestionsResponse searchedQuestionsResponse = new SearchedQuestionsResponse(1L, "example content");
+		SliceQuestionResponse<SearchedQuestionsResponse> response = new SliceQuestionResponse<>(
+			List.of(searchedQuestionsResponse), 0, 5, false, null, null);
+
+		// when
+		when(questionService.searchQuestionsOfCursorPaging(request.content(), request.cursorViewCount(),
+			request.questionId(), request.size()))
+			.thenReturn(response);
+		ResultActions resultActions = requestSearchQuestions(request);
+
+		// then
+		resultActions
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.data[0].content").value("example content"))
+			.andExpect(jsonPath("$.hasNext").value(false));
+	}
+
 	private ResultActions requestCreateQuestion(QuestionRequest dto) throws Exception {
 		return mvc.perform(post("/api/questions")
 				.contentType(MediaType.APPLICATION_JSON)
@@ -131,6 +160,16 @@ class QuestionControllerTest extends IntegrationTest {
 	private ResultActions requestFindQuestionsWithoutCategory(FindQuestionsRequest dto) throws Exception {
 		return mvc.perform(get("/api/questions")
 				.param("type", dto.type().name())
+				.contentType(MediaType.APPLICATION_JSON))
+			.andDo(print());
+	}
+
+	private ResultActions requestSearchQuestions(SearchQuestionsRequest dto) throws Exception {
+		return mvc.perform(get("/api/questions/search")
+				.param("content", dto.content())
+				.param("size", dto.size().toString())
+				.param("cursorViewCount", dto.cursorViewCount().toString())
+				.param("questionId", dto.questionId().toString())
 				.contentType(MediaType.APPLICATION_JSON))
 			.andDo(print());
 	}

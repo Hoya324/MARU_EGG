@@ -29,15 +29,27 @@ class QuestionRepositoryTest extends RepositoryTest {
 
 	@BeforeEach
 	public void setUp() throws Exception {
-		question = new Question("테스트 질문입니다.", "테스트 질문", QuestionType.SUSI,
+		question = new Question("테스트 질문 예시 예시입니다.", "테스트 질문 예시", QuestionType.SUSI,
 			QuestionCategory.ADMISSION_GUIDELINE, 0);
 		questionRepository.save(question);
+		Question additionalQuestion1 = Question.of("추가1 테스트 질문 예시입니다.", "추가 테스트 질문 예시", QuestionType.SUSI,
+			QuestionCategory.ADMISSION_GUIDELINE);
+		questionRepository.save(additionalQuestion1);
+		Question additionalQuestion2 = Question.of("추가2 테스트 질문 예시입니다.", "추가 테스트 질문 예시", QuestionType.SUSI,
+			QuestionCategory.ADMISSION_GUIDELINE);
+		questionRepository.save(additionalQuestion2);
+		Question additionalQuestion3 = Question.of("추가3 테스트 질문 예시입니다.", "추가 테스트 질문 예시", QuestionType.SUSI,
+			QuestionCategory.ADMISSION_GUIDELINE);
+		questionRepository.save(additionalQuestion3);
+		Question additionalQuestionETC = Question.of("추가4 테스트 질문 예시입니다.", "추가 테스트 질문 예시", QuestionType.SUSI,
+			QuestionCategory.ETC);
+		questionRepository.save(additionalQuestionETC);
 
 		answer = Answer.of(question, "테스트 답변입니다.");
 		answerRepository.save(answer);
 	}
 
-	@DisplayName("질문을 조회하는데 설공")
+	@DisplayName("질문을 조회하는데 성공")
 	@Test
 	void 질문_조회_성공() {
 		// given
@@ -45,15 +57,15 @@ class QuestionRepositoryTest extends RepositoryTest {
 		QuestionCategory category = QuestionCategory.ADMISSION_GUIDELINE;
 
 		// when
-		List<Question> questions = questionRepository.findAllByQuestionTypeAndQuestionCategory(
-			type, category);
+		List<Question> questions = questionRepository.findAllByQuestionTypeAndQuestionCategory(type, category);
 
 		// then
 		assertThat(questions).isNotEmpty();
-		assertThat(questions).isEqualTo(List.of(question));
+		assertThat(questions.size()).isEqualTo(4);
+		assertThat(questions.get(0)).isEqualTo(question);
 	}
 
-	@DisplayName("질문을 조회하는데 실패한 경우-type, category 를 못 찾은 경우")
+	@DisplayName("질문을 조회하는데 실패한 경우 - type, category를 못 찾은 경우")
 	@Test
 	void 질문_조회_실패() {
 		// given
@@ -61,8 +73,7 @@ class QuestionRepositoryTest extends RepositoryTest {
 		QuestionCategory category = QuestionCategory.ADMISSION_GUIDELINE;
 
 		// when
-		List<Question> questions = questionRepository.findAllByQuestionTypeAndQuestionCategory(
-			invalidType, category);
+		List<Question> questions = questionRepository.findAllByQuestionTypeAndQuestionCategory(invalidType, category);
 
 		// then
 		assertThat(questions.isEmpty()).isTrue();
@@ -79,7 +90,8 @@ class QuestionRepositoryTest extends RepositoryTest {
 
 		// then
 		assertThat(questions).isNotEmpty();
-		assertThat(questions).isEqualTo(List.of(question));
+		assertThat(questions.size()).isEqualTo(5);
+		assertThat(questions.get(0)).isEqualTo(question);
 	}
 
 	@DisplayName("질문을 조회하는데 실패한 경우 - type만으로 조회할 때")
