@@ -9,10 +9,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import mju.iphak.maru_egg.TestcontainersConfiguration;
 import mju.iphak.maru_egg.common.config.QueryDslConfig;
-import mju.iphak.maru_egg.common.config.SecurityConfig;
-import mju.iphak.maru_egg.common.config.WebClientConfig;
 
-@Import({TestcontainersConfiguration.class, QueryDslConfig.class, WebClientConfig.class, SecurityConfig.class})
+@Import({TestcontainersConfiguration.class, QueryDslConfig.class})
 @ExtendWith(SpringExtension.class)
 @DataJpaTest
 @ActiveProfiles("test")
