@@ -6,6 +6,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -23,6 +24,10 @@ import mju.iphak.maru_egg.common.config.WebClientConfig;
 @AutoConfigureMockMvc
 @Transactional
 @ActiveProfiles("test")
+@TestPropertySource(properties = {
+	"web-client.base-url=http://localhost:8080",
+	"JWT_SECRET=my_test_secret_key"
+})
 public class IntegrationTest {
 	@Autowired
 	protected MockMvc mvc;

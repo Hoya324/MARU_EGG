@@ -11,7 +11,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.ResultActions;
 
 import mju.iphak.maru_egg.answer.domain.Answer;
@@ -29,10 +28,6 @@ import mju.iphak.maru_egg.question.dto.request.SearchQuestionsRequest;
 import mju.iphak.maru_egg.question.dto.response.QuestionResponse;
 import mju.iphak.maru_egg.question.dto.response.SearchedQuestionsResponse;
 
-@TestPropertySource(properties = {
-	"web-client.base-url=http://localhost:8080",
-	"JWT_SECRET=my_test_secret_key"
-})
 class QuestionControllerTest extends IntegrationTest {
 
 	@MockBean
