@@ -1,5 +1,6 @@
 package mju.iphak.maru_egg.common;
 
+import org.junit.Ignore;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -15,5 +16,6 @@ import mju.iphak.maru_egg.common.config.QueryDslConfig;
 @DataJpaTest
 @ActiveProfiles("test")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@Ignore
 public class RepositoryTest {
 }

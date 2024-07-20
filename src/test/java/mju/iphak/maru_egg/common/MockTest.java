@@ -1,5 +1,6 @@
 package mju.iphak.maru_egg.common;
 
+import org.junit.Ignore;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,8 +15,9 @@ import mju.iphak.maru_egg.TestcontainersConfiguration;
 @ActiveProfiles("test")
 @RunWith(MockitoJUnitRunner.class)
 @TestPropertySource(properties = {
-	"web-client.base-url=http://localhost:8080",
-	"JWT_SECRET=my_test_secret_key"
+	"web-client.base-url-test=http://localhost:8080",
+	"jwt.secretKey-test=my_test_secret_key"
 })
+@Ignore
 public class MockTest {
 }
