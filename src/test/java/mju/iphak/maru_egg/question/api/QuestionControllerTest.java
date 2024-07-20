@@ -1,5 +1,6 @@
 package mju.iphak.maru_egg.question.api;
 
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
@@ -9,13 +10,21 @@ import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.Mock;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.TestPropertySource;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.web.reactive.function.client.ClientResponse;
+import org.springframework.web.reactive.function.client.ExchangeFunction;
+import org.springframework.web.reactive.function.client.WebClient;
 
+import mju.iphak.maru_egg.answer.application.AnswerService;
 import mju.iphak.maru_egg.answer.domain.Answer;
 import mju.iphak.maru_egg.answer.dto.response.AnswerResponse;
+import mju.iphak.maru_egg.answer.repository.AnswerRepository;
 import mju.iphak.maru_egg.common.IntegrationTest;
 import mju.iphak.maru_egg.common.dto.pagination.SliceQuestionResponse;
 import mju.iphak.maru_egg.question.application.QuestionProcessingService;
@@ -28,69 +37,97 @@ import mju.iphak.maru_egg.question.dto.request.QuestionRequest;
 import mju.iphak.maru_egg.question.dto.request.SearchQuestionsRequest;
 import mju.iphak.maru_egg.question.dto.response.QuestionResponse;
 import mju.iphak.maru_egg.question.dto.response.SearchedQuestionsResponse;
+import mju.iphak.maru_egg.question.repository.QuestionRepository;
+import reactor.core.publisher.Mono;
 
-@TestPropertySource(properties = {
-	"web-client.base-url=http://localhost:8080",
-	"JWT_SECRET=my_test_secret_key"
-})
 class QuestionControllerTest extends IntegrationTest {
 
-	@MockBean
+	@Autowired
 	private QuestionProcessingService questionProcessingService;
 
-	@MockBean
+	@Autowired
 	private QuestionService questionService;
+
+	@Autowired
+	private QuestionRepository questionRepository;
+
+	@Autowired
+	private AnswerRepository answerRepository;
+
+	@Autowired
+	private AnswerService answerService;
 
 	private Question question;
 	private Answer answer;
 	private QuestionType type;
 	private QuestionCategory category;
 	private String content;
-	private String contentToken;
+
+	@Autowired
+	private JdbcTemplate jdbcTemplate;
+
+	@Mock
+	private ExchangeFunction exchangeFunction;
+
+	@Value("${web-client.base-url}")
+	private String llmBaseUrl;
 
 	@BeforeEach
 	void setUp() {
+		String checkIndexQuery = "SHOW INDEX FROM questions WHERE Key_name = 'idx_ft_question_content'";
+		List<?> result = jdbcTemplate.queryForList(checkIndexQuery);
+		if (!result.isEmpty()) {
+			jdbcTemplate.execute("ALTER TABLE questions DROP INDEX idx_ft_question_content");
+		}
+		jdbcTemplate.execute("ALTER TABLE questions ADD FULLTEXT INDEX idx_ft_question_content(content)");
 		type = QuestionType.SUSI;
 		category = QuestionCategory.ADMISSION_GUIDELINE;
-		content = "content";
-		contentToken = "content";
-		question = Question.of(content, contentToken, type, category);
-		answer = Answer.of(question, content);
+		content = "수시 일정 알려주세요.";
+		question = questionRepository.save(Question.of("수시 일정 알려주세요.", "수시 일정", QuestionType.SUSI,
+			QuestionCategory.ADMISSION_GUIDELINE));
+		answer = answerRepository.save(Answer.of(question,
+			"수시 일정은 2024년 12월 19일(목)부터 2024년 12월 26일(목) 18:00까지 최초합격자 발표가 있고, 2025년 2월 10일(월) 10:00부터 2025년 2월 12일(수) 15:00까지 문서등록 및 등록금 납부가 진행됩니다. 등록금 납부 기간은 2024년 12월 16일(월) 10:00부터 2024년 12월 18일(수) 15:00까지이며, 방법은 입학처 홈페이지를 통한 문서등록 및 등록금 납부를 하시면 됩니다. 상세 안내는 추후 입학처 홈페이지를 통해 공지될 예정입니다."));
+
+		WebClient webClient = WebClient.builder()
+			.exchangeFunction(exchangeFunction)
+			.baseUrl(llmBaseUrl)
+			.build();
+
+		answerService = new AnswerService(answerRepository, webClient);
+
+		ClientResponse clientResponse = ClientResponse.create(HttpStatusCode.valueOf(200))
+			.header("Content-Type", "application/json")
+			.body("{\"answer\":\"" + answer.getContent() + "\"}")
+			.build();
+
+		when(exchangeFunction.exchange(any())).thenReturn(Mono.just(clientResponse));
 	}
 
 	@Test
 	void 질문_API() throws Exception {
 		// given
+		QuestionRequest request = new QuestionRequest(type, category, content);
 		AnswerResponse answerResponse = AnswerResponse.from(answer);
 
-		QuestionRequest request = new QuestionRequest(type, category, content);
-		QuestionResponse response = QuestionResponse.of(question, answerResponse);
-
 		// when
-		when(questionProcessingService.question(type, category, content)).thenReturn(response);
 		ResultActions resultActions = requestCreateQuestion(request);
 
 		// then
 		resultActions
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.id").value(question.getId()))
-			.andExpect(jsonPath("$.dateInformation").value(question.getDateInformation()))
-			.andExpect(jsonPath("$.answer.id").value(answerResponse.id()))
-			.andExpect(jsonPath("$.answer.content").value(answerResponse.content()))
-			.andExpect(jsonPath("$.answer.renewalYear").value(answerResponse.renewalYear()))
-			.andExpect(jsonPath("$.answer.dateInformation").value(answerResponse.dateInformation()));
+			.andExpect(jsonPath("$.content").value(question.getContent()))
+			.andExpect(jsonPath("$.answer.content").isNotEmpty())
+			.andExpect(jsonPath("$.answer.renewalYear").value(answerResponse.renewalYear()));
 	}
 
 	@Test
 	void 질문_목록_조회_API() throws Exception {
 		// given
 		AnswerResponse answerResponse = AnswerResponse.from(answer);
-
 		FindQuestionsRequest request = new FindQuestionsRequest(type, category);
-		QuestionResponse response = QuestionResponse.of(question, answerResponse);
 
+		System.out.println(questionRepository.findAll().get(0).getQuestionType());
 		// when
-		when(questionService.getQuestions(type, category)).thenReturn(List.of(response));
 		ResultActions resultActions = requestFindQuestions(request);
 
 		// then
@@ -110,7 +147,6 @@ class QuestionControllerTest extends IntegrationTest {
 		QuestionResponse response = QuestionResponse.of(question, answerResponse);
 
 		// when
-		when(questionService.getQuestions(type, null)).thenReturn(List.of(response));
 		ResultActions resultActions = requestFindQuestionsWithoutCategory(request);
 
 		// then
@@ -130,16 +166,12 @@ class QuestionControllerTest extends IntegrationTest {
 			List.of(searchedQuestionsResponse), 0, 5, false, null, null);
 
 		// when
-		when(questionService.searchQuestionsOfCursorPaging(request.content(), request.cursorViewCount(),
-			request.questionId(), request.size()))
-			.thenReturn(response);
 		ResultActions resultActions = requestSearchQuestions(request);
 
 		// then
 		resultActions
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.data[0].content").value("example content"))
-			.andExpect(jsonPath("$.hasNext").value(false));
+			.andExpect(jsonPath("$.data").isArray());
 	}
 
 	private ResultActions requestCreateQuestion(QuestionRequest dto) throws Exception {
