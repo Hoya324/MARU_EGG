@@ -31,7 +31,7 @@ public class QuestionService {
 	private final AnswerService answerService;
 
 	public List<QuestionResponse> getQuestions(final QuestionType type, final QuestionCategory category) {
-		List<Question> questions = findQuestionsByTypeAndCategory(type, category);
+		List<Question> questions = findQuestions(type, category);
 		return questions.stream()
 			.map(question -> createQuestionResponse(question, answerService.getAnswerByQuestionId(question.getId())))
 			.collect(Collectors.toList());
@@ -45,7 +45,7 @@ public class QuestionService {
 			cursorViewCount, questionId, pageable);
 	}
 
-	private List<Question> findQuestionsByTypeAndCategory(final QuestionType type, final QuestionCategory category) {
+	private List<Question> findQuestions(final QuestionType type, final QuestionCategory category) {
 		if (category == null) {
 			return questionRepository.findAllByQuestionType(type);
 		}
