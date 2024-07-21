@@ -17,7 +17,7 @@ import mju.iphak.maru_egg.common.dto.pagination.SliceQuestionResponse;
 import mju.iphak.maru_egg.question.domain.Question;
 import mju.iphak.maru_egg.question.domain.QuestionCategory;
 import mju.iphak.maru_egg.question.domain.QuestionType;
-import mju.iphak.maru_egg.question.dto.response.QuestionResponse;
+import mju.iphak.maru_egg.question.dto.response.QuestionListItemResponse;
 import mju.iphak.maru_egg.question.dto.response.SearchedQuestionsResponse;
 import mju.iphak.maru_egg.question.repository.QuestionRepository;
 
@@ -30,7 +30,7 @@ public class QuestionService {
 	private final QuestionRepository questionRepository;
 	private final AnswerService answerService;
 
-	public List<QuestionResponse> getQuestions(final QuestionType type, final QuestionCategory category) {
+	public List<QuestionListItemResponse> getQuestions(final QuestionType type, final QuestionCategory category) {
 		List<Question> questions = findQuestions(type, category);
 		return questions.stream()
 			.map(question -> createQuestionResponse(question, answerService.getAnswerByQuestionId(question.getId())))
@@ -47,13 +47,13 @@ public class QuestionService {
 
 	private List<Question> findQuestions(final QuestionType type, final QuestionCategory category) {
 		if (category == null) {
-			return questionRepository.findAllByQuestionType(type);
+			return questionRepository.findAllByQuestionTypeOrderByViewCountDesc(type);
 		}
-		return questionRepository.findAllByQuestionTypeAndQuestionCategory(type, category);
+		return questionRepository.findAllByQuestionTypeAndQuestionCategoryOrderByViewCountDesc(type, category);
 	}
 
-	private QuestionResponse createQuestionResponse(final Question question, final Answer answer) {
+	private QuestionListItemResponse createQuestionResponse(final Question question, final Answer answer) {
 		AnswerResponse answerResponse = AnswerResponse.from(answer);
-		return QuestionResponse.of(question, answerResponse);
+		return QuestionListItemResponse.of(question, answerResponse);
 	}
 }
