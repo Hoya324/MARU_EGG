@@ -38,6 +38,10 @@ public class Answer extends BaseEntity {
 		return "생성일자: %s, 마지막 DB 갱신일자: %s".formatted(this.getCreatedAt(), this.getUpdatedAt());
 	}
 
+	public void updateContent(String content) {
+		this.content = content != null ? content : this.content;
+	}
+
 	public static Answer of(Question question, String content) {
 		return Answer.builder()
 			.content(content)
