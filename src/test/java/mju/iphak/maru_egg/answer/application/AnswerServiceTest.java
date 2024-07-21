@@ -112,4 +112,19 @@ public class AnswerServiceTest extends MockTest {
 		assertThat(result.answer()).isEqualTo(answer.getContent());
 		assertThat(expectedResponse).isEqualTo(result);
 	}
+
+	@DisplayName("답변 내용을 수정에 성공한 경우")
+	@Test
+	public void 답변_내용_수정_성공() throws Exception {
+		// given
+		when(answerRepository.findById(1L)).thenReturn(Optional.of(answer));
+		Long id = 1L;
+
+		// when
+		String updateContent = "변경된 답변";
+		answerService.updateAnswerContent(id, updateContent);
+
+		// then
+		assertThat(answer.getContent()).isEqualTo(updateContent);
+	}
 }
