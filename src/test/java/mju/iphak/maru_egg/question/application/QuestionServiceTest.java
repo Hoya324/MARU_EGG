@@ -38,7 +38,7 @@ import mju.iphak.maru_egg.question.domain.Question;
 import mju.iphak.maru_egg.question.domain.QuestionCategory;
 import mju.iphak.maru_egg.question.domain.QuestionType;
 import mju.iphak.maru_egg.question.dto.response.QuestionCore;
-import mju.iphak.maru_egg.question.dto.response.QuestionResponse;
+import mju.iphak.maru_egg.question.dto.response.QuestionListItemResponse;
 import mju.iphak.maru_egg.question.dto.response.SearchedQuestionsResponse;
 import mju.iphak.maru_egg.question.repository.QuestionRepository;
 import okhttp3.mockwebserver.MockResponse;
@@ -130,11 +130,13 @@ class QuestionServiceTest extends MockTest {
 		QuestionCategory category = QuestionCategory.ADMISSION_GUIDELINE;
 
 		List<Question> questions = List.of(question);
-		when(questionRepository.findAllByQuestionTypeAndQuestionCategory(type, category)).thenReturn(questions);
+		when(
+			questionRepository.findAllByQuestionTypeAndQuestionCategoryOrderByViewCountDesc(type, category)).thenReturn(
+			questions);
 		when(answerService.getAnswerByQuestionId(question.getId())).thenReturn(answer);
 
 		// when
-		List<QuestionResponse> result = questionService.getQuestions(type, category);
+		List<QuestionListItemResponse> result = questionService.getQuestions(type, category);
 
 		// then
 		assertNotNull(result);
@@ -150,11 +152,11 @@ class QuestionServiceTest extends MockTest {
 		QuestionType type = QuestionType.SUSI;
 
 		List<Question> questions = List.of(question);
-		when(questionRepository.findAllByQuestionType(type)).thenReturn(questions);
+		when(questionRepository.findAllByQuestionTypeOrderByViewCountDesc(type)).thenReturn(questions);
 		when(answerService.getAnswerByQuestionId(question.getId())).thenReturn(answer);
 
 		// when
-		List<QuestionResponse> result = questionService.getQuestions(type, null);
+		List<QuestionListItemResponse> result = questionService.getQuestions(type, null);
 
 		// then
 		assertNotNull(result);
