@@ -13,12 +13,16 @@ public enum ErrorCode {
 
 	// 400 error
 
+	// 401 error
+	UNAUTHORIZED_REQUEST(UNAUTHORIZED, "로그인 후 다시 시도해주세요."),
+
 	// 404 error
 	NOT_FOUND_QUESTION(NOT_FOUND, "type: %s, category: %s, content: %s인 질문을 찾을 수 없습니다."),
 	NOT_FOUND_QUESTION_BY_ID(NOT_FOUND, "id: %s인 질문을 찾을 수 없습니다."),
 	NOT_FOUND_QUESTION_WITHOUT_CATEGORY(NOT_FOUND, "type: %s, content: %s인 질문을 찾을 수 없습니다."),
 	NOT_FOUND_QUESTION_BY_TYPE_CATEGORY(NOT_FOUND, "type: %s, category: %s인 질문을 찾을 수 없습니다."),
-	NOT_FOUND_ANSWER(NOT_FOUND, "질문 id가 %s인 답변을 찾을 수 없습니다."),
+	NOT_FOUND_ANSWER(NOT_FOUND, "답변 id가 %s인 답변을 찾을 수 없습니다."),
+	NOT_FOUND_ANSWER_BY_QUESTION_ID(NOT_FOUND, "질문 id가 %s인 답변을 찾을 수 없습니다."),
 	NOT_FOUND_USER(NOT_FOUND, "유저 이메일이 %s인 유저를 찾을 수 없습니다."),
 
 	// 500 error
