@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
@@ -32,6 +33,7 @@ import mju.iphak.maru_egg.user.repository.UserRepository;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
 
@@ -69,6 +71,8 @@ public class SecurityConfig {
 					.permitAll()
 					.requestMatchers(new MvcRequestMatcher(introspector, API_PREFIX + "/questions/**"))
 					.permitAll()
+					.requestMatchers(new MvcRequestMatcher(introspector, API_PREFIX + "/admin/answers/**"))
+					.hasRole("ADMIN")
 					.requestMatchers(new MvcRequestMatcher(introspector, "/maru-egg/api-docs/**"))
 					.permitAll()
 					.requestMatchers(new MvcRequestMatcher(introspector, "/maru-egg/swagger-ui/index.html"))

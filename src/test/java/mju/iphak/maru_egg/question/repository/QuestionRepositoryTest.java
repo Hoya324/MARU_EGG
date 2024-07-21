@@ -57,7 +57,8 @@ class QuestionRepositoryTest extends RepositoryTest {
 		QuestionCategory category = QuestionCategory.ADMISSION_GUIDELINE;
 
 		// when
-		List<Question> questions = questionRepository.findAllByQuestionTypeAndQuestionCategory(type, category);
+		List<Question> questions = questionRepository.findAllByQuestionTypeAndQuestionCategoryOrderByViewCountDesc(type,
+			category);
 
 		// then
 		assertThat(questions).isNotEmpty();
@@ -73,7 +74,8 @@ class QuestionRepositoryTest extends RepositoryTest {
 		QuestionCategory category = QuestionCategory.ADMISSION_GUIDELINE;
 
 		// when
-		List<Question> questions = questionRepository.findAllByQuestionTypeAndQuestionCategory(invalidType, category);
+		List<Question> questions = questionRepository.findAllByQuestionTypeAndQuestionCategoryOrderByViewCountDesc(
+			invalidType, category);
 
 		// then
 		assertThat(questions.isEmpty()).isTrue();
@@ -86,7 +88,7 @@ class QuestionRepositoryTest extends RepositoryTest {
 		QuestionType type = QuestionType.SUSI;
 
 		// when
-		List<Question> questions = questionRepository.findAllByQuestionType(type);
+		List<Question> questions = questionRepository.findAllByQuestionTypeOrderByViewCountDesc(type);
 
 		// then
 		assertThat(questions).isNotEmpty();
@@ -101,7 +103,7 @@ class QuestionRepositoryTest extends RepositoryTest {
 		QuestionType invalidType = QuestionType.JEONGSI;
 
 		// when
-		List<Question> questions = questionRepository.findAllByQuestionType(invalidType);
+		List<Question> questions = questionRepository.findAllByQuestionTypeOrderByViewCountDesc(invalidType);
 
 		// then
 		assertThat(questions.isEmpty()).isTrue();

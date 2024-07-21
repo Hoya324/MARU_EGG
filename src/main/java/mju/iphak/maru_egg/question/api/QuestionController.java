@@ -22,6 +22,7 @@ import mju.iphak.maru_egg.question.application.QuestionService;
 import mju.iphak.maru_egg.question.dto.request.FindQuestionsRequest;
 import mju.iphak.maru_egg.question.dto.request.QuestionRequest;
 import mju.iphak.maru_egg.question.dto.request.SearchQuestionsRequest;
+import mju.iphak.maru_egg.question.dto.response.QuestionListItemResponse;
 import mju.iphak.maru_egg.question.dto.response.QuestionResponse;
 import mju.iphak.maru_egg.question.dto.response.SearchedQuestionsResponse;
 
@@ -55,7 +56,7 @@ public class QuestionController {
 		@CustomApiResponse(error = "InternalServerError", status = 500, message = "내부 서버 오류가 발생했습니다.", description = "내부 서버 오류")
 	})
 	@GetMapping()
-	public List<QuestionResponse> getQuestions(@Valid @ModelAttribute FindQuestionsRequest request) {
+	public List<QuestionListItemResponse> getQuestions(@Valid @ModelAttribute FindQuestionsRequest request) {
 		return questionService.getQuestions(request.type(), request.category());
 	}
 
