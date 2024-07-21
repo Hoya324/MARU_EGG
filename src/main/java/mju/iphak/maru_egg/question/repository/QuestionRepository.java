@@ -9,7 +9,8 @@ import mju.iphak.maru_egg.question.domain.QuestionCategory;
 import mju.iphak.maru_egg.question.domain.QuestionType;
 
 public interface QuestionRepository extends JpaRepository<Question, Long>, QuestionRepositoryCustom {
-	List<Question> findAllByQuestionTypeAndQuestionCategory(QuestionType type, QuestionCategory category);
+	List<Question> findAllByQuestionTypeAndQuestionCategoryOrderByViewCountDesc(QuestionType type,
+		QuestionCategory category);
 
-	List<Question> findAllByQuestionType(QuestionType type);
+	List<Question> findAllByQuestionTypeOrderByViewCountDesc(QuestionType type);
 }
