@@ -58,6 +58,7 @@ dependencies {
     testImplementation 'org.testcontainers:mysql'
     testImplementation 'org.testcontainers:jdbc:1.19.7'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testImplementation "org.springframework.security:spring-security-test"
 
     //QueryDsl
     implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
