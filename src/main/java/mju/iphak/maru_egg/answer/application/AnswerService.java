@@ -30,7 +30,7 @@ public class AnswerService {
 	public Answer getAnswerByQuestionId(Long questionId) {
 		return answerRepository.findByQuestionId(questionId)
 			.orElseThrow(() -> new EntityNotFoundException(
-				String.format(NOT_FOUND_ANSWER.getMessage(), questionId)));
+				String.format(NOT_FOUND_ANSWER_BY_QUESTION_ID.getMessage(), questionId)));
 	}
 
 	public Mono<LLMAnswerResponse> askQuestion(LLMAskQuestionRequest request) {
@@ -49,5 +49,12 @@ public class AnswerService {
 
 	public Answer saveAnswer(Answer answer) {
 		return answerRepository.save(answer);
+	}
+
+	public void updateAnswerContent(final Long id, final String content) {
+		Answer answer = answerRepository.findById(id)
+			.orElseThrow(() -> new EntityNotFoundException(
+				String.format(NOT_FOUND_ANSWER.getMessage(), id)));
+		answer.updateContent(content);
 	}
 }
