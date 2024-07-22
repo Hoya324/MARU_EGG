@@ -19,7 +19,7 @@ public record QuestionRequest(
 	@NotNull(message = "질문 타입은 비어있을 수 없습니다.")
 	QuestionType type,
 
-	@Schema(description = "질문 카테고리(모집요강, 입시결과, 기출 문제)")
+	@Schema(description = "질문 카테고리(모집요강, 입시결과, 기출 문제)", nullable = true)
 	QuestionCategory category,
 
 	@Schema(description = "질문 내용")
