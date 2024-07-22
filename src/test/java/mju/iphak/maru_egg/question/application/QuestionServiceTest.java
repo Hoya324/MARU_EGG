@@ -68,7 +68,8 @@ class QuestionServiceTest extends MockTest {
 		formData.add("question", request.question());
 		Question testQuestion = Question.of("새로운 질문입니다.", "새로운 질문", QuestionType.SUSI,
 			QuestionCategory.ADMISSION_GUIDELINE);
-		LLMAnswerResponse expectedResponse = LLMAnswerResponse.from(Answer.of(testQuestion, "새로운 답변입니다."));
+		LLMAnswerResponse expectedResponse = LLMAnswerResponse.of(Answer.of(testQuestion, "새로운 답변입니다."),
+			QuestionCategory.ADMISSION_GUIDELINE);
 
 		mockWebServer.enqueue(new MockResponse()
 			.setHeader("Content-type", MediaType.APPLICATION_JSON_VALUE)

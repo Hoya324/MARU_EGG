@@ -34,6 +34,7 @@ import mju.iphak.maru_egg.question.utils.PhraseExtractionUtils;
 public class QuestionProcessingService {
 
 	private static final double STANDARD_SIMILARITY = 0.95;
+	private static final String UNCLASSIFIED = "";
 
 	private final QuestionRepository questionRepository;
 	private final AnswerService answerService;
@@ -66,14 +67,14 @@ public class QuestionProcessingService {
 
 		LLMAnswerResponse llmAnswerResponse = answerService.askQuestion(askQuestionRequest).block();
 
-		Question newQuestion = saveQuestion(type, category, content, contentToken);
+		Question newQuestion = saveQuestion(type, llmAnswerResponse.questionCategory(), content, contentToken);
 		Answer newAnswer = saveAnswer(newQuestion, llmAnswerResponse.answer());
 		return createQuestionResponse(newQuestion, newAnswer);
 	}
 
 	private static String isCategoryNullThen(final QuestionCategory category) {
-		if (category.toString() == null) {
-			return QuestionCategory.UNCLASSIFIED.getQuestionCategory();
+		if (category == null) {
+			return UNCLASSIFIED;
 		}
 		return category.toString();
 	}

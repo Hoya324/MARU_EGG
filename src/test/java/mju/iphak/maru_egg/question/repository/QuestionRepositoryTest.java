@@ -42,7 +42,7 @@ class QuestionRepositoryTest extends RepositoryTest {
 			QuestionCategory.ADMISSION_GUIDELINE);
 		questionRepository.save(additionalQuestion3);
 		Question additionalQuestionUNCLASSIFIED = Question.of("추가4 테스트 질문 예시입니다.", "추가 테스트 질문 예시", QuestionType.SUSI,
-			QuestionCategory.UNCLASSIFIED);
+			null);
 		questionRepository.save(additionalQuestionUNCLASSIFIED);
 
 		answer = Answer.of(question, "테스트 답변입니다.");

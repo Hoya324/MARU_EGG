@@ -67,7 +67,8 @@ class QuestionProcessingServiceTest extends MockTest {
 		formData.add("question", request.question());
 		Question testQuestion = Question.of("새로운 질문입니다.", "새로운 질문", QuestionType.SUSI,
 			QuestionCategory.ADMISSION_GUIDELINE);
-		LLMAnswerResponse expectedResponse = LLMAnswerResponse.from(Answer.of(testQuestion, "새로운 답변입니다."));
+		LLMAnswerResponse expectedResponse = LLMAnswerResponse.of(Answer.of(testQuestion, "새로운 답변입니다."),
+			QuestionCategory.ADMISSION_GUIDELINE);
 
 		mockWebServer.enqueue(new MockResponse()
 			.setHeader("Content-type", MediaType.APPLICATION_JSON_VALUE)
@@ -205,7 +206,7 @@ class QuestionProcessingServiceTest extends MockTest {
 		String contentToken = PhraseExtractionUtils.extractPhrases(content);
 		Question testQuestion = Question.of(content, contentToken, type, category);
 		Answer testAnswer = Answer.of(testQuestion, "새로운 답변입니다.");
-		LLMAnswerResponse expectedResponse = LLMAnswerResponse.from(testAnswer);
+		LLMAnswerResponse expectedResponse = LLMAnswerResponse.of(testAnswer, QuestionCategory.ADMISSION_GUIDELINE);
 
 		when(questionRepository.searchQuestionsByContentTokenAndTypeAndCategory(contentToken, type, category))
 			.thenReturn(Optional.of(Collections.emptyList()));
@@ -234,7 +235,8 @@ class QuestionProcessingServiceTest extends MockTest {
 			question.getContent());
 		Question testQuestion = Question.of("새로운 질문입니다.", "새로운 질문", QuestionType.SUSI,
 			QuestionCategory.ADMISSION_GUIDELINE);
-		LLMAnswerResponse expectedResponse = LLMAnswerResponse.from(Answer.of(testQuestion, "새로운 답변입니다."));
+		LLMAnswerResponse expectedResponse = LLMAnswerResponse.of(Answer.of(testQuestion, "새로운 답변입니다."),
+			QuestionCategory.ADMISSION_GUIDELINE);
 
 		// when
 		LLMAnswerResponse result = mockAskQuestion(request);

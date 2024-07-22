@@ -104,7 +104,7 @@ public class AnswerServiceTest extends MockTest {
 			question.getContent());
 
 		// when
-		LLMAnswerResponse expectedResponse = LLMAnswerResponse.from(answer);
+		LLMAnswerResponse expectedResponse = LLMAnswerResponse.of(answer, QuestionCategory.ADMISSION_GUIDELINE);
 		LLMAnswerResponse result = answerService.askQuestion(request).block();
 
 		// then

@@ -39,7 +39,7 @@ public class QuestionController {
 		@ApiResponse(responseCode = "200", description = "질문 성공")
 	})
 	@CustomApiResponses({
-		@CustomApiResponse(error = "HttpMessageNotReadableException", status = 400, message = "Invalid input format: JSON parse error: Cannot deserialize value of type `mju.iphak.maru_egg.question.domain.QuestionType` from String \\\"SUSI 또는 PYEONIP 또는 JEONGSI 또는 JAEOEGUGMIN\\\": not one of the values accepted for Enum class: [SUSI, PYEONIP, JEONGSI, JAEOEGUGMIN]", description = "validation에 맞지 않은 요청을 할 경우"),
+		@CustomApiResponse(error = "HttpMessageNotReadableException", status = 400, message = "Invalid input format: JSON parse error: Cannot deserialize value of type `mju.iphak.maru_egg.question.domain.QuestionType` from String \\\"SUSI 또는 PYEONIP 또는 JEONGSI\\\": not one of the values accepted for Enum class: [SUSI, PYEONIP, JEONGSI]", description = "validation에 맞지 않은 요청을 할 경우"),
 		@CustomApiResponse(error = "EntityNotFoundException", status = 404, message = "type: SUSI, category: PAST_QUESTIONS, content: 수시 입학 요강에 대해 알려주세요.인 질문을 찾을 수 없습니다.", description = "질문 또는 답변을 찾지 못한 경우"),
 		@CustomApiResponse(error = "InternalServerError", status = 500, message = "내부 서버 오류가 발생했습니다.", description = "내부 서버 오류")
 	})
@@ -52,7 +52,7 @@ public class QuestionController {
 		@ApiResponse(responseCode = "200", description = "질문 성공")
 	})
 	@CustomApiResponses({
-		@CustomApiResponse(error = "HttpMessageNotReadableException", status = 400, message = "Invalid input format: JSON parse error: Cannot deserialize value of type `mju.iphak.maru_egg.question.domain.QuestionType` from String \\\"SUSI 또는 PYEONIP 또는 JEONGSI 또는 JAEOEGUGMIN\\\": not one of the values accepted for Enum class: [SUSI, PYEONIP, JEONGSI, JAEOEGUGMIN]", description = "validation에 맞지 않은 요청을 할 경우"),
+		@CustomApiResponse(error = "HttpMessageNotReadableException", status = 400, message = "Invalid input format: JSON parse error: Cannot deserialize value of type `mju.iphak.maru_egg.question.domain.QuestionType` from String \\\"SUSI 또는 PYEONIP 또는 JEONGSI\\\": not one of the values accepted for Enum class: [SUSI, PYEONIP, JEONGSI]", description = "validation에 맞지 않은 요청을 할 경우"),
 		@CustomApiResponse(error = "InternalServerError", status = 500, message = "내부 서버 오류가 발생했습니다.", description = "내부 서버 오류")
 	})
 	@GetMapping()
@@ -64,7 +64,7 @@ public class QuestionController {
 		@ApiResponse(responseCode = "200", description = "질문 자동완성 성공")
 	})
 	@CustomApiResponses({
-		@CustomApiResponse(error = "HttpMessageNotReadableException", status = 400, message = "Invalid input format: JSON parse error: Cannot deserialize value of type `mju.iphak.maru_egg.question.domain.QuestionType` from String \\\"SUSI 또는 PYEONIP 또는 JEONGSI 또는 JAEOEGUGMIN\\\": not one of the values accepted for Enum class: [SUSI, PYEONIP, JEONGSI, JAEOEGUGMIN]", description = "validation에 맞지 않은 요청을 할 경우"),
+		@CustomApiResponse(error = "HttpMessageNotReadableException", status = 400, message = "Invalid input format: JSON parse error: Cannot deserialize value of type `mju.iphak.maru_egg.question.domain.QuestionType` from String \\\"SUSI 또는 PYEONIP 또는 JEONGSI\\\": not one of the values accepted for Enum class: [SUSI, PYEONIP, JEONGSI]", description = "validation에 맞지 않은 요청을 할 경우"),
 		@CustomApiResponse(error = "InternalServerError", status = 500, message = "내부 서버 오류가 발생했습니다.", description = "내부 서버 오류")
 	})
 	@GetMapping("/search")

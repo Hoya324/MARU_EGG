@@ -8,8 +8,7 @@ import lombok.RequiredArgsConstructor;
 public enum QuestionType {
 	SUSI("수시"),
 	JEONGSI("정시"),
-	PYEONIP("편입학"),
-	JAEOEGUGMIN("재외국민");
+	PYEONIP("편입학");
 
 	private final String questionType;
 

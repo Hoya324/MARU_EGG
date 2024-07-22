@@ -11,9 +11,7 @@ public enum QuestionCategory {
 	ADMISSION_GUIDELINE("모집요강"),
 	PASSING_RESULT("입시결과"),
 	PAST_QUESTIONS("기출문제"),
-	UNIV_LIFE("대학생활"),
-	INTERVIEW_PRACTICAL_TEST("면접/실기"),
-	UNCLASSIFIED("미분류");
+	INTERVIEW_PRACTICAL_TEST("면접/실기");
 
 	private final String questionCategory;
 
