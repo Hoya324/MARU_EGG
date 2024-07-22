@@ -13,7 +13,7 @@ public enum QuestionCategory {
 	PAST_QUESTIONS("기출문제"),
 	UNIV_LIFE("대학생활"),
 	INTERVIEW_PRACTICAL_TEST("면접/실기"),
-	ETC("기타");
+	UNCLASSIFIED("미분류");
 
 	private final String questionCategory;
 
