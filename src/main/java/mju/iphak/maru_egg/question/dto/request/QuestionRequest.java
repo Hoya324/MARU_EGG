@@ -9,7 +9,7 @@ import mju.iphak.maru_egg.question.domain.QuestionType;
 @Schema(description = "질문 생성 요청 DTO", example = """
 	{
 	  "type": "SUSI 또는 PYEONIP 또는 JEONGSI 또는 JAEOEGUGMIN",
-	  "category": "PAST_QUESTIONS 또는 UNIV_LIFE 또는 INTERVIEW_PRACTICAL_TEST 또는 PASSING_RESULT 또는 ADMISSION_GUIDELINE 또는 ETC",
+	  "category": "PAST_QUESTIONS 또는 UNIV_LIFE 또는 INTERVIEW_PRACTICAL_TEST 또는 PASSING_RESULT 또는 ADMISSION_GUIDELINE 또는 UNCLASSIFIED",
 	  "content": "수시 입학 요강에 대해 알려주세요."
 	}
 	""")

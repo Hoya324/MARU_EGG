@@ -41,9 +41,9 @@ class QuestionRepositoryTest extends RepositoryTest {
 		Question additionalQuestion3 = Question.of("추가3 테스트 질문 예시입니다.", "추가 테스트 질문 예시", QuestionType.SUSI,
 			QuestionCategory.ADMISSION_GUIDELINE);
 		questionRepository.save(additionalQuestion3);
-		Question additionalQuestionETC = Question.of("추가4 테스트 질문 예시입니다.", "추가 테스트 질문 예시", QuestionType.SUSI,
-			QuestionCategory.ETC);
-		questionRepository.save(additionalQuestionETC);
+		Question additionalQuestionUNCLASSIFIED = Question.of("추가4 테스트 질문 예시입니다.", "추가 테스트 질문 예시", QuestionType.SUSI,
+			QuestionCategory.UNCLASSIFIED);
+		questionRepository.save(additionalQuestionUNCLASSIFIED);
 
 		answer = Answer.of(question, "테스트 답변입니다.");
 		answerRepository.save(answer);

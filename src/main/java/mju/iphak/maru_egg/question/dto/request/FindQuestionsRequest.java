@@ -16,7 +16,7 @@ public record FindQuestionsRequest(
 	QuestionType type,
 
 	@Schema(description = "질문 카테고리(모집요강, 입시결과, 기출 문제)", allowableValues = {"ADMISSION_GUIDELINE", "PASSING_RESULT",
-		"PAST_QUESTIONS", "ETC", "UNIV_LIFE", "INTERVIEW_PRACTICAL_TEST"})
+		"PAST_QUESTIONS", "UNCLASSIFIED", "UNIV_LIFE", "INTERVIEW_PRACTICAL_TEST"})
 	QuestionCategory category
 ) {
 }
