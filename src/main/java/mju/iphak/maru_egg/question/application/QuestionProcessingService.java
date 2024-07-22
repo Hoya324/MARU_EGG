@@ -60,7 +60,8 @@ public class QuestionProcessingService {
 
 	private QuestionResponse askNewQuestion(QuestionType type, QuestionCategory category, String content,
 		String contentToken) {
-		LLMAskQuestionRequest askQuestionRequest = LLMAskQuestionRequest.of(type.toString(), category.toString(),
+		LLMAskQuestionRequest askQuestionRequest = LLMAskQuestionRequest.of(type.toString(),
+			isCategoryNullThen(category),
 			content);
 
 		LLMAnswerResponse llmAnswerResponse = answerService.askQuestion(askQuestionRequest).block();
@@ -68,6 +69,13 @@ public class QuestionProcessingService {
 		Question newQuestion = saveQuestion(type, category, content, contentToken);
 		Answer newAnswer = saveAnswer(newQuestion, llmAnswerResponse.answer());
 		return createQuestionResponse(newQuestion, newAnswer);
+	}
+
+	private static String isCategoryNullThen(final QuestionCategory category) {
+		if (category.toString() == null) {
+			return QuestionCategory.UNCLASSIFIED.getQuestionCategory();
+		}
+		return category.toString();
 	}
 
 	private Answer saveAnswer(final Question question, final String content) {

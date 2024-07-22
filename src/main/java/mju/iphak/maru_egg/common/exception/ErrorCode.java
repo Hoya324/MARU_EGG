@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 public enum ErrorCode {
 
 	// 400 error
+	BAD_REQUEST_WEBCLIENT(BAD_REQUEST, "%s에 잘못된 요청을 보냈습니다. (questionType: %s, questionCategory: %s, question: %s"),
 
 	// 401 error
 	UNAUTHORIZED_REQUEST(UNAUTHORIZED, "로그인 후 다시 시도해주세요."),
@@ -24,9 +25,11 @@ public enum ErrorCode {
 	NOT_FOUND_ANSWER(NOT_FOUND, "답변 id가 %s인 답변을 찾을 수 없습니다."),
 	NOT_FOUND_ANSWER_BY_QUESTION_ID(NOT_FOUND, "질문 id가 %s인 답변을 찾을 수 없습니다."),
 	NOT_FOUND_USER(NOT_FOUND, "유저 이메일이 %s인 유저를 찾을 수 없습니다."),
+	NOT_FOUND_WEBCLIENT(NOT_FOUND, "%s에서 값을 불러오지 못 했습니다."),
 
 	// 500 error
-	INTERNAL_ERROR_SIMILARITY(NOT_FOUND, "contentToken: %s, question: %s인 질문의 유사도를 검사하는 도중 오류가 발생했습니다.");
+	INTERNAL_ERROR_SIMILARITY(INTERNAL_SERVER_ERROR, "contentToken: %s, question: %s인 질문의 유사도를 검사하는 도중 오류가 발생했습니다."),
+	INTERNAL_ERROR_WEBCLIENT(INTERNAL_SERVER_ERROR, "%s에서 서버 오류가 발생했습니다.");
 
 	private final HttpStatus status;
 	private final String message;
