@@ -15,9 +15,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import mju.iphak.maru_egg.answer.application.AnswerService;
 import mju.iphak.maru_egg.answer.domain.Answer;
+import mju.iphak.maru_egg.answer.domain.AnswerReference;
 import mju.iphak.maru_egg.answer.dto.request.LLMAskQuestionRequest;
+import mju.iphak.maru_egg.answer.dto.response.AnswerReferenceResponse;
 import mju.iphak.maru_egg.answer.dto.response.AnswerResponse;
 import mju.iphak.maru_egg.answer.dto.response.LLMAnswerResponse;
+import mju.iphak.maru_egg.answer.repository.AnswerReferenceRepository;
 import mju.iphak.maru_egg.question.domain.Question;
 import mju.iphak.maru_egg.question.domain.QuestionCategory;
 import mju.iphak.maru_egg.question.domain.QuestionType;
@@ -38,6 +41,7 @@ public class QuestionProcessingService {
 
 	private final QuestionRepository questionRepository;
 	private final AnswerService answerService;
+	private final AnswerReferenceRepository answerReferenceRepository;
 
 	public QuestionResponse question(final QuestionType type, final QuestionCategory category, final String content) {
 		String contentToken = PhraseExtractionUtils.extractPhrases(content);
@@ -69,7 +73,16 @@ public class QuestionProcessingService {
 		Question newQuestion = saveQuestion(type,
 			QuestionCategory.convertToCategory(llmAnswerResponse.questionCategory()), content, contentToken);
 		Answer newAnswer = saveAnswer(newQuestion, llmAnswerResponse.answer());
-		return createQuestionResponse(newQuestion, newAnswer);
+		saveAnswerReference(newAnswer, llmAnswerResponse.references());
+		return createQuestionResponse(newQuestion, newAnswer, llmAnswerResponse.references());
+	}
+
+	private void saveAnswerReference(final Answer answer,
+		List<AnswerReferenceResponse> referenceResponses) {
+		List<AnswerReference> answerReferences = referenceResponses.stream()
+			.map((reference) -> AnswerReference.of(reference.title(), reference.link(), answer))
+			.toList();
+		answerReferenceRepository.saveAll(answerReferences);
 	}
 
 	private static String isCategoryNullThen(final QuestionCategory category) {
@@ -90,9 +103,10 @@ public class QuestionProcessingService {
 		return questionRepository.save(question);
 	}
 
-	private QuestionResponse createQuestionResponse(final Question question, final Answer answer) {
+	private QuestionResponse createQuestionResponse(final Question question, final Answer answer,
+		final List<AnswerReferenceResponse> answerReferenceResponses) {
 		AnswerResponse answerResponse = AnswerResponse.from(answer);
-		return QuestionResponse.of(question, answerResponse);
+		return QuestionResponse.of(question, answerResponse, answerReferenceResponses);
 	}
 
 	private Question getQuestionById(final Long questionId) {
@@ -148,6 +162,9 @@ public class QuestionProcessingService {
 		Question question = getQuestionById(questionId);
 		question.incrementViewCount();
 		Answer answer = answerService.getAnswerByQuestionId(question.getId());
-		return createQuestionResponse(question, answer);
+		List<AnswerReferenceResponse> answerReferenceResponses = answer.getReferences().stream()
+			.map((answerReference) -> AnswerReferenceResponse.of(answerReference.getTitle(), answerReference.getLink()))
+			.toList();
+		return createQuestionResponse(question, answer, answerReferenceResponses);
 	}
 }

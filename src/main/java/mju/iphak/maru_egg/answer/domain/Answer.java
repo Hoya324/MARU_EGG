@@ -1,11 +1,15 @@
 package mju.iphak.maru_egg.answer.domain;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
@@ -33,6 +37,10 @@ public class Answer extends BaseEntity {
 	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "question_id", nullable = false)
 	private Question question;
+
+	@OneToMany(mappedBy = "answer", cascade = CascadeType.ALL)
+	@Builder.Default
+	private List<AnswerReference> references = new ArrayList<>();
 
 	public String getDateInformation() {
 		return "생성일자: %s, 마지막 DB 갱신일자: %s".formatted(this.getCreatedAt(), this.getUpdatedAt());
@@ -63,5 +71,4 @@ public class Answer extends BaseEntity {
 		LocalDate nowDate = LocalDate.now();
 		return Integer.parseInt(String.valueOf(nowDate.getYear()));
 	}
-
 }

@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,6 +31,7 @@ import com.google.gson.Gson;
 import mju.iphak.maru_egg.answer.application.AnswerService;
 import mju.iphak.maru_egg.answer.domain.Answer;
 import mju.iphak.maru_egg.answer.dto.request.LLMAskQuestionRequest;
+import mju.iphak.maru_egg.answer.dto.response.AnswerReferenceResponse;
 import mju.iphak.maru_egg.answer.dto.response.LLMAnswerResponse;
 import mju.iphak.maru_egg.answer.repository.AnswerRepository;
 import mju.iphak.maru_egg.common.MockTest;
@@ -68,8 +70,10 @@ class QuestionServiceTest extends MockTest {
 		formData.add("question", request.question());
 		Question testQuestion = Question.of("새로운 질문입니다.", "새로운 질문", QuestionType.SUSI,
 			QuestionCategory.ADMISSION_GUIDELINE);
+		List<AnswerReferenceResponse> references = new ArrayList<>(
+			List.of(AnswerReferenceResponse.of("테스트 title", "테스트 link")));
 		LLMAnswerResponse expectedResponse = LLMAnswerResponse.of(QuestionType.SUSI.getType(),
-			QuestionCategory.ADMISSION_GUIDELINE.getCategory(), Answer.of(testQuestion, "새로운 답변입니다."));
+			QuestionCategory.ADMISSION_GUIDELINE.getCategory(), Answer.of(testQuestion, "새로운 답변입니다."), references);
 
 		mockWebServer.enqueue(new MockResponse()
 			.setHeader("Content-type", MediaType.APPLICATION_JSON_VALUE)

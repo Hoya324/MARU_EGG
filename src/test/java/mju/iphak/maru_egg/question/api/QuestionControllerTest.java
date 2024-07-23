@@ -6,6 +6,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -23,7 +24,10 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import mju.iphak.maru_egg.answer.application.AnswerService;
 import mju.iphak.maru_egg.answer.domain.Answer;
+import mju.iphak.maru_egg.answer.domain.AnswerReference;
+import mju.iphak.maru_egg.answer.dto.response.AnswerReferenceResponse;
 import mju.iphak.maru_egg.answer.dto.response.AnswerResponse;
+import mju.iphak.maru_egg.answer.repository.AnswerReferenceRepository;
 import mju.iphak.maru_egg.answer.repository.AnswerRepository;
 import mju.iphak.maru_egg.common.IntegrationTest;
 import mju.iphak.maru_egg.common.dto.pagination.SliceQuestionResponse;
@@ -55,10 +59,14 @@ class QuestionControllerTest extends IntegrationTest {
 	private AnswerRepository answerRepository;
 
 	@Autowired
+	private AnswerReferenceRepository answerReferenceRepository;
+
+	@Autowired
 	private AnswerService answerService;
 
 	private Question question;
 	private Answer answer;
+	private AnswerReference answerReference;
 	private QuestionType type;
 	private QuestionCategory category;
 	private String content;
@@ -87,6 +95,7 @@ class QuestionControllerTest extends IntegrationTest {
 			QuestionCategory.ADMISSION_GUIDELINE));
 		answer = answerRepository.save(Answer.of(question,
 			"수시 일정은 2024년 12월 19일(목)부터 2024년 12월 26일(목) 18:00까지 최초합격자 발표가 있고, 2025년 2월 10일(월) 10:00부터 2025년 2월 12일(수) 15:00까지 문서등록 및 등록금 납부가 진행됩니다. 등록금 납부 기간은 2024년 12월 16일(월) 10:00부터 2024년 12월 18일(수) 15:00까지이며, 방법은 입학처 홈페이지를 통한 문서등록 및 등록금 납부를 하시면 됩니다. 상세 안내는 추후 입학처 홈페이지를 통해 공지될 예정입니다."));
+		answerReference = answerReferenceRepository.save(AnswerReference.of("테스트 title", "테스트 link", answer));
 
 		WebClient webClient = WebClient.builder()
 			.exchangeFunction(exchangeFunction)
@@ -144,7 +153,9 @@ class QuestionControllerTest extends IntegrationTest {
 		AnswerResponse answerResponse = AnswerResponse.from(answer);
 
 		FindQuestionsRequest request = new FindQuestionsRequest(type, null);
-		QuestionResponse response = QuestionResponse.of(question, answerResponse);
+		List<AnswerReferenceResponse> references = new ArrayList<>(
+			List.of(AnswerReferenceResponse.of("테스트 title", "테스트 link")));
+		QuestionResponse response = QuestionResponse.of(question, answerResponse, references);
 
 		// when
 		ResultActions resultActions = requestFindQuestionsWithoutCategory(request);
