@@ -22,6 +22,7 @@ public class WebClientConfig {
 			.baseUrl(baseUrl)
 			.filter(logRequest())
 			.filter(logResponse())
+			.filter(logError())
 			.build();
 	}
 
@@ -39,6 +40,17 @@ public class WebClientConfig {
 			clientResponse.headers()
 				.asHttpHeaders()
 				.forEach((name, values) -> values.forEach(value -> log.info("{}={}", name, value)));
+			return Mono.just(clientResponse);
+		});
+	}
+
+	private ExchangeFilterFunction logError() {
+		return ExchangeFilterFunction.ofResponseProcessor(clientResponse -> {
+			if (clientResponse.statusCode().isError()) {
+				clientResponse.bodyToMono(String.class).subscribe(body -> {
+					log.error("Response Error Body: {}", body);
+				});
+			}
 			return Mono.just(clientResponse);
 		});
 	}
