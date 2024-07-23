@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.Before;
@@ -20,6 +22,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import jakarta.persistence.EntityNotFoundException;
 import mju.iphak.maru_egg.answer.domain.Answer;
 import mju.iphak.maru_egg.answer.dto.request.LLMAskQuestionRequest;
+import mju.iphak.maru_egg.answer.dto.response.AnswerReferenceResponse;
 import mju.iphak.maru_egg.answer.dto.response.LLMAnswerResponse;
 import mju.iphak.maru_egg.answer.repository.AnswerRepository;
 import mju.iphak.maru_egg.common.MockTest;
@@ -104,10 +107,12 @@ public class AnswerServiceTest extends MockTest {
 		LLMAskQuestionRequest request = LLMAskQuestionRequest.of(QuestionType.SUSI.getType(),
 			QuestionCategory.ADMISSION_GUIDELINE.getCategory(),
 			question.getContent());
+		List<AnswerReferenceResponse> references = new ArrayList<>(
+			List.of(AnswerReferenceResponse.of("테스트 title", "테스트 link")));
 
 		// when
 		LLMAnswerResponse expectedResponse = LLMAnswerResponse.of(QuestionType.SUSI.getType(),
-			QuestionCategory.ADMISSION_GUIDELINE.getCategory(), answer);
+			QuestionCategory.ADMISSION_GUIDELINE.getCategory(), answer, references);
 		LLMAnswerResponse result = answerService.askQuestion(request).block();
 
 		// then

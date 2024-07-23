@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -28,9 +29,12 @@ import com.google.gson.Gson;
 
 import mju.iphak.maru_egg.answer.application.AnswerService;
 import mju.iphak.maru_egg.answer.domain.Answer;
+import mju.iphak.maru_egg.answer.domain.AnswerReference;
 import mju.iphak.maru_egg.answer.dto.request.LLMAskQuestionRequest;
+import mju.iphak.maru_egg.answer.dto.response.AnswerReferenceResponse;
 import mju.iphak.maru_egg.answer.dto.response.AnswerResponse;
 import mju.iphak.maru_egg.answer.dto.response.LLMAnswerResponse;
+import mju.iphak.maru_egg.answer.repository.AnswerReferenceRepository;
 import mju.iphak.maru_egg.answer.repository.AnswerRepository;
 import mju.iphak.maru_egg.common.MockTest;
 import mju.iphak.maru_egg.question.domain.Question;
@@ -53,6 +57,9 @@ class QuestionProcessingServiceTest extends MockTest {
 	private AnswerRepository answerRepository;
 
 	@Mock
+	private AnswerReferenceRepository answerReferenceRepository;
+
+	@Mock
 	private AnswerService answerService;
 	private MockWebServer mockWebServer;
 
@@ -67,8 +74,10 @@ class QuestionProcessingServiceTest extends MockTest {
 		formData.add("question", request.question());
 		Question testQuestion = Question.of("새로운 질문입니다.", "새로운 질문", QuestionType.SUSI,
 			QuestionCategory.ADMISSION_GUIDELINE);
+		List<AnswerReferenceResponse> references = new ArrayList<>(
+			List.of(AnswerReferenceResponse.of("테스트 title", "테스트 link")));
 		LLMAnswerResponse expectedResponse = LLMAnswerResponse.of(QuestionType.SUSI.getType(),
-			QuestionCategory.ADMISSION_GUIDELINE.getCategory(), Answer.of(testQuestion, "새로운 답변입니다."));
+			QuestionCategory.ADMISSION_GUIDELINE.getCategory(), Answer.of(testQuestion, "새로운 답변입니다."), references);
 
 		mockWebServer.enqueue(new MockResponse()
 			.setHeader("Content-type", MediaType.APPLICATION_JSON_VALUE)
@@ -98,6 +107,7 @@ class QuestionProcessingServiceTest extends MockTest {
 
 	private Question question;
 	private Answer answer;
+	private AnswerReference answerReference;
 
 	@BeforeEach
 	void setUp() {
@@ -105,16 +115,22 @@ class QuestionProcessingServiceTest extends MockTest {
 
 		question = mock(Question.class);
 		answer = mock(Answer.class);
+		answerReference = mock(AnswerReference.class);
 
+		List<AnswerReference> references = new ArrayList<>(
+			List.of(AnswerReference.of("테스트 title", "테스트 link", answer)));
 		when(question.getId()).thenReturn(1L);
 		when(answer.getId()).thenReturn(1L);
+		when(answer.getReferences()).thenReturn(references);
 		when(answerService.getAnswerByQuestionId(1L)).thenReturn(answer);
 		when(answerRepository.findByQuestionId(anyLong())).thenReturn(Optional.of(answer));
 		when(questionRepository.searchQuestionsByContentTokenAndTypeAndCategory(anyString(), any(QuestionType.class),
 			any(QuestionCategory.class)))
 			.thenReturn(Optional.of(List.of(QuestionCore.of(1L, "테스트 질문입니다."))));
 		when(questionRepository.findById(1L)).thenReturn(Optional.of(question));
-		questionProcessingService = new QuestionProcessingService(questionRepository, answerService);
+
+		questionProcessingService = new QuestionProcessingService(questionRepository, answerService,
+			answerReferenceRepository);
 
 		doAnswer(invocation -> {
 			LLMAskQuestionRequest request = invocation.getArgument(0);
@@ -131,6 +147,8 @@ class QuestionProcessingServiceTest extends MockTest {
 		QuestionCategory category = QuestionCategory.ADMISSION_GUIDELINE;
 		String content = "테스트 질문입니다.";
 		String contentToken = PhraseExtractionUtils.extractPhrases(content);
+		List<AnswerReferenceResponse> references = new ArrayList<>(
+			List.of(AnswerReferenceResponse.of("테스트 title", "테스트 link")));
 
 		when(questionRepository.searchQuestionsByContentTokenAndTypeAndCategory(anyString(), eq(type), eq(category)))
 			.thenReturn(Optional.of(List.of(QuestionCore.of(1L, contentToken))));
@@ -139,7 +157,7 @@ class QuestionProcessingServiceTest extends MockTest {
 		QuestionResponse result = questionProcessingService.question(type, category, content);
 
 		// then
-		assertThat(result).isEqualTo(QuestionResponse.of(question, AnswerResponse.from(answer)));
+		assertThat(result).isEqualTo(QuestionResponse.of(question, AnswerResponse.from(answer), references));
 	}
 
 	// TODO: 추후 test
@@ -206,8 +224,10 @@ class QuestionProcessingServiceTest extends MockTest {
 		String contentToken = PhraseExtractionUtils.extractPhrases(content);
 		Question testQuestion = Question.of(content, contentToken, type, category);
 		Answer testAnswer = Answer.of(testQuestion, "새로운 답변입니다.");
+		List<AnswerReferenceResponse> references = new ArrayList<>(
+			List.of(AnswerReferenceResponse.of("테스트 title", "테스트 link")));
 		LLMAnswerResponse expectedResponse = LLMAnswerResponse.of(QuestionType.SUSI.getType(),
-			QuestionCategory.ADMISSION_GUIDELINE.getCategory(), testAnswer);
+			QuestionCategory.ADMISSION_GUIDELINE.getCategory(), testAnswer, references);
 
 		when(questionRepository.searchQuestionsByContentTokenAndTypeAndCategory(contentToken, type, category))
 			.thenReturn(Optional.of(Collections.emptyList()));
@@ -236,8 +256,10 @@ class QuestionProcessingServiceTest extends MockTest {
 			question.getContent());
 		Question testQuestion = Question.of("새로운 질문입니다.", "새로운 질문", QuestionType.SUSI,
 			QuestionCategory.ADMISSION_GUIDELINE);
+		List<AnswerReferenceResponse> references = new ArrayList<>(
+			List.of(AnswerReferenceResponse.of("테스트 title", "테스트 link")));
 		LLMAnswerResponse expectedResponse = LLMAnswerResponse.of(QuestionType.SUSI.getType(),
-			QuestionCategory.ADMISSION_GUIDELINE.getCategory(), Answer.of(testQuestion, "새로운 답변입니다."));
+			QuestionCategory.ADMISSION_GUIDELINE.getCategory(), Answer.of(testQuestion, "새로운 답변입니다."), references);
 
 		// when
 		LLMAnswerResponse result = mockAskQuestion(request);
