@@ -47,7 +47,7 @@ public class AnswerServiceTest extends MockTest {
 
 	@Before
 	public void setUp() {
-		question = Question.of("수시 일정 알려주세요.", "수시 일정", QuestionType.JEONGSI,
+		question = Question.of("수시 일정 알려주세요.", "수시 일정", QuestionType.SUSI,
 			QuestionCategory.ADMISSION_GUIDELINE);
 		answer = Answer.of(question,
 			"수시 일정은 2024년 12월 19일(목)부터 2024년 12월 26일(목) 18:00까지 최초합격자 발표가 있고, 2025년 2월 10일(월) 10:00부터 2025년 2월 12일(수) 15:00까지 문서등록 및 등록금 납부가 진행됩니다. 등록금 납부 기간은 2024년 12월 16일(월) 10:00부터 2024년 12월 18일(수) 15:00까지이며, 방법은 입학처 홈페이지를 통한 문서등록 및 등록금 납부를 하시면 됩니다. 상세 안내는 추후 입학처 홈페이지를 통해 공지될 예정입니다.");
@@ -61,7 +61,9 @@ public class AnswerServiceTest extends MockTest {
 
 		ClientResponse clientResponse = ClientResponse.create(HttpStatusCode.valueOf(200))
 			.header("Content-Type", "application/json")
-			.body("{\"answer\":\"" + answer.getContent() + "\"}")
+			.body(String.format("{\"questionType\":\"%s\",\"questionCategory\":\"%s\",\"answer\":\"%s\"}",
+				question.getQuestionType().getType(), question.getQuestionCategory().getCategory(),
+				answer.getContent()))
 			.build();
 
 		when(exchangeFunction.exchange(any())).thenReturn(Mono.just(clientResponse));
@@ -99,12 +101,13 @@ public class AnswerServiceTest extends MockTest {
 	@Test
 	public void LLM_질문_요청() {
 		// given
-		LLMAskQuestionRequest request = LLMAskQuestionRequest.of(QuestionType.SUSI.toString(),
-			QuestionCategory.ADMISSION_GUIDELINE.toString(),
+		LLMAskQuestionRequest request = LLMAskQuestionRequest.of(QuestionType.SUSI.getType(),
+			QuestionCategory.ADMISSION_GUIDELINE.getCategory(),
 			question.getContent());
 
 		// when
-		LLMAnswerResponse expectedResponse = LLMAnswerResponse.of(answer, QuestionCategory.ADMISSION_GUIDELINE);
+		LLMAnswerResponse expectedResponse = LLMAnswerResponse.of(QuestionType.SUSI.getType(),
+			QuestionCategory.ADMISSION_GUIDELINE.getCategory(), answer);
 		LLMAnswerResponse result = answerService.askQuestion(request).block();
 
 		// then
