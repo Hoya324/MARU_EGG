@@ -2,17 +2,18 @@ package mju.iphak.maru_egg.answer.dto.response;
 
 import lombok.Builder;
 import mju.iphak.maru_egg.answer.domain.Answer;
-import mju.iphak.maru_egg.question.domain.QuestionCategory;
 
 @Builder
 public record LLMAnswerResponse(
-	String answer,
-	QuestionCategory questionCategory
+	String questionType,
+	String questionCategory,
+	String answer
 ) {
-	public static LLMAnswerResponse of(Answer answer, QuestionCategory category) {
+	public static LLMAnswerResponse of(String questionType, String questionCategory, Answer answer) {
 		return LLMAnswerResponse.builder()
+			.questionType(questionType)
+			.questionCategory(questionCategory)
 			.answer(answer.getContent())
-			.questionCategory(category)
 			.build();
 	}
 }
