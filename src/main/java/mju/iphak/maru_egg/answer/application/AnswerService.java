@@ -48,22 +48,17 @@ public class AnswerService {
 			.contentType(MediaType.APPLICATION_FORM_URLENCODED)
 			.body(BodyInserters.fromFormData(formData))
 			.retrieve()
-			.onStatus(
-				HttpStatusCode::isError,
-				response -> {
-					return switch (response.statusCode().value()) {
-						case 400 -> Mono.error(
-							new BadRequestWebClientException(
-								String.format(BAD_REQUEST_WEBCLIENT.getMessage(), "LLM 서버", request.questionType(),
-									request.questionCategory(), request.question())));
-						case 404 -> Mono.error(
-							new NotFoundWebClientException(String.format(NOT_FOUND_WEBCLIENT.getMessage(), "LLM 서버")));
-						default -> Mono.error(
-							new InternalServerErrorWebClientException(
-								String.format(INTERNAL_ERROR_WEBCLIENT.getMessage(), "LLM 서버")));
-					};
-				}
-			)
+			.onStatus(HttpStatusCode::isError, response -> {
+				return switch (response.statusCode().value()) {
+					case 400 -> Mono.error(new BadRequestWebClientException(
+						String.format(BAD_REQUEST_WEBCLIENT.getMessage(), "LLM 서버", request.questionType(),
+							request.questionCategory(), request.question())));
+					case 404 -> Mono.error(new NotFoundWebClientException(
+						String.format(NOT_FOUND_WEBCLIENT.getMessage(), "LLM 서버")));
+					default -> Mono.error(new InternalServerErrorWebClientException(
+						String.format(INTERNAL_ERROR_WEBCLIENT.getMessage(), "LLM 서버")));
+				};
+			})
 			.bodyToMono(LLMAnswerResponse.class);
 	}
 

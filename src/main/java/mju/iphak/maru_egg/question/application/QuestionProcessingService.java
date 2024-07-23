@@ -34,6 +34,7 @@ import mju.iphak.maru_egg.question.utils.PhraseExtractionUtils;
 public class QuestionProcessingService {
 
 	private static final double STANDARD_SIMILARITY = 0.95;
+	private static final String UNCLASSIFIED = "";
 
 	private final QuestionRepository questionRepository;
 	private final AnswerService answerService;
@@ -60,22 +61,22 @@ public class QuestionProcessingService {
 
 	private QuestionResponse askNewQuestion(QuestionType type, QuestionCategory category, String content,
 		String contentToken) {
-		LLMAskQuestionRequest askQuestionRequest = LLMAskQuestionRequest.of(type.toString(),
+		LLMAskQuestionRequest askQuestionRequest = LLMAskQuestionRequest.of(type.getType(),
 			isCategoryNullThen(category),
 			content);
 
 		LLMAnswerResponse llmAnswerResponse = answerService.askQuestion(askQuestionRequest).block();
-
-		Question newQuestion = saveQuestion(type, category, content, contentToken);
+		Question newQuestion = saveQuestion(type,
+			QuestionCategory.convertToCategory(llmAnswerResponse.questionCategory()), content, contentToken);
 		Answer newAnswer = saveAnswer(newQuestion, llmAnswerResponse.answer());
 		return createQuestionResponse(newQuestion, newAnswer);
 	}
 
 	private static String isCategoryNullThen(final QuestionCategory category) {
-		if (category.toString() == null) {
-			return QuestionCategory.UNCLASSIFIED.getQuestionCategory();
+		if (category == null) {
+			return UNCLASSIFIED;
 		}
-		return category.toString();
+		return category.getCategory();
 	}
 
 	private Answer saveAnswer(final Question question, final String content) {
