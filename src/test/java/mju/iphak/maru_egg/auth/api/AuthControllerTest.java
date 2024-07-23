@@ -5,6 +5,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,8 +51,9 @@ class AuthControllerTest extends IntegrationTest {
 		userRepository.save(user);
 	}
 
+	@DisplayName("회원가입 성공")
 	@Test
-	void testSignUp() throws Exception {
+	void 회원가입_성공() throws Exception {
 		// given
 		SignUpRequest signUpRequest = new SignUpRequest("testuser2@example.com", "Password123!");
 
