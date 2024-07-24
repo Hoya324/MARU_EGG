@@ -21,15 +21,15 @@ import mju.iphak.maru_egg.question.domain.Question;
 	    "dateInformation": "생성일자: 2024-07-15T23:36:59.847690, 마지막 DB 갱신일자: 2024-07-15T23:36:59.847690"
 	  },
 	  "references": [
-			{
-				"title": "2025학년도 수시모집",
-				"link": "https://iphak.mju.ac.kr/main/"
-			},
-			{
-				"title": "2025학년도 정시모집",
-				"link": "https://iphak.mju.ac.kr/main/"
-			}
-	  	]
+	    {
+		  "title": "2025학년도 수시모집",
+		  "link": "https://iphak.mju.ac.kr/main/"
+	    },
+	    {
+		  "title": "2025학년도 정시모집",
+		  "link": "https://iphak.mju.ac.kr/main/"
+	    }
+	  ]
 	}
 	""")
 public record QuestionResponse(
