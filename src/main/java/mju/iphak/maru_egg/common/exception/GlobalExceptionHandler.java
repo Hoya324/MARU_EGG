@@ -7,6 +7,7 @@ import java.time.format.DateTimeFormatter;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -85,6 +86,14 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler(InternalServerErrorWebClientException.class)
 	protected ResponseEntity<ErrorResponse> handleInternalServerErrorWebClientException(
 		InternalServerErrorWebClientException e) {
+		String timestamp = getCurrentTimestamp();
+		log.error(LOG_FORMAT, timestamp, e.getClass().getSimpleName(), e.getMessage());
+		return ResponseEntity.status(INTERNAL_SERVER_ERROR)
+			.body(ErrorResponse.of(e.getClass().getSimpleName(), INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+	}
+
+	@ExceptionHandler(JpaSystemException.class)
+	protected ResponseEntity<ErrorResponse> handleJpaSystemException(JpaSystemException e) {
 		String timestamp = getCurrentTimestamp();
 		log.error(LOG_FORMAT, timestamp, e.getClass().getSimpleName(), e.getMessage());
 		return ResponseEntity.status(INTERNAL_SERVER_ERROR)
