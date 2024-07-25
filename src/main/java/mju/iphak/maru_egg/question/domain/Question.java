@@ -1,5 +1,7 @@
 package mju.iphak.maru_egg.question.domain;
 
+import org.hibernate.annotations.ColumnDefault;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -34,12 +36,19 @@ public class Question extends BaseEntity {
 	@Column(name = "view_count", nullable = false)
 	private int viewCount;
 
+	@ColumnDefault("false")
+	private boolean isChecked;
+
 	public String getDateInformation() {
 		return "생성일자: %s, 마지막 DB 갱신일자: %s".formatted(this.getCreatedAt(), this.getUpdatedAt());
 	}
 
 	public void incrementViewCount() {
 		this.viewCount++;
+	}
+
+	public void updateIsChecked(boolean isChecked) {
+		this.isChecked = isChecked;
 	}
 
 	public static Question of(String content, String contentToken, QuestionType questionType,
@@ -49,6 +58,7 @@ public class Question extends BaseEntity {
 			.contentToken(contentToken)
 			.questionType(questionType)
 			.questionCategory(questionCategory)
+			.isChecked(false)
 			.build();
 	}
 }
