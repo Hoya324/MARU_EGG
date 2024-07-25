@@ -30,7 +30,7 @@ class QuestionRepositoryTest extends RepositoryTest {
 	@BeforeEach
 	public void setUp() throws Exception {
 		question = new Question("테스트 질문 예시 예시입니다.", "테스트 질문 예시", QuestionType.SUSI,
-			QuestionCategory.ADMISSION_GUIDELINE, 0);
+			QuestionCategory.ADMISSION_GUIDELINE, 0, false);
 		questionRepository.save(question);
 		Question additionalQuestion1 = Question.of("추가1 테스트 질문 예시입니다.", "추가 테스트 질문 예시", QuestionType.SUSI,
 			QuestionCategory.ADMISSION_GUIDELINE);

@@ -15,7 +15,7 @@ import mju.iphak.maru_egg.answer.dto.request.UpdateAnswerContentRequest;
 import mju.iphak.maru_egg.common.meta.CustomApiResponse;
 import mju.iphak.maru_egg.common.meta.CustomApiResponses;
 
-@Tag(name = "Answer API", description = "답변 관련 API 입니다.")
+@Tag(name = "Admin Answer API", description = "답변 관련 API 입니다.")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/admin/answers")
