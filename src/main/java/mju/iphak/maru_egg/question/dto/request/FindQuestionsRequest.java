@@ -11,7 +11,7 @@ import mju.iphak.maru_egg.question.domain.QuestionType;
 @ParameterObject
 public record FindQuestionsRequest(
 
-	@Schema(description = "질문 타입(수시, 정시, 편입학, 재외국민)", allowableValues = {"SUSI", "JEONGSI", "PYEONIP", "JEAOEGUGMIN"})
+	@Schema(description = "질문 타입(수시, 정시, 편입학)", allowableValues = {"SUSI", "JEONGSI", "PYEONIP"})
 	@NotNull(message = "질문 타입은 비어있을 수 없습니다.")
 	QuestionType type,
 
