@@ -1,5 +1,7 @@
 package mju.iphak.maru_egg.question.application;
 
+import static mju.iphak.maru_egg.common.exception.ErrorCode.*;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -8,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import mju.iphak.maru_egg.answer.application.AnswerService;
@@ -43,6 +46,14 @@ public class QuestionService {
 		return questionRepository.searchQuestionsOfCursorPagingByContent(
 			content,
 			cursorViewCount, questionId, pageable);
+	}
+
+	@Transactional
+	public void checkQuestion(final Long id, final boolean check) {
+		Question question = questionRepository.findById(id)
+			.orElseThrow(() -> new EntityNotFoundException(
+				String.format(NOT_FOUND_QUESTION_BY_ID.getMessage(), id)));
+		question.updateIsChecked(check);
 	}
 
 	private List<Question> findQuestions(final QuestionType type, final QuestionCategory category) {
