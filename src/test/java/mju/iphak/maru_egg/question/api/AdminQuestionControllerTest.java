@@ -50,7 +50,7 @@ class AdminQuestionControllerTest extends IntegrationTest {
 	@WithMockUser(roles = "ADMIN")
 	void 질문_체크_API_잘못된_JSON_형식() throws Exception {
 		// given
-		String invalidJson = "{\"questionId\": \"ㅇㅇ\", \"check\": true}";
+		String invalidJson = "{\"questionId\": \"잘못된 아이디 형식\", \"check\": true}";
 
 		// when
 		ResultActions resultActions = mvc.perform(post("/api/questions/check")
