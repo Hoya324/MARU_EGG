@@ -36,7 +36,7 @@ class AdminQuestionControllerTest extends IntegrationTest {
 		CheckQuestionRequest request = new CheckQuestionRequest(1L, true);
 
 		// when
-		ResultActions resultActions = mvc.perform(post("/api/questions/check")
+		ResultActions resultActions = mvc.perform(post("/api/admin/questions/check")
 			.contentType(MediaType.APPLICATION_JSON)
 			.content(objectMapper.writeValueAsString(request)));
 
@@ -53,7 +53,7 @@ class AdminQuestionControllerTest extends IntegrationTest {
 		String invalidJson = "{\"questionId\": \"잘못된 아이디 형식\", \"check\": true}";
 
 		// when
-		ResultActions resultActions = mvc.perform(post("/api/questions/check")
+		ResultActions resultActions = mvc.perform(post("/api/admin/questions/check")
 			.contentType(MediaType.APPLICATION_JSON)
 			.content(invalidJson));
 
@@ -72,7 +72,7 @@ class AdminQuestionControllerTest extends IntegrationTest {
 			.checkQuestion(anyLong(), anyBoolean());
 
 		// when
-		ResultActions resultActions = mvc.perform(post("/api/questions/check")
+		ResultActions resultActions = mvc.perform(post("/api/admin/questions/check")
 			.contentType(MediaType.APPLICATION_JSON)
 			.content(objectMapper.writeValueAsString(request)));
 
@@ -90,7 +90,7 @@ class AdminQuestionControllerTest extends IntegrationTest {
 		doThrow(new RuntimeException("내부 서버 오류")).when(questionService).checkQuestion(anyLong(), anyBoolean());
 
 		// when
-		ResultActions resultActions = mvc.perform(post("/api/questions/check")
+		ResultActions resultActions = mvc.perform(post("/api/admin/questions/check")
 			.contentType(MediaType.APPLICATION_JSON)
 			.content(objectMapper.writeValueAsString(request)));
 
