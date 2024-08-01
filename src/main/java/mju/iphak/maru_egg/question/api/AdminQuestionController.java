@@ -18,7 +18,7 @@ import mju.iphak.maru_egg.question.dto.request.CheckQuestionRequest;
 @Tag(name = "Admin Question API", description = "질문 관련 API 입니다.")
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/questions")
+@RequestMapping("/api/admin/questions")
 public class AdminQuestionController {
 
 	private final QuestionService questionService;
