@@ -40,6 +40,14 @@ jobs:
           echo "${{ secrets.YML_DEV }}" > ./application-dev.yml
         shell: bash
 
+      # 환경별 yml 파일 생성 - 통합 테스트
+      - name: make application-integration-test.yml
+        run: |
+          cd ./src/test/resources
+          touch ./application-integration-test.yml
+          echo "${{ secrets.YML_INTEGRATION_TEST }}" > ./application-integration-test.yml
+        shell: bash
+
       # Gradle 패키지 캐시
       - name: Cache Gradle packages
         uses: actions/cache@v3
@@ -56,6 +64,10 @@ jobs:
         uses: gradle/gradle-build-action@v3
         with:
           arguments: clean bootJar
+
+      # Gradle로 테스트
+      - name: Test with Gradle
+        run: ./gradlew test --no-daemon
 
       # Docker Hub에 로그인
       - name: Log in to Docker Hub
