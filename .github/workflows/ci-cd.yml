@@ -126,5 +126,5 @@ jobs:
             if [ "$(sudo docker ps -q)" ]; then sudo docker stop $(sudo docker ps -q); fi
             if [ "$(sudo docker ps -a -q)" ]; then sudo docker rm $(sudo docker ps -a -q); fi
             sudo docker pull ${{ secrets.DOCKER_REPO }}:${{ steps.meta.outputs.tags }}-${{ github.run_number }}
-            sudo docker-compose up -d 
+            sudo docker-compose up -d
             sudo docker image prune -f
