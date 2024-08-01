@@ -40,6 +40,13 @@ jobs:
           echo "${{ secrets.YML_DEV }}" > ./application-dev.yml
         shell: bash
 
+      # Gradle 패키지 캐시
+      - name: Cache Gradle packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+
       # gradlew 실행 권한 부여
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
