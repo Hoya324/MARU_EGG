@@ -35,18 +35,11 @@ jobs:
       - name: Test with Gradle
         run: ./gradlew --info test jacocoTestReport
 
-      - name: Publish Unit Test Results
+      - name: 테스트 결과 업로드
         uses: EnricoMi/publish-unit-test-result-action@v1
         if: ${{ always() }}
         with:
           files: build/test-results/**/*.xml
-
-      - name: Comment on PR with Coverage
-        uses: marocchino/sticky-pull-request-comment@v2
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          header: Test & Coverage Results
-          path: build/reports/jacoco/test/jacocoTestReport.xml
 
       - name: 커버리지 결과 PR에 업로드
         id: jacoco
