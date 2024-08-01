@@ -5,7 +5,7 @@ on:
     branches: [ "main", "develop" ]
 
 env:
-  COVERAGE_PERCENT: 20
+  COVERAGE_PERCENT: 30
 
 permissions: write-all
 
