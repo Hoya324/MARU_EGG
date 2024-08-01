@@ -40,21 +40,6 @@ jobs:
           echo "${{ secrets.YML_DEV }}" > ./application-dev.yml
         shell: bash
 
-      # 환경별 yml 파일 생성 - 통합 테스트
-      - name: make application-integration-test.yml
-        run: |
-          cd ./src/test/resources
-          touch ./application-integration-test.yml
-          echo "${{ secrets.YML_INTEGRATION_TEST }}" > ./application-integration-test.yml
-        shell: bash
-
-      # Gradle 패키지 캐시
-      - name: Cache Gradle packages
-        uses: actions/cache@v3
-        with:
-          path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-
       # gradlew 실행 권한 부여
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
@@ -138,5 +123,5 @@ jobs:
             if [ "$(sudo docker ps -q)" ]; then sudo docker stop $(sudo docker ps -q); fi
             if [ "$(sudo docker ps -a -q)" ]; then sudo docker rm $(sudo docker ps -a -q); fi
             sudo docker pull ${{ secrets.DOCKER_REPO }}:${{ steps.meta.outputs.tags }}-${{ github.run_number }}
-            sudo docker-compose up -d
+            sudo docker-compose up -d 
             sudo docker image prune -f
