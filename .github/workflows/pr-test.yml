@@ -1,0 +1,60 @@
+name: PR Test
+
+on:
+  pull_request:
+    branches: [ "main", "develop" ]
+
+env:
+  COVERAGE_PERCENT: 20
+
+permissions: write-all
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Java JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: 17
+          distribution: 'temurin'
+
+      - name: make application-integration-test.yml
+        run: |
+          cd ./src/test/resources
+          touch ./application-integration-test.yml
+          echo "${{ secrets.YML_INTEGRATION_TEST }}" > ./application-integration-test.yml
+        shell: bash
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Test with Gradle
+        run: ./gradlew --info test jacocoTestReport
+
+      - name: 테스트 결과 업로드
+        uses: EnricoMi/publish-unit-test-result-action@v1
+        if: ${{ always() }}
+        with:
+          files: build/test-results/**/*.xml
+
+      - name: 커버리지 결과 PR에 업로드
+        id: jacoco
+        uses: madrapps/jacoco-report@v1.3
+        with:
+          paths: ${{ github.workspace }}/build/reports/jacoco/test/jacocoTestReport.xml
+          token: ${{ secrets.GITHUB_TOKEN }}
+          min-coverage-overall: ${{ env.COVERAGE_PERCENT }}
+          debug-mode: false
+          title: Code Coverage
+          update-comment: true
+
+      - name: 테스트 커버리지 미달시 워크플로우 블로킹
+        if: ${{ steps.jacoco.outputs.coverage-overall < env.COVERAGE_PERCENT }}
+        uses: actions/github-script@v6
+        with:
+          script: |
+            core.setFailed('전체 커버리지가 ${{ env.COVERAGE_PERCENT }}% 미만입니다!')

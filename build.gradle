@@ -24,16 +24,77 @@ repositories {
     mavenCentral()
 }
 
+test {
+    finalizedBy jacocoTestReport
+    useJUnitPlatform()
+}
+
 jacoco {
     toolVersion = "0.8.11"
-    reportsDirectory = layout.buildDirectory.dir('customJacocoReportDir')
+    reportsDirectory = layout.buildDirectory.dir("reports/jacoco")
+}
+
+jacocoTestReport {
+    dependsOn test
+    reports {
+        html.required = true
+        xml.required = true
+        csv.required = false
+    }
+
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it, excludes: [
+                    "**/Q*",
+                    "**/*Request*",
+                    "**/*Response*",
+                    "**/*Config*",
+                    "mju/iphak/maru_egg/common/**",
+                    "mju/iphak/maru_egg/auth/jwt/**",
+                    "mju/iphak/maru_egg/answer/application/**",
+                    "mju/iphak/maru_egg/common/config/**",
+                    "mju/iphak/maru_egg/auth/login/**",
+                    "mju/iphak/maru_egg/question/domain/**",
+                    "mju/iphak/maru_egg/**/dto/**",
+            ])
+        }))
+    }
+}
+
+jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            element = 'CLASS'
+
+            limit {
+                counter = 'LINE'
+                value = 'COVEREDRATIO'
+            }
+            excludes = [
+                    "**/Q*",
+                    "**/*Request*",
+                    "**/*Response*",
+                    "**/*Config*",
+                    "mju/iphak/maru_egg/common/**",
+                    "mju/iphak/maru_egg/auth/jwt/**",
+                    "mju/iphak/maru_egg/answer/application/**",
+                    "mju/iphak/maru_egg/common/config/**",
+                    "mju/iphak/maru_egg/auth/login/**",
+                    "mju/iphak/maru_egg/question/domain/**",
+                    "mju/iphak/maru_egg/**/dto/**",
+            ]
+        }
+    }
 }
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-security'
+
+    // Swagger
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.4.0'
+
     implementation 'io.hypersistence:hypersistence-utils-hibernate-60:3.5.1'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
 
@@ -42,23 +103,6 @@ dependencies {
 
     // 직렬화
     implementation 'com.google.code.gson:gson:2.11.0'
-
-    compileOnly 'org.projectlombok:lombok'
-    developmentOnly 'org.springframework.boot:spring-boot-devtools'
-    runtimeOnly 'com.mysql:mysql-connector-j'
-    annotationProcessor 'org.projectlombok:lombok'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'org.springframework.boot:spring-boot-testcontainers'
-
-    // WebClient Mock Test
-    testImplementation "com.squareup.okhttp3:mockwebserver:4.9.2"
-    testImplementation "io.projectreactor:reactor-test"
-
-    testImplementation 'org.testcontainers:junit-jupiter'
-    testImplementation 'org.testcontainers:mysql'
-    testImplementation 'org.testcontainers:jdbc:1.19.7'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-    testImplementation "org.springframework.security:spring-security-test"
 
     //QueryDsl
     implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
@@ -79,6 +123,25 @@ dependencies {
 
     // jwt
     implementation 'com.auth0:java-jwt:3.4.1'
+
+    compileOnly 'org.projectlombok:lombok'
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    runtimeOnly 'com.mysql:mysql-connector-j'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    // Test
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.boot:spring-boot-testcontainers'
+
+    // WebClient Mock Test
+    testImplementation "com.squareup.okhttp3:mockwebserver:4.9.2"
+    testImplementation "io.projectreactor:reactor-test"
+
+    testImplementation 'org.testcontainers:junit-jupiter'
+    testImplementation 'org.testcontainers:mysql'
+    testImplementation 'org.testcontainers:jdbc:1.19.7'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testImplementation "org.springframework.security:spring-security-test"
 }
 
 tasks.named('test') {
