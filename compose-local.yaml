@@ -5,10 +5,10 @@ services:
     ports:
       - "3316:3306"
     environment:
-      MYSQL_ROOT_PASSWORD:
+      MYSQL_ROOT_PASSWORD: maruegg!
       MYSQL_DATABASE: maru-egg-db
-      MYSQL_USER:
-      MYSQL_PASSWORD:
+      MYSQL_USER: maruegg
+      MYSQL_PASSWORD: maruegg!
       TZ: Asia/Seoul
     volumes:
       - ./db/mysql/data:/var/lib/mysql
