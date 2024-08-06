@@ -30,6 +30,7 @@ import com.google.gson.Gson;
 
 import mju.iphak.maru_egg.answer.application.AnswerService;
 import mju.iphak.maru_egg.answer.domain.Answer;
+import mju.iphak.maru_egg.answer.dto.request.CreateAnswerRequest;
 import mju.iphak.maru_egg.answer.dto.request.LLMAskQuestionRequest;
 import mju.iphak.maru_egg.answer.dto.response.AnswerReferenceResponse;
 import mju.iphak.maru_egg.answer.dto.response.LLMAnswerResponse;
@@ -39,6 +40,7 @@ import mju.iphak.maru_egg.common.dto.pagination.SliceQuestionResponse;
 import mju.iphak.maru_egg.question.domain.Question;
 import mju.iphak.maru_egg.question.domain.QuestionCategory;
 import mju.iphak.maru_egg.question.domain.QuestionType;
+import mju.iphak.maru_egg.question.dto.request.CreateQuestionRequest;
 import mju.iphak.maru_egg.question.dto.response.QuestionCore;
 import mju.iphak.maru_egg.question.dto.response.QuestionListItemResponse;
 import mju.iphak.maru_egg.question.dto.response.SearchedQuestionsResponse;
@@ -197,5 +199,25 @@ class QuestionServiceTest extends MockTest {
 		assertFalse(result.data().isEmpty());
 		assertThat(result.data().get(0).content()).isEqualTo("example content");
 		assertThat(result.hasNext()).isFalse();
+	}
+
+	@DisplayName("질문 생성에 성공한 경우")
+	@Test
+	void 질문_생성_성공() {
+		// given
+		CreateAnswerRequest answerRequest = new CreateAnswerRequest("example answer content", 2024);
+		CreateQuestionRequest request = new CreateQuestionRequest("example content", QuestionType.SUSI,
+			QuestionCategory.ADMISSION_GUIDELINE, answerRequest);
+		Question question = request.toEntity();
+
+		when(questionRepository.save(question))
+			.thenReturn(question);
+
+		// when
+		questionService.createQuestion(request);
+
+		// then
+		verify(questionRepository, times(1)).save(any(Question.class));
+		verify(answerService, times(1)).createAnswer(any(Question.class), eq(answerRequest));
 	}
 }
