@@ -21,6 +21,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import jakarta.persistence.EntityNotFoundException;
 import mju.iphak.maru_egg.answer.domain.Answer;
+import mju.iphak.maru_egg.answer.dto.request.CreateAnswerRequest;
 import mju.iphak.maru_egg.answer.dto.request.LLMAskQuestionRequest;
 import mju.iphak.maru_egg.answer.dto.response.AnswerReferenceResponse;
 import mju.iphak.maru_egg.answer.dto.response.LLMAnswerResponse;
@@ -29,6 +30,7 @@ import mju.iphak.maru_egg.common.MockTest;
 import mju.iphak.maru_egg.question.domain.Question;
 import mju.iphak.maru_egg.question.domain.QuestionCategory;
 import mju.iphak.maru_egg.question.domain.QuestionType;
+import mju.iphak.maru_egg.question.dto.request.CreateQuestionRequest;
 import reactor.core.publisher.Mono;
 
 public class AnswerServiceTest extends MockTest {
@@ -134,5 +136,25 @@ public class AnswerServiceTest extends MockTest {
 
 		// then
 		assertThat(answer.getContent()).isEqualTo(updateContent);
+	}
+
+	@DisplayName("질문 생성에 성공한 경우")
+	@Test
+	public void 답변_생성_성공() {
+		// given
+		CreateAnswerRequest answerRequest = new CreateAnswerRequest("example answer content", 2024);
+		CreateQuestionRequest request = new CreateQuestionRequest("example content", QuestionType.SUSI,
+			QuestionCategory.ADMISSION_GUIDELINE, answerRequest);
+		Question question = request.toEntity();
+		Answer answer = answerRequest.toEntity(question);
+
+		when(answerRepository.save(answer))
+			.thenReturn(answer);
+
+		// when
+		answerService.createAnswer(question, answerRequest);
+
+		// then
+		verify(answerRepository, times(1)).save(any(Answer.class));
 	}
 }
