@@ -25,6 +25,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import mju.iphak.maru_egg.answer.application.AnswerService;
 import mju.iphak.maru_egg.answer.domain.Answer;
 import mju.iphak.maru_egg.answer.domain.AnswerReference;
+import mju.iphak.maru_egg.answer.dto.request.CreateAnswerRequest;
 import mju.iphak.maru_egg.answer.dto.response.AnswerReferenceResponse;
 import mju.iphak.maru_egg.answer.dto.response.AnswerResponse;
 import mju.iphak.maru_egg.answer.repository.AnswerReferenceRepository;
@@ -36,6 +37,7 @@ import mju.iphak.maru_egg.question.application.QuestionService;
 import mju.iphak.maru_egg.question.domain.Question;
 import mju.iphak.maru_egg.question.domain.QuestionCategory;
 import mju.iphak.maru_egg.question.domain.QuestionType;
+import mju.iphak.maru_egg.question.dto.request.CreateQuestionRequest;
 import mju.iphak.maru_egg.question.dto.request.FindQuestionsRequest;
 import mju.iphak.maru_egg.question.dto.request.QuestionRequest;
 import mju.iphak.maru_egg.question.dto.request.SearchQuestionsRequest;
@@ -185,6 +187,21 @@ class QuestionControllerTest extends IntegrationTest {
 			.andExpect(jsonPath("$.data").isArray());
 	}
 
+	@Test
+	void 질문_생성_API() throws Exception {
+		// given
+		CreateAnswerRequest answerRequest = new CreateAnswerRequest("example answer content", 2024);
+		CreateQuestionRequest request = new CreateQuestionRequest("example content", QuestionType.SUSI,
+			QuestionCategory.ADMISSION_GUIDELINE, answerRequest);
+
+		// when
+		ResultActions resultActions = requestCreateQuestion(request);
+
+		// then
+		resultActions
+			.andExpect(status().isOk());
+	}
+
 	private ResultActions requestCreateQuestion(QuestionRequest dto) throws Exception {
 		return mvc.perform(post("/api/questions")
 				.contentType(MediaType.APPLICATION_JSON)
@@ -213,6 +230,13 @@ class QuestionControllerTest extends IntegrationTest {
 				.param("size", dto.size().toString())
 				.param("cursorViewCount", dto.cursorViewCount().toString())
 				.param("questionId", dto.questionId().toString())
+				.contentType(MediaType.APPLICATION_JSON))
+			.andDo(print());
+	}
+
+	private ResultActions requestCreateQuestion(CreateQuestionRequest dto) throws Exception {
+		return mvc.perform(post("/api/questions/new")
+				.content(objectMapper.writeValueAsString(dto))
 				.contentType(MediaType.APPLICATION_JSON))
 			.andDo(print());
 	}
