@@ -25,11 +25,11 @@ jwt:
 
   access:
     expiration: 3600000
-    header: "jwt-token"
+    header: "Authorization"
 
   refresh:
     expiration: 1209600000
-    header: "jwt-token-refresh"
+    header: "Authorization-refresh"
 
 logging:
   level:
