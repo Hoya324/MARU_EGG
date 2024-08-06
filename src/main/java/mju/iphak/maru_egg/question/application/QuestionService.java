@@ -20,6 +20,7 @@ import mju.iphak.maru_egg.common.dto.pagination.SliceQuestionResponse;
 import mju.iphak.maru_egg.question.domain.Question;
 import mju.iphak.maru_egg.question.domain.QuestionCategory;
 import mju.iphak.maru_egg.question.domain.QuestionType;
+import mju.iphak.maru_egg.question.dto.request.CreateQuestionRequest;
 import mju.iphak.maru_egg.question.dto.response.QuestionListItemResponse;
 import mju.iphak.maru_egg.question.dto.response.SearchedQuestionsResponse;
 import mju.iphak.maru_egg.question.repository.QuestionRepository;
@@ -54,6 +55,13 @@ public class QuestionService {
 			.orElseThrow(() -> new EntityNotFoundException(
 				String.format(NOT_FOUND_QUESTION_BY_ID.getMessage(), id)));
 		question.updateIsChecked(check);
+	}
+
+	@Transactional
+	public void createQuestion(final CreateQuestionRequest request) {
+		Question question = request.toEntity();
+		questionRepository.save(question);
+		answerService.createAnswer(question, request.answer());
 	}
 
 	private List<Question> findQuestions(final QuestionType type, final QuestionCategory category) {

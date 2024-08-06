@@ -7,16 +7,16 @@ import mju.iphak.maru_egg.answer.domain.Answer;
 @Builder
 @Schema(description = "답변 DTO")
 public record AnswerResponse(
-	@Schema(description = "답변 id")
+	@Schema(description = "답변 id", example = "1")
 	Long id,
 
-	@Schema(description = "답변 내용")
+	@Schema(description = "답변 내용", example = "예시 답변입니다.")
 	String content,
 
-	@Schema(description = "답변 갱신 년도")
+	@Schema(description = "답변 갱신 년도", example = "2024")
 	int renewalYear,
 
-	@Schema(description = "답변 DB 생성 및 업데이트 날짜")
+	@Schema(description = "답변 DB 생성 및 업데이트 날짜", example = "생성일자: 2024-07-24T15:49:33, 마지막 DB 갱신일자: 2024-07-24T15:52:49")
 	String dateInformation
 ) {
 	public static AnswerResponse from(Answer answer) {

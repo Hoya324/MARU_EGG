@@ -6,10 +6,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Schema(description = "질문 목록 요청 DTO")
 public record CheckQuestionRequest(
 
-	@Parameter(description = "질문 id")
+	@Parameter(description = "질문 id", example = "1")
 	Long questionId,
 
-	@Parameter(description = "질문-답변 확인 상태")
+	@Parameter(description = "질문-답변 확인 상태", example = "true")
 	boolean check
 ) {
 }

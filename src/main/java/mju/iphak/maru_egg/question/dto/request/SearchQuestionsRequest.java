@@ -10,7 +10,7 @@ import jakarta.validation.constraints.PositiveOrZero;
 @Schema(description = "질문 자동완성 요청 DTO")
 @ParameterObject
 public record SearchQuestionsRequest(
-	@Schema(description = "질문 내용")
+	@Schema(description = "질문 내용", example = "수시")
 	@NotBlank(message = "질문은 비어있을 수 없습니다.")
 	String content,
 
