@@ -1,5 +1,7 @@
 package mju.iphak.maru_egg.question.domain;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -8,10 +10,10 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum QuestionCategory {
-	ADMISSION_GUIDELINE("모집요강"),
-	PASSING_RESULT("입시결과"),
-	PAST_QUESTIONS("기출문제"),
-	INTERVIEW_PRACTICAL_TEST("면접/실기");
+	@JsonProperty("ADMISSION_GUIDELINE") ADMISSION_GUIDELINE("모집요강"),
+	@JsonProperty("PASSING_RESULT") PASSING_RESULT("입시결과"),
+	@JsonProperty("PAST_QUESTIONS") PAST_QUESTIONS("기출문제"),
+	@JsonProperty("INTERVIEW_PRACTICAL_TEST") INTERVIEW_PRACTICAL_TEST("면접/실기");
 
 	private final String category;
 
