@@ -14,12 +14,14 @@ import org.springframework.web.reactive.function.client.WebClient;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import mju.iphak.maru_egg.answer.domain.Answer;
+import mju.iphak.maru_egg.answer.dto.request.CreateAnswerRequest;
 import mju.iphak.maru_egg.answer.dto.request.LLMAskQuestionRequest;
 import mju.iphak.maru_egg.answer.dto.response.LLMAnswerResponse;
 import mju.iphak.maru_egg.answer.repository.AnswerRepository;
 import mju.iphak.maru_egg.common.exception.custom.webClient.BadRequestWebClientException;
 import mju.iphak.maru_egg.common.exception.custom.webClient.InternalServerErrorWebClientException;
 import mju.iphak.maru_egg.common.exception.custom.webClient.NotFoundWebClientException;
+import mju.iphak.maru_egg.question.domain.Question;
 import reactor.core.publisher.Mono;
 
 @RequiredArgsConstructor
@@ -62,14 +64,19 @@ public class AnswerService {
 			.bodyToMono(LLMAnswerResponse.class);
 	}
 
-	public Answer saveAnswer(Answer answer) {
-		return answerRepository.save(answer);
-	}
-
 	public void updateAnswerContent(final Long id, final String content) {
 		Answer answer = answerRepository.findById(id)
 			.orElseThrow(() -> new EntityNotFoundException(
 				String.format(NOT_FOUND_ANSWER.getMessage(), id)));
 		answer.updateContent(content);
+	}
+
+	public void createAnswer(final Question question, final CreateAnswerRequest request) {
+		Answer answer = request.toEntity(question);
+		saveAnswer(answer);
+	}
+
+	public Answer saveAnswer(Answer answer) {
+		return answerRepository.save(answer);
 	}
 }
