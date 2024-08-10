@@ -1,12 +1,5 @@
-FROM openjdk:17
+FROM nginx:latest
 
-EXPOSE 8080
+COPY default.conf /etc/nginx/conf.d/default.conf
 
-# The application's jar file
-ARG JAR_FILE=build/libs/*.jar
-
-# Add the application's jar to the container
-COPY ${JAR_FILE} MARU_EGG_BE.jar
-
-# Run the jar file
-ENTRYPOINT ["java", "-jar", "MARU_EGG_BE.jar"]
+CMD ["nginx", "-g", "daemon off;"]
