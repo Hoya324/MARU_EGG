@@ -1,4 +1,5 @@
 FROM nginx:latest
-# 가상 공간의 nginx 기본 설정파일 삭제 후 작성한 설정파일로 대체
+# 기본 설정 파일 삭제
 RUN rm /etc/nginx/conf.d/default.conf
-COPY nginx.conf /etc/nginx/conf.d
+# 작성한 설정 파일을 올바른 위치에 복사
+COPY nginx.conf /etc/nginx/nginx.conf
