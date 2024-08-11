@@ -9,7 +9,6 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
@@ -45,12 +44,6 @@ public class SecurityConfig {
 	private final ObjectMapper objectMapper;
 
 	@Bean
-	public WebSecurityCustomizer webSecurityCustomizer() {
-		return (web) -> web.ignoring()
-			.requestMatchers("/favicon.ico", "/css/**", "/js/**", "/img/**", "/lib/**");
-	}
-
-	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http, HandlerMappingIntrospector introspector) throws
 		Exception {
 		http
@@ -63,6 +56,8 @@ public class SecurityConfig {
 				.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
 			.authorizeHttpRequests(authorizeHttpRequests ->
 				authorizeHttpRequests
+					.requestMatchers("/favicon.ico", "/css/**", "/js/**", "/img/**", "/lib/**")
+					.permitAll()
 					.requestMatchers(new MvcRequestMatcher(introspector, API_PREFIX + "/"))
 					.permitAll()
 					.requestMatchers(new MvcRequestMatcher(introspector, API_PREFIX + "/auth/sign-up"))
