@@ -6,6 +6,8 @@ services:
       - "8080:8080"
     networks:
       - maru-egg-dev
+    volumes:
+      - /home/ec2-user/logs:/logs
 
   nginx:
     image: nginx:latest
