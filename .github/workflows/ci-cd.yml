@@ -121,19 +121,19 @@ jobs:
                 container_name: maru-egg
                 image: ${{ secrets.DOCKER_REPO }}:develop-${{ github.run_number }}
                 ports:
-                  - "8080:8080"
+                  - \"8080:8080\"
                 networks:
                   - maru-egg-dev
                 volumes:
                   - /home/ec2-user/logs:/logs
-            
+
               nginx:
                 image: nginx:latest
                 container_name: maru-egg-nginx
                 restart: unless-stopped
                 ports:
-                  - "80:80"
-                  - "443:443"
+                  - \"80:80\"
+                  - \"443:443\"
                 volumes:
                   - ./nginx/nginx.conf:/etc/nginx/nginx.conf
                   - ./data/certbot/conf:/etc/letsencrypt
@@ -142,9 +142,8 @@ jobs:
                   - maru-egg-app
                 networks:
                   - maru-egg-dev
-                command: >
-                  /bin/sh -c "while true; do sleep 6h && nginx -s reload; done & nginx -g 'daemon off;'"
-            
+                command: \"/bin/sh -c 'while true; do sleep 6h && nginx -s reload; done & nginx -g \\\"daemon off;\\\"'\"
+
               certbot:
                 container_name: certbot
                 image: certbot/certbot
@@ -152,11 +151,10 @@ jobs:
                 volumes:
                   - ./data/certbot/conf:/etc/letsencrypt
                   - ./data/certbot/www:/var/www/certbot
-                entrypoint: >
-                  /bin/sh -c "trap 'exit 0' TERM; while true; do certbot renew; sleep 12h; done"
+                entrypoint: \"/bin/sh -c 'trap \\\"exit 0\\\" TERM; while true; do certbot renew; sleep 12h; done'\"
                 networks:
                   - maru-egg-dev
-            
+
             networks:
               maru-egg-dev:" > docker-compose.yml
             echo ${{ secrets.DOCKER_PASSWORD }} | sudo docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
