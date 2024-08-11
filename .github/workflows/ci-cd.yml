@@ -121,7 +121,7 @@ jobs:
                 container_name: maru-egg
                 image: ${{ secrets.DOCKER_REPO }}:develop-${{ github.run_number }}
                 ports:
-                  - 8080:8080
+                  - "8080:8080"
                 networks:
                   - maru-egg-dev
                 volumes:
@@ -132,18 +132,18 @@ jobs:
                 container_name: maru-egg-nginx
                 restart: unless-stopped
                 ports:
-                  - 80:80
-                  - 443:443
+                  - "80:80"
+                  - "443:443"
                 volumes:
-                  - ./nginx/nginx.conf/:/etc/nginx/nginx.conf
+                  - ./nginx/nginx.conf:/etc/nginx/nginx.conf
                   - ./data/certbot/conf:/etc/letsencrypt
                   - ./data/certbot/www:/var/www/certbot
                 depends_on:
                   - maru-egg-app
                 networks:
                   - maru-egg-dev
-                    command: >
-                      /bin/sh -c "while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g 'daemon off;'"
+                command: >
+                  /bin/sh -c "while true; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g 'daemon off;'"
             
               certbot:
                 container_name: certbot
@@ -153,7 +153,7 @@ jobs:
                   - ./data/certbot/conf:/etc/letsencrypt
                   - ./data/certbot/www:/var/www/certbot
                 entrypoint: >
-                  /bin/sh -c "trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;"
+                  /bin/sh -c "trap exit TERM; while true; do certbot renew; sleep 12h & wait $${!}; done;"
                 networks:
                   - maru-egg-dev
             
