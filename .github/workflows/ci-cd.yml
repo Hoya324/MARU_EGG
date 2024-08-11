@@ -91,20 +91,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # .env 파일 생성 및 확인
-      - name: Create .env file
-        run: |
-          echo "DOCKER_REPO=${{ secrets.DOCKER_REPO }}" > .env
-          echo "IMAGE_TAG=develop-${{ github.run_number }}" >> .env
-          ls -la
-          cat .env
-
-      # docker-compose.yml 파일 경로 확인
-      - name: Verify docker-compose.yml file
-        run: |
-          ls -la
-          cat docker-compose.yml
-
       - name: Copy files to EC2 instance
         uses: appleboy/scp-action@master
         with:
