@@ -9,17 +9,5 @@ services:
     volumes:
       - /home/ec2-user/logs:/logs
 
-  nginx:
-    image: nginx:latest
-    container_name: maru-egg-nginx
-    ports:
-      - "80:80"
-    networks:
-      - maru-egg-dev
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
-    depends_on:
-      - maru-egg-app
-
 networks:
   maru-egg-dev:
