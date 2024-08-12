@@ -94,7 +94,21 @@ jobs:
       - name: Create and send .env file to EC2 instance
         run: |
           touch .env
-          echo "DOCKER_REPO=${{ secrets.DOCKER_REPO }}" > .env && echo "IMAGE_TAG=develop-${{ github.run_number }}" >> .env
+          echo "DOCKER_REPO=${{ secrets.DOCKER_REPO }}" > .env
+          echo "IMAGE_TAG=develop-${{ github.run_number }}" >> .env
+          echo "Generated .env file:"
+
+      - name: Verify .env and docker-compose.yml existence
+        run: |
+          if [ ! -f ".env" ]; then
+            echo ".env file not found!"
+            exit 1
+          fi
+          if [ ! -f "docker-compose.yml" ]; then
+            echo "docker-compose.yml file not found!"
+            exit 1
+          fi
+          echo "Both .env and docker-compose.yml files are present."
 
       - name: Copy .env and docker-compose into instance
         uses: appleboy/scp-action@master
