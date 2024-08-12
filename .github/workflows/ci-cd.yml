@@ -94,13 +94,13 @@ jobs:
       - name: Create and send .env file to EC2 instance
         run: echo "DOCKER_REPO=${{ secrets.DOCKER_REPO }}" > .env && echo "IMAGE_TAG=develop-${{ github.run_number }}" >> .env
 
-      - name: Copy docker-compose into instance
+      - name: Copy .env and docker-compose into instance
         uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.PUBLIC_DNS }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.PEM_KEY }}
-          source: "docker-compose.yml"
+          source: ".env docker-compose.yml"
           target: "/home/${{ secrets.USERNAME }}"
           strip_components: 3
           overwrite: true
@@ -115,48 +115,6 @@ jobs:
           key: ${{ secrets.PEM_KEY }}
           script: |
             cd /home/${{ secrets.USERNAME }}
-            echo "
-            services:
-              maru-egg-app:
-                container_name: maru-egg
-                image: ${{ secrets.DOCKER_REPO }}:develop-${{ github.run_number }}
-                ports:
-                  - \"8080:8080\"
-                networks:
-                  - maru-egg-dev
-                volumes:
-                  - /home/ec2-user/logs:/logs
-
-              nginx:
-                image: nginx:1.27.0
-                container_name: maru-egg-nginx
-                restart: unless-stopped
-                ports:
-                  - \"80:80\"
-                  - \"443:443\"
-                volumes:
-                  - ./nginx.conf:/etc/nginx/nginx.conf
-                  - ./data/certbot/conf:/etc/letsencrypt
-                  - ./data/certbot/www:/var/www/certbot
-                depends_on:
-                  - maru-egg-app
-                networks:
-                  - maru-egg-dev
-                command: \"/bin/sh -c 'while true; do sleep 6h && nginx -s reload; done & nginx -g \\\"daemon off;\\\"'\"
-
-              certbot:
-                container_name: certbot
-                image: certbot/certbot
-                restart: unless-stopped
-                volumes:
-                  - ./data/certbot/conf:/etc/letsencrypt
-                  - ./data/certbot/www:/var/www/certbot
-                entrypoint: \"/bin/sh -c 'trap \\\"exit 0\\\" TERM; while true; do certbot renew; sleep 12h; done'\"
-                networks:
-                  - maru-egg-dev
-
-            networks:
-              maru-egg-dev:" > docker-compose.yml
             echo ${{ secrets.DOCKER_PASSWORD }} | sudo docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
             sudo docker-compose down
             sudo docker-compose pull

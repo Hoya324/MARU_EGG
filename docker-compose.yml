@@ -10,34 +10,16 @@ services:
       - /home/ec2-user/logs:/logs
 
   nginx:
-    image: nginx:1.27.0
+    image: nginx:latest
     container_name: maru-egg-nginx
-    restart: unless-stopped
     ports:
       - "80:80"
-      - "443:443"
+    networks:
+      - maru-egg-dev
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf
-      - ./data/certbot/conf:/etc/letsencrypt
-      - ./data/certbot/www:/var/www/certbot
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:
       - maru-egg-app
-    networks:
-      - maru-egg-dev
-    command: >
-      /bin/sh -c "while true; do sleep 6h && nginx -s reload; done & nginx -g 'daemon off;'"
-
-  certbot:
-    container_name: certbot
-    image: certbot/certbot
-    restart: unless-stopped
-    volumes:
-      - ./data/certbot/conf:/etc/letsencrypt
-      - ./data/certbot/www:/var/www/certbot
-    entrypoint: >
-      /bin/sh -c "trap 'exit 0' TERM; while true; do certbot renew; sleep 12h; done"
-    networks:
-      - maru-egg-dev
 
 networks:
   maru-egg-dev:
