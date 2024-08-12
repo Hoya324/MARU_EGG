@@ -16,17 +16,5 @@ services:
       - ./db/mysql/init:/docker-entrypoint-initdb.d
     command:
       - "--innodb_ft_min_token_size=1"
-
-  nginx:
-    image: nginx:latest
-    container_name: maru-egg-nginx
-    ports:
-      - "80:80"
-    networks:
-      - maru-egg-local
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
-    depends_on:
-      - maru-egg-app
 networks:
   maru-egg-local:
