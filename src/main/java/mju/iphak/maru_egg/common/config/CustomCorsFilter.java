@@ -24,8 +24,6 @@ public class CustomCorsFilter implements Filter {
 		ServletException {
 		HttpServletResponse response = (HttpServletResponse)res;
 		HttpServletRequest request = (HttpServletRequest)req;
-		response.setHeader("Access-Control-Allow-Origin",
-			"http://localhost:3000, https://maru-egg-fe.vercel.app, http://marueggserver.com, https://marueggserver.com");
 		response.setHeader("Access-Control-Allow-Credentials", "true");
 		response.setHeader("Access-Control-Allow-Methods", "*");
 		response.setHeader("Access-Control-Max-Age", "3600");
