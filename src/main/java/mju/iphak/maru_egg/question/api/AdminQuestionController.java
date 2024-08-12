@@ -1,8 +1,10 @@
 package mju.iphak.maru_egg.question.api;
 
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
@@ -21,5 +23,9 @@ public class AdminQuestionController implements AdminQuestionControllerDocs {
 	@PostMapping("/check")
 	public void checkQuestion(@Valid @RequestBody CheckQuestionRequest request) {
 		questionService.checkQuestion(request.questionId(), request.check());
+	}
+
+	@DeleteMapping
+	public void deleteQuestion(@RequestParam Long questionId) {
 	}
 }

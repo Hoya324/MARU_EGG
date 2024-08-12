@@ -1,6 +1,7 @@
 package mju.iphak.maru_egg.question.docs;
 
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -22,4 +23,13 @@ public interface AdminQuestionControllerDocs {
 		@CustomApiResponse(error = "InternalServerError", status = 500, message = "내부 서버 오류가 발생했습니다.", description = "내부 서버 오류")
 	})
 	void checkQuestion(@Valid @RequestBody CheckQuestionRequest request);
+
+	@Operation(summary = "질문, 답변 삭제", description = "질문과 답변을 삭제하는 API", responses = {
+		@ApiResponse(responseCode = "200", description = "질문과 답변 삭제 성공")
+	})
+	@CustomApiResponses({
+		@CustomApiResponse(error = "EntityNotFoundException", status = 404, message = "id: 132인 질문을 찾을 수 없습니다.", description = "질문을 찾지 못한 경우"),
+		@CustomApiResponse(error = "InternalServerError", status = 500, message = "내부 서버 오류가 발생했습니다.", description = "내부 서버 오류")
+	})
+	void deleteQuestion(@RequestParam Long questionId);
 }
