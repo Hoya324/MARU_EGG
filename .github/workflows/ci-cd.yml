@@ -128,7 +128,7 @@ jobs:
                   - /home/ec2-user/logs:/logs
 
               nginx:
-                image: nginx:latest
+                image: nginx:1.27.0
                 container_name: maru-egg-nginx
                 restart: unless-stopped
                 ports:
