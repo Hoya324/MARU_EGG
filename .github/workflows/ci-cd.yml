@@ -112,7 +112,7 @@ jobs:
           key: ${{ secrets.PEM_KEY }}
           script: |
             cd /home/${{ secrets.USERNAME }}
-            echo "
+            sudo tee docker-compose.yml <<EOF
             services:
               maru-egg-app:
                 container_name: maru-egg
@@ -120,7 +120,14 @@ jobs:
                 ports:
                   - '8080:8080'
                 expose:
-                  - '8080'" > docker-compose.yml
+                  - '8080'
+                networks:
+                  - maru-egg-dev
+                volumes:
+                  - /home/ec2-user/logs:/logs
+            networks:
+              maru-egg-dev:
+            EOF
             echo ${{ secrets.DOCKER_PASSWORD }} | sudo docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
             if [ "$(sudo docker ps -q)" ]; then sudo docker stop $(sudo docker ps -q); fi
             if [ "$(sudo docker ps -a -q)" ]; then sudo docker rm $(sudo docker ps -a -q); fi
