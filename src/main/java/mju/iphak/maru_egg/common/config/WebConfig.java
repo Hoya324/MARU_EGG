@@ -9,11 +9,12 @@ public class WebConfig implements WebMvcConfigurer {
 
 	private static final String ORIGIN_LOCAL_URL = "http://localhost:3000";
 	private static final String ORIGIN_URL = "https://maru-egg-fe.vercel.app";
+	private static final String ORIGIN_SERVER_DOMAIN_URL = "http://marueggserver.com";
 
 	@Override
 	public void addCorsMappings(CorsRegistry registry) {
 		registry.addMapping("/**")
-			.allowedOrigins(ORIGIN_LOCAL_URL, ORIGIN_URL)
+			.allowedOrigins(ORIGIN_LOCAL_URL, ORIGIN_URL, ORIGIN_SERVER_DOMAIN_URL)
 			.allowedMethods("GET", "POST", "PUT", "DELETE")
 			.allowedHeaders("Authorization", "Content-Type")
 			.exposedHeaders("Authorization")
