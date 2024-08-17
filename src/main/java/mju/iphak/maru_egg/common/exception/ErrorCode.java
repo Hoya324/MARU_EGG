@@ -29,6 +29,7 @@ public enum ErrorCode {
 
 	// 500 error
 	INTERNAL_ERROR_SIMILARITY(INTERNAL_SERVER_ERROR, "contentToken: %s, question: %s인 질문의 유사도를 검사하는 도중 오류가 발생했습니다."),
+	INTERNAL_ERROR_TEXT_SIMILARITY(INTERNAL_SERVER_ERROR, "질문의 유사도를 검사하는 도중 오류가 발생했습니다."),
 	INTERNAL_ERROR_WEBCLIENT(INTERNAL_SERVER_ERROR, "%s에서 서버 오류가 발생했습니다.");
 
 	private final HttpStatus status;
