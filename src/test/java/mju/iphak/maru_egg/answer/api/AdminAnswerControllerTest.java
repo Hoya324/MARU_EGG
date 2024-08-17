@@ -15,14 +15,14 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.ResultActions;
 
 import jakarta.persistence.EntityNotFoundException;
-import mju.iphak.maru_egg.answer.application.AnswerService;
+import mju.iphak.maru_egg.answer.application.AnswerApiClient;
 import mju.iphak.maru_egg.answer.dto.request.UpdateAnswerContentRequest;
 import mju.iphak.maru_egg.common.IntegrationTest;
 
 class AdminAnswerControllerTest extends IntegrationTest {
 
 	@MockBean
-	private AnswerService answerService;
+	private AnswerApiClient answerApiClient;
 
 	@BeforeEach
 	void setUp() {
@@ -68,7 +68,7 @@ class AdminAnswerControllerTest extends IntegrationTest {
 	void 답변_수정_API_존재하지_않는_답변_ID() throws Exception {
 		// given
 		UpdateAnswerContentRequest request = new UpdateAnswerContentRequest(999L, "새로운 답변 내용");
-		doThrow(new EntityNotFoundException("답변을 찾을 수 없습니다.")).when(answerService)
+		doThrow(new EntityNotFoundException("답변을 찾을 수 없습니다.")).when(answerApiClient)
 			.updateAnswerContent(anyLong(), anyString());
 
 		// when
@@ -87,7 +87,7 @@ class AdminAnswerControllerTest extends IntegrationTest {
 	void 답변_수정_API_서버_내부_오류() throws Exception {
 		// given
 		UpdateAnswerContentRequest request = new UpdateAnswerContentRequest(1L, "새로운 답변 내용");
-		doThrow(new RuntimeException("내부 서버 오류")).when(answerService).updateAnswerContent(anyLong(), anyString());
+		doThrow(new RuntimeException("내부 서버 오류")).when(answerApiClient).updateAnswerContent(anyLong(), anyString());
 
 		// when
 		ResultActions resultActions = mvc.perform(post("/api/admin/answers")

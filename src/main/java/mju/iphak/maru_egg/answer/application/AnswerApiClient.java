@@ -27,7 +27,7 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 @Service
 @Transactional
-public class AnswerService {
+public class AnswerApiClient {
 
 	private final AnswerRepository answerRepository;
 	private final WebClient webClient;

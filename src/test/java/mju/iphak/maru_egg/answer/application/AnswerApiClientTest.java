@@ -33,7 +33,7 @@ import mju.iphak.maru_egg.question.domain.QuestionType;
 import mju.iphak.maru_egg.question.dto.request.CreateQuestionRequest;
 import reactor.core.publisher.Mono;
 
-public class AnswerServiceTest extends MockTest {
+public class AnswerApiClientTest extends MockTest {
 
 	@Mock
 	private AnswerRepository answerRepository;
@@ -42,7 +42,7 @@ public class AnswerServiceTest extends MockTest {
 	private ExchangeFunction exchangeFunction;
 
 	@InjectMocks
-	private AnswerService answerService;
+	private AnswerApiClient answerApiClient;
 
 	private Answer answer;
 	private Question question;
@@ -62,7 +62,7 @@ public class AnswerServiceTest extends MockTest {
 			.baseUrl(llmBaseUrl)
 			.build();
 
-		answerService = new AnswerService(answerRepository, webClient);
+		answerApiClient = new AnswerApiClient(answerRepository, webClient);
 
 		ClientResponse clientResponse = ClientResponse.create(HttpStatusCode.valueOf(200))
 			.header("Content-Type", "application/json")
@@ -81,7 +81,7 @@ public class AnswerServiceTest extends MockTest {
 		when(answerRepository.findByQuestionId(1L)).thenReturn(Optional.of(answer));
 
 		// when
-		Answer result = answerService.getAnswerByQuestionId(1L);
+		Answer result = answerApiClient.getAnswerByQuestionId(1L);
 
 		// then
 		assertNotNull(result);
@@ -96,7 +96,7 @@ public class AnswerServiceTest extends MockTest {
 
 		// when & then
 		EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> {
-			answerService.getAnswerByQuestionId(1L);
+			answerApiClient.getAnswerByQuestionId(1L);
 		});
 
 		assertEquals("질문 id가 1인 답변을 찾을 수 없습니다.", exception.getMessage());
@@ -115,7 +115,7 @@ public class AnswerServiceTest extends MockTest {
 		// when
 		LLMAnswerResponse expectedResponse = LLMAnswerResponse.of(QuestionType.SUSI.getType(),
 			QuestionCategory.ADMISSION_GUIDELINE.getCategory(), answer, references);
-		LLMAnswerResponse result = answerService.askQuestion(request).block();
+		LLMAnswerResponse result = answerApiClient.askQuestion(request).block();
 
 		// then
 		assertThat(result).isNotNull();
@@ -132,7 +132,7 @@ public class AnswerServiceTest extends MockTest {
 
 		// when
 		String updateContent = "변경된 답변";
-		answerService.updateAnswerContent(id, updateContent);
+		answerApiClient.updateAnswerContent(id, updateContent);
 
 		// then
 		assertThat(answer.getContent()).isEqualTo(updateContent);
@@ -152,7 +152,7 @@ public class AnswerServiceTest extends MockTest {
 			.thenReturn(answer);
 
 		// when
-		answerService.createAnswer(question, answerRequest);
+		answerApiClient.createAnswer(question, answerRequest);
 
 		// then
 		verify(answerRepository, times(1)).save(any(Answer.class));

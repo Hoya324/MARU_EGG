@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import mju.iphak.maru_egg.answer.application.AnswerService;
+import mju.iphak.maru_egg.answer.application.AnswerApiClient;
 import mju.iphak.maru_egg.answer.domain.Answer;
 import mju.iphak.maru_egg.answer.domain.AnswerReference;
 import mju.iphak.maru_egg.answer.dto.request.LLMAskQuestionRequest;
@@ -40,7 +40,7 @@ public class QuestionProcessingService {
 
 	private final QuestionRepository questionRepository;
 	private final AnswerReferenceRepository answerReferenceRepository;
-	private final AnswerService answerService;
+	private final AnswerApiClient answerApiClient;
 
 	public QuestionResponse question(final QuestionType type, final QuestionCategory category, final String content) {
 		String contentToken = PhraseExtractionUtils.extractPhrases(content);
@@ -70,7 +70,7 @@ public class QuestionProcessingService {
 			content
 		);
 
-		LLMAnswerResponse llmAnswerResponse = answerService.askQuestion(askQuestionRequest).block();
+		LLMAnswerResponse llmAnswerResponse = answerApiClient.askQuestion(askQuestionRequest).block();
 
 		if (!isValidAnswer(llmAnswerResponse)) {
 			return QuestionResponse.valueOfInvalidQuestion(content);
@@ -97,7 +97,7 @@ public class QuestionProcessingService {
 
 	private Answer saveAnswer(Question question, String content) {
 		Answer newAnswer = Answer.of(question, content);
-		return answerService.saveAnswer(newAnswer);
+		return answerApiClient.saveAnswer(newAnswer);
 	}
 
 	private Question saveQuestion(QuestionType type, QuestionCategory category, String content, String contentToken) {
@@ -142,7 +142,7 @@ public class QuestionProcessingService {
 	private QuestionResponse getExistingQuestionResponse(Long questionId) {
 		Question question = getQuestionById(questionId);
 		question.incrementViewCount();
-		Answer answer = answerService.getAnswerByQuestionId(question.getId());
+		Answer answer = answerApiClient.getAnswerByQuestionId(question.getId());
 		List<AnswerReferenceResponse> answerReferenceResponses = answer.getReferences().stream()
 			.map(reference -> AnswerReferenceResponse.of(reference.getTitle(), reference.getLink()))
 			.toList();

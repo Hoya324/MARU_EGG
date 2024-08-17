@@ -27,7 +27,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import com.google.gson.Gson;
 
-import mju.iphak.maru_egg.answer.application.AnswerService;
+import mju.iphak.maru_egg.answer.application.AnswerApiClient;
 import mju.iphak.maru_egg.answer.domain.Answer;
 import mju.iphak.maru_egg.answer.domain.AnswerReference;
 import mju.iphak.maru_egg.answer.dto.request.LLMAskQuestionRequest;
@@ -60,7 +60,7 @@ class QuestionProcessingServiceTest extends MockTest {
 	private AnswerReferenceRepository answerReferenceRepository;
 
 	@Mock
-	private AnswerService answerService;
+	private AnswerApiClient answerApiClient;
 	private MockWebServer mockWebServer;
 
 	@InjectMocks
@@ -86,12 +86,12 @@ class QuestionProcessingServiceTest extends MockTest {
 			.setBody(new Gson().toJson(expectedResponse))
 		);
 
-		return answerService.askQuestion(request).block();
+		return answerApiClient.askQuestion(request).block();
 	}
 
 	void startServer(ClientHttpConnector connector) {
 		this.mockWebServer = new MockWebServer();
-		answerService = new AnswerService(answerRepository, WebClient
+		answerApiClient = new AnswerApiClient(answerRepository, WebClient
 			.builder()
 			.baseUrl(this.mockWebServer.url("/").toString())
 			.clientConnector(connector).build()
@@ -122,20 +122,20 @@ class QuestionProcessingServiceTest extends MockTest {
 		when(question.getId()).thenReturn(1L);
 		when(answer.getId()).thenReturn(1L);
 		when(answer.getReferences()).thenReturn(references);
-		when(answerService.getAnswerByQuestionId(1L)).thenReturn(answer);
+		when(answerApiClient.getAnswerByQuestionId(1L)).thenReturn(answer);
 		when(answerRepository.findByQuestionId(anyLong())).thenReturn(Optional.of(answer));
 		when(questionRepository.searchQuestionsByContentTokenAndTypeAndCategory(anyString(), any(QuestionType.class),
 			any(QuestionCategory.class)))
 			.thenReturn(Optional.of(List.of(QuestionCore.of(1L, "테스트 질문입니다."))));
 		when(questionRepository.findById(1L)).thenReturn(Optional.of(question));
 
-		questionProcessingService = new QuestionProcessingService(questionRepository, answerService,
+		questionProcessingService = new QuestionProcessingService(questionRepository, answerApiClient,
 			answerReferenceRepository);
 
 		doAnswer(invocation -> {
 			LLMAskQuestionRequest request = invocation.getArgument(0);
 			return Mono.just(mockAskQuestion(request));
-		}).when(answerService).askQuestion(any(LLMAskQuestionRequest.class));
+		}).when(answerApiClient).askQuestion(any(LLMAskQuestionRequest.class));
 	}
 
 	@DisplayName("질문을 조회하는데 성공한 경우")
@@ -232,11 +232,11 @@ class QuestionProcessingServiceTest extends MockTest {
 		when(questionRepository.searchQuestionsByContentTokenAndTypeAndCategory(contentToken, type, category))
 			.thenReturn(Optional.of(Collections.emptyList()));
 		when(questionRepository.save(any(Question.class))).thenReturn(testQuestion);
-		when(answerService.saveAnswer(any(Answer.class))).thenReturn(testAnswer);
+		when(answerApiClient.saveAnswer(any(Answer.class))).thenReturn(testAnswer);
 		doAnswer(invocation -> {
 			LLMAskQuestionRequest request = invocation.getArgument(0);
 			return Mono.just(mockAskQuestion(request));
-		}).when(answerService).askQuestion(any(LLMAskQuestionRequest.class));
+		}).when(answerApiClient).askQuestion(any(LLMAskQuestionRequest.class));
 
 		// when
 		QuestionResponse result = questionProcessingService.question(type, category, content);

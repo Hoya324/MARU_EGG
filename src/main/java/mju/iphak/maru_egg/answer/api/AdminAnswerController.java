@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import mju.iphak.maru_egg.answer.application.AnswerService;
+import mju.iphak.maru_egg.answer.application.AnswerApiClient;
 import mju.iphak.maru_egg.answer.docs.AdminAnswerControllerDocs;
 import mju.iphak.maru_egg.answer.dto.request.UpdateAnswerContentRequest;
 import mju.iphak.maru_egg.common.meta.CustomApiResponse;
@@ -18,7 +18,7 @@ import mju.iphak.maru_egg.common.meta.CustomApiResponses;
 @RequestMapping("/api/admin/answers")
 public class AdminAnswerController implements AdminAnswerControllerDocs {
 
-	private final AnswerService answerService;
+	private final AnswerApiClient answerApiClient;
 
 	@CustomApiResponses({
 		@CustomApiResponse(error = "HttpMessageNotReadableException", status = 400, message = "Invalid input format: JSON parse error: Cannot deserialize value of type `java.lang.Long` from String \"ㅇㅇ\": not a valid `java.lang.Long` value", description = "잘못된 요청 값을 보낸 경우"),
@@ -27,6 +27,6 @@ public class AdminAnswerController implements AdminAnswerControllerDocs {
 	})
 	@PostMapping()
 	public void updateAnswerContent(@Valid @RequestBody UpdateAnswerContentRequest request) {
-		answerService.updateAnswerContent(request.id(), request.content());
+		answerApiClient.updateAnswerContent(request.id(), request.content());
 	}
 }
