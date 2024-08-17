@@ -28,7 +28,7 @@ import mju.iphak.maru_egg.question.repository.QuestionRepository;
 public class AnswerManager {
 
 	private static final String INVALID_ANSWER = "해당 내용에 대한 정보는 존재하지 않습니다. 정확한 내용은 입학지원팀에 문의해주세요.";
-	private static final String baseMessage = """
+	private static final String BASE_MESSAGE = """
 		질문해주신 내용에 대한 적절한 정보을 발견하지 못 했습니다.
 				
 		대신 질문해주신 내용에 가장 적합한 자료들을 골라봤어요. 참고하셔서 다시 질문해주세요!
@@ -68,7 +68,7 @@ public class AnswerManager {
 	}
 
 	private static String getGuideAnswer(final List<AnswerReferenceResponse> references) {
-		return baseMessage + references.stream()
+		return BASE_MESSAGE + references.stream()
 			.map(reference -> String.format("참고자료 %d : [%s](%s)",
 				references.indexOf(reference) + 1,
 				reference.title(),
