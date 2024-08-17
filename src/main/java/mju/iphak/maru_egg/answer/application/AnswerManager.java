@@ -32,7 +32,9 @@ public class AnswerManager {
 		질문해주신 내용에 대한 적절한 정보을 발견하지 못 했습니다.
 				
 		대신 질문해주신 내용에 가장 적합한 자료들을 골라봤어요. 참고하셔서 다시 질문해주세요!
+		 
 		""";
+	private static final String IPHAK_OFFICE_NUMBER_GUIDE = "\n입학처 상담 전화번호 : 02-300-1799, 1800";
 
 	private final QuestionRepository questionRepository;
 	private final AnswerApiClient answerApiClient;
@@ -71,7 +73,7 @@ public class AnswerManager {
 				references.indexOf(reference) + 1,
 				reference.title(),
 				reference.link()))
-			.collect(Collectors.joining("\n"));
+			.collect(Collectors.joining("\n")) + IPHAK_OFFICE_NUMBER_GUIDE;
 	}
 
 	private boolean isInvalidAnswer(LLMAnswerResponse llmAnswerResponse) {
