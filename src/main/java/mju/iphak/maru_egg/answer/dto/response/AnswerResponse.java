@@ -19,8 +19,6 @@ public record AnswerResponse(
 	@Schema(description = "답변 DB 생성 및 업데이트 날짜", example = "생성일자: 2024-07-24T15:49:33, 마지막 DB 갱신일자: 2024-07-24T15:52:49")
 	String dateInformation
 ) {
-	private static final String INVALID_ANSWER = "해당 내용에 대한 정보는 존재하지 않습니다. 정확한 내용은 입학지원팀에 문의해주세요.";
-
 	public static AnswerResponse from(Answer answer) {
 		return AnswerResponse.builder()
 			.id(answer.getId())
@@ -30,10 +28,10 @@ public record AnswerResponse(
 			.build();
 	}
 
-	public static AnswerResponse valueOfInvalidAnswer() {
+	public static AnswerResponse valueOfInvalidAnswer(String content) {
 		return AnswerResponse.builder()
 			.id(null)
-			.content(INVALID_ANSWER)
+			.content(content)
 			.renewalYear(0)
 			.dateInformation(null)
 			.build();
