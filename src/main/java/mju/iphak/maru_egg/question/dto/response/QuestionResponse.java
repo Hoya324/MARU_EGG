@@ -11,10 +11,10 @@ import mju.iphak.maru_egg.question.domain.Question;
 @Builder
 @Schema(description = "질문 응답 DTO")
 public record QuestionResponse(
-	@Schema(description = "질문 id", type = "string", example = "1")
+	@Schema(description = "질문 id", type = "string", examples = {"1", "null"})
 	Long id,
 
-	@Schema(description = "질문", example = "수시 일정 알려주세요.", examples = "수시 일정 알려주세요.")
+	@Schema(description = "질문", example = "수시 일정 알려주세요.")
 	String content,
 
 	@Schema(description = "답변 DB 생성 및 업데이트 날짜", example = "생성일자: 2024-07-24T22:11:02, 마지막 DB 갱신일자: 2024-07-24T22:45:25.037855")
@@ -26,7 +26,6 @@ public record QuestionResponse(
 	@Schema(description = "참고 자료 리스트")
 	List<AnswerReferenceResponse> references
 ) {
-
 	public static QuestionResponse of(Question question, AnswerResponse answerResponse,
 		List<AnswerReferenceResponse> answerReferenceResponses) {
 		return QuestionResponse.builder()
@@ -35,6 +34,17 @@ public record QuestionResponse(
 			.dateInformation(question.getDateInformation())
 			.answer(answerResponse)
 			.references(answerReferenceResponses)
+			.build();
+	}
+
+	public static QuestionResponse valueOfInvalidQuestion(String question) {
+		AnswerResponse answerResponse = AnswerResponse.valueOfInvalidAnswer();
+		return QuestionResponse.builder()
+			.id(null)
+			.content(question)
+			.dateInformation(null)
+			.answer(answerResponse)
+			.references(null)
 			.build();
 	}
 }

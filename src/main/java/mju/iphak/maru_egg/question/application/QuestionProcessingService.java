@@ -38,6 +38,7 @@ public class QuestionProcessingService {
 
 	private static final double STANDARD_SIMILARITY = 0.95;
 	private static final String UNCLASSIFIED = "";
+	private static final String INVALID_ANSWER = "해당 내용에 대한 정보는 존재하지 않습니다. 정확한 내용은 입학지원팀에 문의해주세요.";
 
 	private final QuestionRepository questionRepository;
 	private final AnswerService answerService;
@@ -70,11 +71,24 @@ public class QuestionProcessingService {
 			content);
 
 		LLMAnswerResponse llmAnswerResponse = answerService.askQuestion(askQuestionRequest).block();
-		Question newQuestion = saveQuestion(type,
-			QuestionCategory.convertToCategory(llmAnswerResponse.questionCategory()), content, contentToken);
-		Answer newAnswer = saveAnswer(newQuestion, llmAnswerResponse.answer());
-		saveAnswerReference(newAnswer, llmAnswerResponse.references());
-		return createQuestionResponse(newQuestion, newAnswer, llmAnswerResponse.references());
+
+		return getQuestionResponse(type, content, contentToken, llmAnswerResponse);
+	}
+
+	private QuestionResponse getQuestionResponse(final QuestionType type, final String content,
+		final String contentToken, final LLMAnswerResponse llmAnswerResponse) {
+		if (isCorrectAnswer(llmAnswerResponse)) {
+			Question newQuestion = saveQuestion(type,
+				QuestionCategory.convertToCategory(llmAnswerResponse.questionCategory()), content, contentToken);
+			Answer newAnswer = saveAnswer(newQuestion, llmAnswerResponse.answer());
+			saveAnswerReference(newAnswer, llmAnswerResponse.references());
+			return createQuestionResponse(newQuestion, newAnswer, llmAnswerResponse.references());
+		}
+		return QuestionResponse.valueOfInvalidQuestion(content);
+	}
+
+	private static boolean isCorrectAnswer(final LLMAnswerResponse llmAnswerResponse) {
+		return !llmAnswerResponse.answer().equals(INVALID_ANSWER);
 	}
 
 	private void saveAnswerReference(final Answer answer,
