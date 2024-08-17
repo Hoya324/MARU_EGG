@@ -37,11 +37,11 @@ public record QuestionResponse(
 			.build();
 	}
 
-	public static QuestionResponse valueOfInvalidQuestion(String question) {
-		AnswerResponse answerResponse = AnswerResponse.valueOfInvalidAnswer();
+	public static QuestionResponse valueOfInvalidQuestion(String content, String answer) {
+		AnswerResponse answerResponse = AnswerResponse.valueOfInvalidAnswer(answer);
 		return QuestionResponse.builder()
 			.id(null)
-			.content(question)
+			.content(content)
 			.dateInformation(null)
 			.answer(answerResponse)
 			.references(null)

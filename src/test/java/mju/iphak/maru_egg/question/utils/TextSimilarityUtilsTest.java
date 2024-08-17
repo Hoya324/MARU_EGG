@@ -1,6 +1,6 @@
 package mju.iphak.maru_egg.question.utils;
 
-import static mju.iphak.maru_egg.question.utils.PhraseExtractionUtils.*;
+import static mju.iphak.maru_egg.common.utils.PhraseExtractionUtils.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -15,7 +15,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import mju.iphak.maru_egg.question.utils.NLP.TextSimilarityUtils;
+import mju.iphak.maru_egg.common.utils.NLP.TextSimilarityUtils;
+import mju.iphak.maru_egg.common.utils.PhraseExtractionUtils;
 
 public class TextSimilarityUtilsTest {
 

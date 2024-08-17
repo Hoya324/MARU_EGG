@@ -22,7 +22,7 @@ import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.ExchangeFunction;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import mju.iphak.maru_egg.answer.application.AnswerService;
+import mju.iphak.maru_egg.answer.application.AnswerApiClient;
 import mju.iphak.maru_egg.answer.domain.Answer;
 import mju.iphak.maru_egg.answer.domain.AnswerReference;
 import mju.iphak.maru_egg.answer.dto.request.CreateAnswerRequest;
@@ -64,7 +64,7 @@ class QuestionControllerTest extends IntegrationTest {
 	private AnswerReferenceRepository answerReferenceRepository;
 
 	@Autowired
-	private AnswerService answerService;
+	private AnswerApiClient answerApiClient;
 
 	private Question question;
 	private Answer answer;
@@ -104,7 +104,7 @@ class QuestionControllerTest extends IntegrationTest {
 			.baseUrl(llmBaseUrl)
 			.build();
 
-		answerService = new AnswerService(answerRepository, webClient);
+		answerApiClient = new AnswerApiClient(answerRepository, webClient);
 
 		ClientResponse clientResponse = ClientResponse.create(HttpStatusCode.valueOf(200))
 			.header("Content-Type", "application/json")

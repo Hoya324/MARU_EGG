@@ -1,4 +1,4 @@
-package mju.iphak.maru_egg.question.utils.NLP;
+package mju.iphak.maru_egg.common.utils.NLP;
 
 import java.util.Arrays;
 import java.util.HashMap;

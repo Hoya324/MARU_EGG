@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import mju.iphak.maru_egg.answer.application.AnswerService;
+import mju.iphak.maru_egg.answer.application.AnswerApiClient;
 import mju.iphak.maru_egg.answer.domain.Answer;
 import mju.iphak.maru_egg.answer.dto.response.AnswerResponse;
 import mju.iphak.maru_egg.common.dto.pagination.SliceQuestionResponse;
@@ -32,12 +32,12 @@ import mju.iphak.maru_egg.question.repository.QuestionRepository;
 public class QuestionService {
 
 	private final QuestionRepository questionRepository;
-	private final AnswerService answerService;
+	private final AnswerApiClient answerApiClient;
 
 	public List<QuestionListItemResponse> getQuestions(final QuestionType type, final QuestionCategory category) {
 		List<Question> questions = findQuestions(type, category);
 		return questions.stream()
-			.map(question -> createQuestionResponse(question, answerService.getAnswerByQuestionId(question.getId())))
+			.map(question -> createQuestionResponse(question, answerApiClient.getAnswerByQuestionId(question.getId())))
 			.collect(Collectors.toList());
 	}
 
@@ -61,7 +61,7 @@ public class QuestionService {
 	public void createQuestion(final CreateQuestionRequest request) {
 		Question question = request.toEntity();
 		questionRepository.save(question);
-		answerService.createAnswer(question, request.answer());
+		answerApiClient.createAnswer(question, request.answer());
 	}
 
 	private List<Question> findQuestions(final QuestionType type, final QuestionCategory category) {
