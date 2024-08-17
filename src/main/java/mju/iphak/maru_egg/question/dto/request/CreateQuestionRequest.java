@@ -1,6 +1,6 @@
 package mju.iphak.maru_egg.question.dto.request;
 
-import static mju.iphak.maru_egg.question.utils.PhraseExtractionUtils.*;
+import static mju.iphak.maru_egg.common.utils.PhraseExtractionUtils.*;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import mju.iphak.maru_egg.answer.dto.request.CreateAnswerRequest;

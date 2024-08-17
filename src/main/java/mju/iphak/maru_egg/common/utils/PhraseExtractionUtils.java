@@ -1,4 +1,4 @@
-package mju.iphak.maru_egg.question.utils;
+package mju.iphak.maru_egg.common.utils;
 
 import java.util.List;
 import java.util.stream.Collectors;

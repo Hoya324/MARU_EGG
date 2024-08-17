@@ -20,14 +20,14 @@ import mju.iphak.maru_egg.answer.dto.response.AnswerReferenceResponse;
 import mju.iphak.maru_egg.answer.dto.response.AnswerResponse;
 import mju.iphak.maru_egg.answer.dto.response.LLMAnswerResponse;
 import mju.iphak.maru_egg.answer.repository.AnswerReferenceRepository;
+import mju.iphak.maru_egg.common.utils.NLP.TextSimilarityUtils;
+import mju.iphak.maru_egg.common.utils.PhraseExtractionUtils;
 import mju.iphak.maru_egg.question.domain.Question;
 import mju.iphak.maru_egg.question.domain.QuestionCategory;
 import mju.iphak.maru_egg.question.domain.QuestionType;
 import mju.iphak.maru_egg.question.dto.response.QuestionCore;
 import mju.iphak.maru_egg.question.dto.response.QuestionResponse;
 import mju.iphak.maru_egg.question.repository.QuestionRepository;
-import mju.iphak.maru_egg.question.utils.NLP.TextSimilarityUtils;
-import mju.iphak.maru_egg.question.utils.PhraseExtractionUtils;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -39,8 +39,8 @@ public class QuestionProcessingService {
 	private static final String INVALID_ANSWER = "해당 내용에 대한 정보는 존재하지 않습니다. 정확한 내용은 입학지원팀에 문의해주세요.";
 
 	private final QuestionRepository questionRepository;
-	private final AnswerReferenceRepository answerReferenceRepository;
 	private final AnswerApiClient answerApiClient;
+	private final AnswerReferenceRepository answerReferenceRepository;
 
 	public QuestionResponse question(final QuestionType type, final QuestionCategory category, final String content) {
 		String contentToken = PhraseExtractionUtils.extractPhrases(content);

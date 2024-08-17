@@ -1,6 +1,6 @@
 package mju.iphak.maru_egg.question.utils;
 
-import static mju.iphak.maru_egg.question.utils.PhraseExtractionUtils.*;
+import static mju.iphak.maru_egg.common.utils.PhraseExtractionUtils.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.stream.Stream;
@@ -9,6 +9,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+
+import mju.iphak.maru_egg.common.utils.PhraseExtractionUtils;
 
 public class PhraseExtractionUtilsTest {
 	@DisplayName("텍스트 추출 검사")
