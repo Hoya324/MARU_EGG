@@ -92,8 +92,8 @@ class QuestionControllerTest extends IntegrationTest {
 		jdbcTemplate.execute("ALTER TABLE questions ADD FULLTEXT INDEX idx_ft_question_content(content)");
 		type = QuestionType.SUSI;
 		category = QuestionCategory.ADMISSION_GUIDELINE;
-		content = "수시 일정 알려주세요.";
-		question = questionRepository.save(Question.of("수시 일정 알려주세요.", "수시 일정", QuestionType.SUSI,
+		content = "수시 원서 일정 알려주세요.";
+		question = questionRepository.save(Question.of("수시 원서 일정 알려주세요.", "수시 일정", QuestionType.SUSI,
 			QuestionCategory.ADMISSION_GUIDELINE));
 		answer = answerRepository.save(Answer.of(question,
 			"수시 일정은 2024년 12월 19일(목)부터 2024년 12월 26일(목) 18:00까지 최초합격자 발표가 있고, 2025년 2월 10일(월) 10:00부터 2025년 2월 12일(수) 15:00까지 문서등록 및 등록금 납부가 진행됩니다. 등록금 납부 기간은 2024년 12월 16일(월) 10:00부터 2024년 12월 18일(수) 15:00까지이며, 방법은 입학처 홈페이지를 통한 문서등록 및 등록금 납부를 하시면 됩니다. 상세 안내는 추후 입학처 홈페이지를 통해 공지될 예정입니다."));
