@@ -28,13 +28,8 @@ import mju.iphak.maru_egg.question.repository.QuestionRepository;
 public class AnswerManager {
 
 	private static final String INVALID_ANSWER = "해당 내용에 대한 정보는 존재하지 않습니다. 정확한 내용은 입학지원팀에 문의해주세요.";
-	private static final String BASE_MESSAGE = """
-		질문해주신 내용에 대한 적절한 정보을 발견하지 못 했습니다.
-				
-		대신 질문해주신 내용에 가장 적합한 자료들을 골라봤어요. 참고하셔서 다시 질문해주세요!
-		 
-		""";
-	private static final String IPHAK_OFFICE_NUMBER_GUIDE = "\n입학처 상담 전화번호 : 02-300-1799, 1800";
+	private static final String BASE_MESSAGE = "질문해주신 내용에 대한 적절한 정보을 발견하지 못 했습니다.\n\n대신 질문해주신 내용에 가장 적합한 자료들을 골라봤어요. 참고하셔서 다시 질문해주세요!\n\n\n\n";
+	private static final String IPHAK_OFFICE_NUMBER_GUIDE = "\n\n입학처 상담 전화번호 : 02-300-1799, 1800";
 
 	private final QuestionRepository questionRepository;
 	private final AnswerApiClient answerApiClient;
@@ -69,7 +64,7 @@ public class AnswerManager {
 
 	private static String getGuideAnswer(final List<AnswerReferenceResponse> references) {
 		return BASE_MESSAGE + references.stream()
-			.map(reference -> String.format("참고자료 %d : [%s](%s)",
+			.map(reference -> String.format("참고자료 %d : [%s](%s)\n\n",
 				references.indexOf(reference) + 1,
 				reference.title(),
 				reference.link()))
