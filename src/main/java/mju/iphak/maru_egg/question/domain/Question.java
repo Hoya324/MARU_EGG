@@ -61,4 +61,15 @@ public class Question extends BaseEntity {
 			.isChecked(false)
 			.build();
 	}
+
+	public static Question create(String content, String contentToken, QuestionType questionType,
+		QuestionCategory questionCategory) {
+		return Question.builder()
+			.content(content)
+			.contentToken(contentToken)
+			.questionType(questionType)
+			.questionCategory(questionCategory)
+			.isChecked(true)
+			.build();
+	}
 }

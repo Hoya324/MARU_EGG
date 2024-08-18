@@ -23,6 +23,6 @@ public record CreateQuestionRequest(
 	CreateAnswerRequest answer
 ) {
 	public Question toEntity() {
-		return Question.of(content, extractPhrases(content), questionType, questionCategory);
+		return Question.create(content, extractPhrases(content), questionType, questionCategory);
 	}
 }
