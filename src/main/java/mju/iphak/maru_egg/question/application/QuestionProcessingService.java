@@ -57,6 +57,10 @@ public class QuestionProcessingService {
 		return answerManager.processNewQuestion(type, category, content, contentToken);
 	}
 
+	public QuestionResponse getQuestion(final Long questionId) {
+		return getExistingQuestionResponse(questionId);
+	}
+
 	private List<QuestionCore> getQuestionCores(QuestionType type, QuestionCategory category, String contentToken) {
 		return category == null ?
 			questionRepository.searchQuestionsByContentTokenAndType(contentToken, type)

@@ -15,9 +15,13 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.ResultActions;
 
 import jakarta.persistence.EntityNotFoundException;
+import mju.iphak.maru_egg.answer.dto.request.CreateAnswerRequest;
 import mju.iphak.maru_egg.common.IntegrationTest;
 import mju.iphak.maru_egg.question.application.QuestionService;
+import mju.iphak.maru_egg.question.domain.QuestionCategory;
+import mju.iphak.maru_egg.question.domain.QuestionType;
 import mju.iphak.maru_egg.question.dto.request.CheckQuestionRequest;
+import mju.iphak.maru_egg.question.dto.request.CreateQuestionRequest;
 
 class AdminQuestionControllerTest extends IntegrationTest {
 
@@ -97,6 +101,29 @@ class AdminQuestionControllerTest extends IntegrationTest {
 		// then
 		resultActions
 			.andExpect(status().isInternalServerError())
+			.andDo(print());
+	}
+
+	@Test
+	@WithMockUser(roles = "ADMIN")
+	void 질문_생성_API() throws Exception {
+		// given
+		CreateAnswerRequest answerRequest = new CreateAnswerRequest("example answer content", 2024);
+		CreateQuestionRequest request = new CreateQuestionRequest("example content", QuestionType.SUSI,
+			QuestionCategory.ADMISSION_GUIDELINE, answerRequest);
+
+		// when
+		ResultActions resultActions = requestCreateQuestion(request);
+
+		// then
+		resultActions
+			.andExpect(status().isOk());
+	}
+
+	private ResultActions requestCreateQuestion(CreateQuestionRequest dto) throws Exception {
+		return mvc.perform(post("/api/admin/questions/new")
+				.content(objectMapper.writeValueAsString(dto))
+				.contentType(MediaType.APPLICATION_JSON))
 			.andDo(print());
 	}
 }
