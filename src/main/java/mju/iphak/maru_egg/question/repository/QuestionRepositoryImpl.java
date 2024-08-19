@@ -9,15 +9,16 @@ import java.util.stream.Collectors;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.NumberTemplate;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import mju.iphak.maru_egg.common.dto.pagination.SliceQuestionResponse;
-import mju.iphak.maru_egg.question.domain.QQuestion;
 import mju.iphak.maru_egg.question.domain.Question;
 import mju.iphak.maru_egg.question.domain.QuestionCategory;
 import mju.iphak.maru_egg.question.domain.QuestionType;
@@ -35,8 +36,7 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
 	@Override
 	public Optional<List<QuestionCore>> searchQuestionsByContentTokenAndType(final String contentToken,
 		final QuestionType type) {
-		NumberTemplate<Double> booleanTemplate = createBooleanTemplate(question, contentToken);
-
+		NumberTemplate<Double> booleanTemplate = createBooleanTemplate(contentToken);
 		List<Tuple> tuples = queryFactory.select(question.id, question.contentToken)
 			.from(question)
 			.where(booleanTemplate.gt(0).and(question.questionType.eq(type)))
@@ -52,94 +52,59 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
 	@Override
 	public Optional<List<QuestionCore>> searchQuestionsByContentTokenAndTypeAndCategory(final String contentToken,
 		final QuestionType type, final QuestionCategory category) {
-		NumberTemplate<Double> booleanTemplate = createBooleanTemplate(question, contentToken);
-
+		NumberTemplate<Double> booleanTemplate = createBooleanTemplate(contentToken);
 		List<Tuple> tuples = queryFactory.select(question.id, question.contentToken)
 			.from(question)
-			.where(
-				booleanTemplate.gt(0).and(question.questionType.eq(type)).and(question.questionCategory.eq(category)))
+			.where(booleanTemplate.gt(0)
+				.and(question.questionType.eq(type))
+				.and(question.questionCategory.eq(category)))
 			.fetch();
 
 		List<QuestionCore> result = tuples.stream()
 			.map(tuple -> QuestionCore.of(tuple.get(question.id), tuple.get(question.contentToken)))
 			.collect(Collectors.toList());
+
 		return Optional.of(result);
 	}
 
 	@Override
 	public SliceQuestionResponse<SearchedQuestionsResponse> searchQuestionsOfCursorPagingByContentWithFullTextSearch(
-		final String content,
+		final QuestionType type, final QuestionCategory category, final String content,
 		final Integer cursorViewCount, final Long questionId, final Pageable pageable) {
-		QQuestion question = QQuestion.question;
+
 		int pageSize = pageable.getPageSize();
+		Integer viewCountCursorKey = getValidCursorViewCount(cursorViewCount);
+		Long questionIdCursorKey = getValidCursorQuestionId(questionId);
 
-		Integer ViewCountCursorKey =
-			cursorViewCount != null && cursorViewCount > 0 ? cursorViewCount : Integer.MAX_VALUE;
-		Long QuestionIdCursorKey = questionId != null && questionId > 0 ? questionId : Long.MAX_VALUE;
+		NumberTemplate<Double> booleanTemplate = createBooleanTemplate(content);
+		BooleanExpression cursorPredicate = createCursorPredicate(viewCountCursorKey, questionIdCursorKey);
 
-		NumberTemplate<Double> booleanTemplate = createBooleanTemplate(question, content);
-		BooleanExpression cursorPredicate = createCursorPredicate(ViewCountCursorKey, QuestionIdCursorKey, question);
+		List<Question> questions = fetchQuestions(type, category, booleanTemplate, cursorPredicate, pageSize);
 
-		List<Question> questions = fetchQuestions(booleanTemplate, cursorPredicate, question, pageSize);
-
-		boolean hasNext = questions.size() > pageSize;
-
-		if (hasNext) {
-			questions.remove(pageSize);
-		}
-
-		List<SearchedQuestionsResponse> questionResponses = mapToResponse(questions);
-
-		Integer nextCursorViewCount = null;
-		Long nextQuestionId = null;
-		if (!questions.isEmpty()) {
-			Question lastQuestion = questions.get(questions.size() - 1);
-			nextCursorViewCount = lastQuestion.getViewCount();
-			nextQuestionId = lastQuestion.getId();
-		}
-
-		return new SliceQuestionResponse<>(questionResponses, pageable.getPageNumber(), pageSize, hasNext,
-			nextCursorViewCount, nextQuestionId);
+		return buildSliceQuestionResponse(pageable, pageSize, questions);
 	}
 
 	@Override
 	public SliceQuestionResponse<SearchedQuestionsResponse> searchQuestionsOfCursorPagingByContentWithLikeFunction(
-		final String content,
+		final QuestionType type, final QuestionCategory category, final String content,
 		final Integer cursorViewCount, final Long questionId, final Pageable pageable) {
-		QQuestion question = QQuestion.question;
+
 		int pageSize = pageable.getPageSize();
 
-		List<Question> questions = queryFactory
-			.selectFrom(question)
-			.where(question.content.contains(content))
-			.limit(pageSize)
+		BooleanBuilder whereClause = buildWhereClause(type, category, content);
+		List<Question> questions = queryFactory.selectFrom(question)
+			.where(whereClause)
+			.limit(pageSize + 1)
 			.fetch();
 
-		boolean hasNext = questions.size() > pageSize;
-
-		if (hasNext) {
-			questions.remove(pageSize);
-		}
-
-		List<SearchedQuestionsResponse> questionResponses = mapToResponse(questions);
-
-		Integer nextCursorViewCount = null;
-		Long nextQuestionId = null;
-		if (!questions.isEmpty()) {
-			Question lastQuestion = questions.get(questions.size() - 1);
-			nextCursorViewCount = lastQuestion.getViewCount();
-			nextQuestionId = lastQuestion.getId();
-		}
-
-		return new SliceQuestionResponse<>(questionResponses, pageable.getPageNumber(), pageSize, hasNext,
-			nextCursorViewCount, nextQuestionId);
+		return buildSliceQuestionResponse(pageable, pageSize, questions);
 	}
 
-	private NumberTemplate<Double> createBooleanTemplate(QQuestion question, String content) {
+	private NumberTemplate<Double> createBooleanTemplate(String content) {
 		return Expressions.numberTemplate(Double.class, "function('match', {0}, {1})", question.content, content);
 	}
 
-	private BooleanExpression createCursorPredicate(Integer cursorViewCount, Long questionId, QQuestion question) {
+	private BooleanExpression createCursorPredicate(Integer cursorViewCount, Long questionId) {
 		if (cursorViewCount != null && questionId != null) {
 			return question.viewCount.lt(cursorViewCount)
 				.or(question.viewCount.eq(cursorViewCount).and(question.id.lt(questionId)));
@@ -151,18 +116,77 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
 		return null;
 	}
 
-	private List<Question> fetchQuestions(NumberTemplate<Double> booleanTemplate, BooleanExpression cursorPredicate,
-		QQuestion question, int pageSize) {
+	private Integer getValidCursorViewCount(Integer cursorViewCount) {
+		return (cursorViewCount != null && cursorViewCount > 0) ? cursorViewCount : Integer.MAX_VALUE;
+	}
+
+	private Long getValidCursorQuestionId(Long questionId) {
+		return (questionId != null && questionId > 0) ? questionId : Long.MAX_VALUE;
+	}
+
+	private List<Question> fetchQuestions(
+		final QuestionType type, final QuestionCategory category,
+		NumberTemplate<Double> booleanTemplate, BooleanExpression cursorPredicate, int pageSize) {
+
+		BooleanBuilder whereClause = new BooleanBuilder();
+		whereClause.and(booleanTemplate.gt(MIN_MATCHING_POINT));
+
+		if (cursorPredicate != null) {
+			whereClause.and(cursorPredicate);
+		}
+
+		if (type != null) {
+			whereClause.and(question.questionType.eq(type));
+		}
+
+		if (category != null) {
+			whereClause.and(question.questionCategory.eq(category));
+		}
+
 		return queryFactory.selectFrom(question)
-			.where(booleanTemplate.gt(MIN_MATCHING_POINT), cursorPredicate)
+			.where(whereClause)
 			.orderBy(question.viewCount.desc(), question.id.desc())
 			.limit(pageSize + 1)
 			.fetch();
 	}
 
-	private List<SearchedQuestionsResponse> mapToResponse(List<Question> questions) {
-		return questions.stream()
+	private BooleanBuilder buildWhereClause(final QuestionType type, final QuestionCategory category,
+		final String content) {
+		BooleanBuilder whereClause = new BooleanBuilder();
+		if (content != null && !content.isEmpty()) {
+			whereClause.and(question.content.contains(content));
+		}
+		if (type != null) {
+			whereClause.and(question.questionType.eq(type));
+		}
+		if (category != null) {
+			whereClause.and(question.questionCategory.eq(category));
+		}
+		return whereClause;
+	}
+
+	@NotNull
+	private SliceQuestionResponse<SearchedQuestionsResponse> buildSliceQuestionResponse(
+		final Pageable pageable, final int pageSize, final List<Question> questions) {
+
+		boolean hasNext = questions.size() > pageSize;
+		if (hasNext) {
+			questions.remove(pageSize);
+		}
+
+		List<SearchedQuestionsResponse> questionResponses = questions.stream()
 			.map(q -> SearchedQuestionsResponse.of(q.getId(), q.getContent()))
 			.collect(Collectors.toList());
+
+		Integer nextCursorViewCount = null;
+		Long nextQuestionId = null;
+		if (!questions.isEmpty()) {
+			Question lastQuestion = questions.get(questions.size() - 1);
+			nextCursorViewCount = lastQuestion.getViewCount();
+			nextQuestionId = lastQuestion.getId();
+		}
+
+		return new SliceQuestionResponse<>(questionResponses, pageable.getPageNumber(), pageSize, hasNext,
+			nextCursorViewCount, nextQuestionId);
 	}
 }
