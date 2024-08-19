@@ -112,6 +112,7 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
 		List<Question> questions = queryFactory
 			.selectFrom(question)
 			.where(question.content.contains(content))
+			.limit(pageSize)
 			.fetch();
 
 		boolean hasNext = questions.size() > pageSize;
