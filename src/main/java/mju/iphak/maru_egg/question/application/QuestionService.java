@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import mju.iphak.maru_egg.answer.application.AnswerApiClient;
+import mju.iphak.maru_egg.answer.application.AnswerManager;
 import mju.iphak.maru_egg.answer.domain.Answer;
 import mju.iphak.maru_egg.answer.dto.response.AnswerResponse;
 import mju.iphak.maru_egg.common.dto.pagination.SliceQuestionResponse;
@@ -32,24 +32,29 @@ import mju.iphak.maru_egg.question.repository.QuestionRepository;
 public class QuestionService {
 
 	private final QuestionRepository questionRepository;
-	private final AnswerApiClient answerApiClient;
+	private final AnswerManager answerManager;
 
 	public List<QuestionListItemResponse> getQuestions(final QuestionType type, final QuestionCategory category) {
 		List<Question> questions = findQuestions(type, category);
 		return questions.stream()
-			.map(question -> createQuestionResponse(question, answerApiClient.getAnswerByQuestionId(question.getId())))
+			.map(question -> createQuestionResponse(question, answerManager.getAnswerByQuestionId(question.getId())))
 			.collect(Collectors.toList());
 	}
 
-	public SliceQuestionResponse<SearchedQuestionsResponse> searchQuestionsOfCursorPaging(final String content,
-		final Integer cursorViewCount, final Long questionId, final Integer size) {
+	public SliceQuestionResponse<SearchedQuestionsResponse> searchQuestionsOfCursorPaging(final QuestionType type,
+		final QuestionCategory category, final String content, final Integer cursorViewCount, final Long questionId,
+		final Integer size) {
 		Pageable pageable = PageRequest.of(0, size);
 		SliceQuestionResponse<SearchedQuestionsResponse> response;
 		response = questionRepository.searchQuestionsOfCursorPagingByContentWithLikeFunction(
+			type,
+			category,
 			content,
 			cursorViewCount, questionId, pageable);
 		if (response.data().isEmpty()) {
 			response = questionRepository.searchQuestionsOfCursorPagingByContentWithFullTextSearch(
+				type,
+				category,
 				content,
 				cursorViewCount, questionId, pageable);
 		}
@@ -68,7 +73,7 @@ public class QuestionService {
 	public void createQuestion(final CreateQuestionRequest request) {
 		Question question = request.toEntity();
 		questionRepository.save(question);
-		answerApiClient.createAnswer(question, request.answer());
+		answerManager.createAnswer(question, request.answer());
 	}
 
 	private List<Question> findQuestions(final QuestionType type, final QuestionCategory category) {

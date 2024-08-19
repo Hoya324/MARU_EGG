@@ -12,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import mju.iphak.maru_egg.answer.application.AnswerApiClient;
 import mju.iphak.maru_egg.answer.application.AnswerManager;
 import mju.iphak.maru_egg.answer.domain.Answer;
 import mju.iphak.maru_egg.answer.dto.response.AnswerReferenceResponse;
@@ -35,7 +34,6 @@ public class QuestionProcessingService {
 	private static final double STANDARD_SIMILARITY = 0.95;
 
 	private final QuestionRepository questionRepository;
-	private final AnswerApiClient answerApiClient;
 	private final AnswerManager answerManager;
 
 	public QuestionResponse question(final QuestionType type, final QuestionCategory category, final String content) {
@@ -72,7 +70,7 @@ public class QuestionProcessingService {
 	private QuestionResponse getExistingQuestionResponse(Long questionId) {
 		Question question = getQuestionById(questionId);
 		question.incrementViewCount();
-		Answer answer = answerApiClient.getAnswerByQuestionId(question.getId());
+		Answer answer = answerManager.getAnswerByQuestionId(question.getId());
 		List<AnswerReferenceResponse> answerReferenceResponses = answer.getReferences().stream()
 			.map(reference -> AnswerReferenceResponse.of(reference.getTitle(), reference.getLink()))
 			.toList();

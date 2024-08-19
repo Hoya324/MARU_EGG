@@ -1,20 +1,25 @@
 package mju.iphak.maru_egg.answer.application;
 
+import static mju.iphak.maru_egg.common.exception.ErrorCode.*;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import mju.iphak.maru_egg.answer.domain.Answer;
 import mju.iphak.maru_egg.answer.domain.AnswerReference;
+import mju.iphak.maru_egg.answer.dto.request.CreateAnswerRequest;
 import mju.iphak.maru_egg.answer.dto.request.LLMAskQuestionRequest;
 import mju.iphak.maru_egg.answer.dto.response.AnswerReferenceResponse;
 import mju.iphak.maru_egg.answer.dto.response.AnswerResponse;
 import mju.iphak.maru_egg.answer.dto.response.LLMAnswerResponse;
 import mju.iphak.maru_egg.answer.repository.AnswerReferenceRepository;
+import mju.iphak.maru_egg.answer.repository.AnswerRepository;
 import mju.iphak.maru_egg.question.domain.Question;
 import mju.iphak.maru_egg.question.domain.QuestionCategory;
 import mju.iphak.maru_egg.question.domain.QuestionType;
@@ -34,6 +39,7 @@ public class AnswerManager {
 	private final QuestionRepository questionRepository;
 	private final AnswerApiClient answerApiClient;
 	private final AnswerReferenceRepository answerReferenceRepository;
+	private final AnswerRepository answerRepository;
 
 	public QuestionResponse processNewQuestion(QuestionType type, QuestionCategory category, String content,
 		String contentToken) {
@@ -50,6 +56,25 @@ public class AnswerManager {
 		}
 
 		return saveAndGetQuestionResponse(type, content, contentToken, llmAnswerResponse);
+	}
+
+	@Transactional(readOnly = true)
+	public Answer getAnswerByQuestionId(Long questionId) {
+		return answerRepository.findByQuestionId(questionId)
+			.orElseThrow(() -> new EntityNotFoundException(
+				String.format(NOT_FOUND_ANSWER_BY_QUESTION_ID.getMessage(), questionId)));
+	}
+
+	public void updateAnswerContent(final Long id, final String content) {
+		Answer answer = answerRepository.findById(id)
+			.orElseThrow(() -> new EntityNotFoundException(
+				String.format(NOT_FOUND_ANSWER.getMessage(), id)));
+		answer.updateContent(content);
+	}
+
+	public void createAnswer(final Question question, final CreateAnswerRequest request) {
+		Answer answer = request.toEntity(question);
+		answerRepository.save(answer);
 	}
 
 	private QuestionResponse saveAndGetQuestionResponse(final QuestionType type, final String content,
@@ -89,7 +114,7 @@ public class AnswerManager {
 
 	private Answer saveAnswer(Question question, String content) {
 		Answer newAnswer = Answer.of(question, content);
-		return answerApiClient.saveAnswer(newAnswer);
+		return answerRepository.save(newAnswer);
 	}
 
 	private QuestionResponse createQuestionResponse(Question question, Answer answer,

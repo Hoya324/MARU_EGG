@@ -7,7 +7,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
@@ -30,9 +29,6 @@ class AuthControllerTest extends IntegrationTest {
 	@Autowired
 	private ObjectMapper objectMapper;
 
-	@InjectMocks
-	private AuthController authController;
-
 	@MockBean
 	private AuthService authService;
 
@@ -47,7 +43,7 @@ class AuthControllerTest extends IntegrationTest {
 	@BeforeEach
 	void setUp() {
 		// 유저 데이터 설정
-		user = User.of("testuser@example.com", passwordEncoder.encode("Password123!"));
+		user = createTestUser("testuser@example.com", "Password123!");
 		userRepository.save(user);
 	}
 
@@ -64,5 +60,9 @@ class AuthControllerTest extends IntegrationTest {
 			.andExpect(status().isOk());
 
 		verify(authService, times(1)).signUp(signUpRequest.email(), signUpRequest.password());
+	}
+
+	private User createTestUser(String email, String rawPassword) {
+		return User.of(email, passwordEncoder.encode(rawPassword));
 	}
 }
