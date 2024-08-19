@@ -1,30 +1,31 @@
 package mju.iphak.maru_egg.answer.application;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-import java.util.List;
+import java.util.Optional;
 
+import org.junit.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import jakarta.persistence.EntityNotFoundException;
 import mju.iphak.maru_egg.answer.domain.Answer;
-import mju.iphak.maru_egg.answer.dto.request.LLMAskQuestionRequest;
-import mju.iphak.maru_egg.answer.dto.response.AnswerReferenceResponse;
-import mju.iphak.maru_egg.answer.dto.response.LLMAnswerResponse;
+import mju.iphak.maru_egg.answer.dto.request.CreateAnswerRequest;
 import mju.iphak.maru_egg.answer.repository.AnswerReferenceRepository;
+import mju.iphak.maru_egg.answer.repository.AnswerRepository;
+import mju.iphak.maru_egg.common.MockTest;
 import mju.iphak.maru_egg.question.domain.Question;
 import mju.iphak.maru_egg.question.domain.QuestionCategory;
 import mju.iphak.maru_egg.question.domain.QuestionType;
-import mju.iphak.maru_egg.question.dto.response.QuestionResponse;
+import mju.iphak.maru_egg.question.dto.request.CreateQuestionRequest;
 import mju.iphak.maru_egg.question.repository.QuestionRepository;
-import reactor.core.publisher.Mono;
 
-class AnswerManagerTest {
+public class AnswerManagerTest extends MockTest {
 
 	@Mock
 	private QuestionRepository questionRepository;
@@ -34,6 +35,9 @@ class AnswerManagerTest {
 
 	@Mock
 	private AnswerReferenceRepository answerReferenceRepository;
+
+	@Mock
+	private AnswerRepository answerRepository;
 
 	@InjectMocks
 	private AnswerManager answerManager;
@@ -46,70 +50,66 @@ class AnswerManagerTest {
 		MockitoAnnotations.openMocks(this);
 	}
 
-	@DisplayName("LLM에서 유효한 답변을 받을 경우")
+	@DisplayName("questionId로 답변을 조회합니다.")
 	@Test
-	void LLM에서_유효한_답변() {
-		// Given
-		QuestionType type = QuestionType.SUSI;
-		QuestionCategory category = QuestionCategory.ADMISSION_GUIDELINE;
-		String content = "입학 안내는 무엇인가요?";
-		String contentToken = "입학 안내";
+	public void 답변_조회_성공() {
+		// given
+		when(answerRepository.findByQuestionId(1L)).thenReturn(Optional.of(answer));
 
-		Question newQuestion = Question.of(content, contentToken, type, category);
-		Answer newAnswer = Answer.of(newQuestion, "입학 안내는 다음과 같습니다.");
-		List<AnswerReferenceResponse> references = List.of(
-			AnswerReferenceResponse.of("참조 자료 제목", "http://example.com")
-		);
+		// when
+		Answer result = answerManager.getAnswerByQuestionId(1L);
 
-		LLMAnswerResponse llmAnswerResponse = LLMAnswerResponse.of(
-			type.getType(), category.getCategory(), newAnswer, references
-		);
-
-		when(questionRepository.save(any(Question.class))).thenReturn(newQuestion);
-		when(answerApiClient.askQuestion(any(LLMAskQuestionRequest.class))).thenReturn(Mono.just(llmAnswerResponse));
-		when(answerApiClient.saveAnswer(any(Answer.class))).thenReturn(newAnswer);
-
-		// When
-		QuestionResponse result = answerManager.processNewQuestion(type, category, content, contentToken);
-
-		// Then
-		assertThat(result).isNotNull();
-		assertThat(result.content()).isEqualTo(content);
-		assertThat(result.answer().content()).isEqualTo(newAnswer.getContent());
-		assertThat(result.references()).hasSize(1);
-		assertThat(result.references().get(0).title()).isEqualTo("참조 자료 제목");
-		assertThat(result.references().get(0).link()).isEqualTo("http://example.com");
-
-		verify(questionRepository, times(1)).save(any(Question.class));
-		verify(answerApiClient, times(1)).askQuestion(any(LLMAskQuestionRequest.class));
-		verify(answerApiClient, times(1)).saveAnswer(any(Answer.class));
-		verify(answerReferenceRepository, times(1)).saveAll(anyList());
+		// then
+		assertNotNull(result);
+		assertEquals(answer, result);
 	}
 
-	@DisplayName("LLM에서 유효하지 않은 답변을 받을 경우")
+	@DisplayName("questionId로 답변 조회에 실패한 경우.")
 	@Test
-	void LLM_유효하지_않은_답변() {
-		// Given
-		QuestionType type = QuestionType.SUSI;
-		QuestionCategory category = QuestionCategory.ADMISSION_GUIDELINE;
-		String content = "입학 안내는 무엇인가요?";
-		String contentToken = "입학 안내";
+	public void 답변_조회_실패_NOTFOUND() {
+		// given
+		when(answerRepository.findByQuestionId(1L)).thenReturn(Optional.empty());
 
-		LLMAnswerResponse llmAnswerResponse = LLMAnswerResponse.of(
-			type.getType(), category.getCategory(), answer, List.of()
-		);
+		// when & then
+		EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> {
+			answerManager.getAnswerByQuestionId(1L);
+		});
 
-		when(answerApiClient.askQuestion(any(LLMAskQuestionRequest.class))).thenReturn(Mono.just(llmAnswerResponse));
+		assertEquals("질문 id가 1인 답변을 찾을 수 없습니다.", exception.getMessage());
+	}
 
-		// When
-		QuestionResponse result = answerManager.processNewQuestion(type, category, content, contentToken);
+	@DisplayName("답변 내용을 수정에 성공한 경우")
+	@Test
+	public void 답변_내용_수정_성공() throws Exception {
+		// given
+		when(answerRepository.findById(1L)).thenReturn(Optional.of(answer));
+		Long id = 1L;
 
-		// Then
-		assertThat(result).isNotNull();
+		// when
+		String updateContent = "변경된 답변";
+		answerManager.updateAnswerContent(id, updateContent);
 
-		verify(questionRepository, never()).save(any(Question.class));
-		verify(answerApiClient, times(1)).askQuestion(any(LLMAskQuestionRequest.class));
-		verify(answerApiClient, never()).saveAnswer(any(Answer.class));
-		verify(answerReferenceRepository, never()).saveAll(anyList());
+		// then
+		assertThat(answer.getContent()).isEqualTo(updateContent);
+	}
+
+	@DisplayName("질문 생성에 성공한 경우")
+	@org.junit.Test
+	public void 답변_생성_성공() {
+		// given
+		CreateAnswerRequest answerRequest = new CreateAnswerRequest("example answer content", 2024);
+		CreateQuestionRequest request = new CreateQuestionRequest("example content", QuestionType.SUSI,
+			QuestionCategory.ADMISSION_GUIDELINE, answerRequest);
+		Question question = request.toEntity();
+		Answer answer = answerRequest.toEntity(question);
+
+		when(answerRepository.save(answer))
+			.thenReturn(answer);
+
+		// when
+		answerManager.createAnswer(question, answerRequest);
+
+		// then
+		verify(answerRepository, times(1)).save(any(Answer.class));
 	}
 }

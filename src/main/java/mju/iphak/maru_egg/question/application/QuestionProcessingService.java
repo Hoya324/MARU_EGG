@@ -72,7 +72,7 @@ public class QuestionProcessingService {
 	private QuestionResponse getExistingQuestionResponse(Long questionId) {
 		Question question = getQuestionById(questionId);
 		question.incrementViewCount();
-		Answer answer = answerApiClient.getAnswerByQuestionId(question.getId());
+		Answer answer = answerManager.getAnswerByQuestionId(question.getId());
 		List<AnswerReferenceResponse> answerReferenceResponses = answer.getReferences().stream()
 			.map(reference -> AnswerReferenceResponse.of(reference.getTitle(), reference.getLink()))
 			.toList();

@@ -94,7 +94,7 @@ class QuestionProcessingServiceTest extends MockTest {
 
 	void startServer(ClientHttpConnector connector) {
 		this.mockWebServer = new MockWebServer();
-		answerApiClient = new AnswerApiClient(answerRepository, WebClient
+		answerApiClient = new AnswerApiClient(WebClient
 			.builder()
 			.baseUrl(this.mockWebServer.url("/").toString())
 			.clientConnector(connector).build()
@@ -125,7 +125,7 @@ class QuestionProcessingServiceTest extends MockTest {
 		when(question.getId()).thenReturn(1L);
 		when(answer.getId()).thenReturn(1L);
 		when(answer.getReferences()).thenReturn(references);
-		when(answerApiClient.getAnswerByQuestionId(1L)).thenReturn(answer);
+		when(answerManager.getAnswerByQuestionId(1L)).thenReturn(answer);
 		when(answerRepository.findByQuestionId(anyLong())).thenReturn(Optional.of(answer));
 		when(questionRepository.searchQuestionsByContentTokenAndTypeAndCategory(anyString(), any(QuestionType.class),
 			any(QuestionCategory.class)))
@@ -213,4 +213,71 @@ class QuestionProcessingServiceTest extends MockTest {
 		assertThat(result).isEqualTo(expectedResponse);
 	}
 
+	@DisplayName("LLM에서 유효한 답변을 받을 경우")
+	@Test
+	void LLM에서_유효한_답변() {
+		// Given
+		QuestionType type = QuestionType.SUSI;
+		QuestionCategory category = QuestionCategory.ADMISSION_GUIDELINE;
+		String content = "입학 안내는 무엇인가요?";
+		String contentToken = "입학 안내";
+
+		Question newQuestion = Question.of(content, contentToken, type, category);
+		Answer newAnswer = Answer.of(newQuestion, "입학 안내는 다음과 같습니다.");
+		List<AnswerReferenceResponse> references = List.of(
+			AnswerReferenceResponse.of("참조 자료 제목", "http://example.com")
+		);
+
+		LLMAnswerResponse llmAnswerResponse = LLMAnswerResponse.of(
+			type.getType(), category.getCategory(), newAnswer, references
+		);
+
+		when(questionRepository.save(any(Question.class))).thenReturn(newQuestion);
+		when(answerApiClient.askQuestion(LLMAskQuestionRequest.of(type.getType(), category.getCategory(), content))
+			.thenReturn(Mono.just(llmAnswerResponse)));
+		when(answerRepository.save(any(Answer.class))).thenReturn(newAnswer);
+
+		// When
+		QuestionResponse result = answerManager.processNewQuestion(type, category, content, contentToken);
+
+		// Then
+		assertThat(result).isNotNull();
+		assertThat(result.content()).isEqualTo(content);
+		assertThat(result.answer().content()).isEqualTo(newAnswer.getContent());
+		assertThat(result.references()).hasSize(1);
+		assertThat(result.references().get(0).title()).isEqualTo("참조 자료 제목");
+		assertThat(result.references().get(0).link()).isEqualTo("http://example.com");
+
+		verify(questionRepository, times(1)).save(any(Question.class));
+		verify(answerApiClient, times(1)).askQuestion(any(LLMAskQuestionRequest.class));
+		verify(answerRepository, times(1)).save(any(Answer.class));
+		verify(answerReferenceRepository, times(1)).saveAll(anyList());
+	}
+
+	@DisplayName("LLM에서 유효하지 않은 답변을 받을 경우")
+	@Test
+	void LLM_유효하지_않은_답변() {
+		// Given
+		QuestionType type = QuestionType.SUSI;
+		QuestionCategory category = QuestionCategory.ADMISSION_GUIDELINE;
+		String content = "입학 안내는 무엇인가요?";
+		String contentToken = "입학 안내";
+
+		LLMAnswerResponse llmAnswerResponse = LLMAnswerResponse.of(
+			type.getType(), category.getCategory(), answer, List.of()
+		);
+
+		when(answerApiClient.askQuestion(any(LLMAskQuestionRequest.class))).thenReturn(Mono.just(llmAnswerResponse));
+
+		// When
+		QuestionResponse result = answerManager.processNewQuestion(type, category, content, contentToken);
+
+		// Then
+		assertThat(result).isNotNull();
+
+		verify(questionRepository, never()).save(any(Question.class));
+		verify(answerApiClient, times(1)).askQuestion(any(LLMAskQuestionRequest.class));
+		verify(answerRepository, never()).save(any(Answer.class));
+		verify(answerReferenceRepository, never()).saveAll(anyList());
+	}
 }
