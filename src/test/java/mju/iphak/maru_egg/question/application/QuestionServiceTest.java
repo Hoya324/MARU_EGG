@@ -191,6 +191,10 @@ class QuestionServiceTest extends MockTest {
 			questionId, pageable))
 			.thenReturn(expectedResponse);
 
+		when(questionRepository.searchQuestionsOfCursorPagingByContentWithLikeFunction(content, cursorViewCount,
+			questionId, pageable))
+			.thenReturn(expectedResponse);
+
 		// when
 		SliceQuestionResponse<SearchedQuestionsResponse> result = questionService.searchQuestionsOfCursorPaging(content,
 			cursorViewCount, questionId, size);
