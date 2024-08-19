@@ -67,7 +67,7 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
 	}
 
 	@Override
-	public SliceQuestionResponse<SearchedQuestionsResponse> searchQuestionsOfCursorPagingByContent(
+	public SliceQuestionResponse<SearchedQuestionsResponse> searchQuestionsOfCursorPagingByContentWithFullTextSearch(
 		final String content,
 		final Integer cursorViewCount, final Long questionId, final Pageable pageable) {
 		QQuestion question = QQuestion.question;
@@ -81,6 +81,38 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
 		BooleanExpression cursorPredicate = createCursorPredicate(ViewCountCursorKey, QuestionIdCursorKey, question);
 
 		List<Question> questions = fetchQuestions(booleanTemplate, cursorPredicate, question, pageSize);
+
+		boolean hasNext = questions.size() > pageSize;
+
+		if (hasNext) {
+			questions.remove(pageSize);
+		}
+
+		List<SearchedQuestionsResponse> questionResponses = mapToResponse(questions);
+
+		Integer nextCursorViewCount = null;
+		Long nextQuestionId = null;
+		if (!questions.isEmpty()) {
+			Question lastQuestion = questions.get(questions.size() - 1);
+			nextCursorViewCount = lastQuestion.getViewCount();
+			nextQuestionId = lastQuestion.getId();
+		}
+
+		return new SliceQuestionResponse<>(questionResponses, pageable.getPageNumber(), pageSize, hasNext,
+			nextCursorViewCount, nextQuestionId);
+	}
+
+	@Override
+	public SliceQuestionResponse<SearchedQuestionsResponse> searchQuestionsOfCursorPagingByContentWithLikeFunction(
+		final String content,
+		final Integer cursorViewCount, final Long questionId, final Pageable pageable) {
+		QQuestion question = QQuestion.question;
+		int pageSize = pageable.getPageSize();
+
+		List<Question> questions = queryFactory
+			.selectFrom(question)
+			.where(question.content.contains(content))
+			.fetch();
 
 		boolean hasNext = questions.size() > pageSize;
 

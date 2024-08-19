@@ -187,7 +187,12 @@ class QuestionServiceTest extends MockTest {
 		SliceQuestionResponse<SearchedQuestionsResponse> expectedResponse = new SliceQuestionResponse<>(
 			List.of(searchedQuestionsResponse), 0, size, false, null, null);
 
-		when(questionRepository.searchQuestionsOfCursorPagingByContent(content, cursorViewCount, questionId, pageable))
+		when(questionRepository.searchQuestionsOfCursorPagingByContentWithFullTextSearch(content, cursorViewCount,
+			questionId, pageable))
+			.thenReturn(expectedResponse);
+
+		when(questionRepository.searchQuestionsOfCursorPagingByContentWithLikeFunction(content, cursorViewCount,
+			questionId, pageable))
 			.thenReturn(expectedResponse);
 
 		// when
