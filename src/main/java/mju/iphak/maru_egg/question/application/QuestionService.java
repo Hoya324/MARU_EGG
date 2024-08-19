@@ -48,6 +48,12 @@ public class QuestionService {
 		response = questionRepository.searchQuestionsOfCursorPagingByContentWithFullTextSearch(
 			content,
 			cursorViewCount, questionId, pageable);
+		if (response.data().isEmpty()) {
+			response = questionRepository.searchQuestionsOfCursorPagingByContentWithLikeFunction(
+				content,
+				cursorViewCount, questionId, pageable);
+		}
+		return response;
 	}
 
 	@Transactional

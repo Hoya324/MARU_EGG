@@ -22,4 +22,8 @@ public interface QuestionRepositoryCustom {
 	SliceQuestionResponse<SearchedQuestionsResponse> searchQuestionsOfCursorPagingByContentWithFullTextSearch(
 		final String content,
 		final Integer cursorViewCount, final Long questionId, final Pageable pageable);
+
+	SliceQuestionResponse<SearchedQuestionsResponse> searchQuestionsOfCursorPagingByContentWithLikeFunction(
+		final String content,
+		final Integer cursorViewCount, final Long questionId, final Pageable pageable);
 }
