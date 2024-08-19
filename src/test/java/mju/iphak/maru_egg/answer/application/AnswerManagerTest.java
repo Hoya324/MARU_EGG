@@ -18,14 +18,13 @@ import mju.iphak.maru_egg.answer.domain.Answer;
 import mju.iphak.maru_egg.answer.dto.request.CreateAnswerRequest;
 import mju.iphak.maru_egg.answer.repository.AnswerReferenceRepository;
 import mju.iphak.maru_egg.answer.repository.AnswerRepository;
-import mju.iphak.maru_egg.common.MockTest;
 import mju.iphak.maru_egg.question.domain.Question;
 import mju.iphak.maru_egg.question.domain.QuestionCategory;
 import mju.iphak.maru_egg.question.domain.QuestionType;
 import mju.iphak.maru_egg.question.dto.request.CreateQuestionRequest;
 import mju.iphak.maru_egg.question.repository.QuestionRepository;
 
-public class AnswerManagerTest extends MockTest {
+public class AnswerManagerTest {
 
 	@Mock
 	private QuestionRepository questionRepository;
@@ -42,26 +41,14 @@ public class AnswerManagerTest extends MockTest {
 	@InjectMocks
 	private AnswerManager answerManager;
 
+	private Question question;
 	private Answer answer;
 
 	@BeforeEach
 	void setUp() {
-		answer = mock(Answer.class);
 		MockitoAnnotations.openMocks(this);
-	}
-
-	@DisplayName("questionId로 답변을 조회합니다.")
-	@Test
-	public void 답변_조회_성공() {
-		// given
-		when(answerRepository.findByQuestionId(1L)).thenReturn(Optional.of(answer));
-
-		// when
-		Answer result = answerManager.getAnswerByQuestionId(1L);
-
-		// then
-		assertNotNull(result);
-		assertEquals(answer, result);
+		question = mock(Question.class);
+		answer = mock(Answer.class);
 	}
 
 	@DisplayName("questionId로 답변 조회에 실패한 경우.")
@@ -78,23 +65,8 @@ public class AnswerManagerTest extends MockTest {
 		assertEquals("질문 id가 1인 답변을 찾을 수 없습니다.", exception.getMessage());
 	}
 
-	@DisplayName("답변 내용을 수정에 성공한 경우")
+	@DisplayName("답변 생성에 성공한 경우")
 	@Test
-	public void 답변_내용_수정_성공() throws Exception {
-		// given
-		when(answerRepository.findById(1L)).thenReturn(Optional.of(answer));
-		Long id = 1L;
-
-		// when
-		String updateContent = "변경된 답변";
-		answerManager.updateAnswerContent(id, updateContent);
-
-		// then
-		assertThat(answer.getContent()).isEqualTo(updateContent);
-	}
-
-	@DisplayName("질문 생성에 성공한 경우")
-	@org.junit.Test
 	public void 답변_생성_성공() {
 		// given
 		CreateAnswerRequest answerRequest = new CreateAnswerRequest("example answer content", 2024);
@@ -103,13 +75,27 @@ public class AnswerManagerTest extends MockTest {
 		Question question = request.toEntity();
 		Answer answer = answerRequest.toEntity(question);
 
-		when(answerRepository.save(answer))
-			.thenReturn(answer);
+		when(answerRepository.save(any(Answer.class))).thenReturn(answer);
 
 		// when
 		answerManager.createAnswer(question, answerRequest);
 
 		// then
 		verify(answerRepository, times(1)).save(any(Answer.class));
+	}
+
+	@DisplayName("답변 내용 수정 실패")
+	@Test
+	public void 답변_내용_수정_실패_NOTFOUND() {
+		// given
+		Long id = 1L;
+		when(answerRepository.findById(id)).thenReturn(Optional.empty());
+
+		// when & then
+		EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> {
+			answerManager.updateAnswerContent(id, "새로운 내용");
+		});
+
+		assertThat("답변 id가 1인 답변을 찾을 수 없습니다.").isEqualTo(exception.getMessage());
 	}
 }

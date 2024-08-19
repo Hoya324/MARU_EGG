@@ -6,7 +6,6 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -63,57 +62,17 @@ class QuestionServiceTest extends MockTest {
 
 	@Mock
 	private AnswerApiClient answerApiClient;
-	private MockWebServer mockWebServer;
 
 	@InjectMocks
 	private QuestionService questionService;
 
-	private LLMAnswerResponse mockAskQuestion(LLMAskQuestionRequest request) {
-		startServer(new ReactorClientHttpConnector());
-		MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
-		formData.add("questionType", request.questionType());
-		formData.add("questionCategory", request.questionCategory());
-		formData.add("question", request.question());
-		Question testQuestion = Question.of("새로운 질문입니다.", "새로운 질문", QuestionType.SUSI,
-			QuestionCategory.ADMISSION_GUIDELINE);
-		List<AnswerReferenceResponse> references = new ArrayList<>(
-			List.of(AnswerReferenceResponse.of("테스트 title", "테스트 link")));
-		LLMAnswerResponse expectedResponse = LLMAnswerResponse.of(QuestionType.SUSI.getType(),
-			QuestionCategory.ADMISSION_GUIDELINE.getCategory(), Answer.of(testQuestion, "새로운 답변입니다."), references);
-
-		mockWebServer.enqueue(new MockResponse()
-			.setHeader("Content-type", MediaType.APPLICATION_JSON_VALUE)
-			.setHeader("Accept", MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-			.setResponseCode(200)
-			.setBody(new Gson().toJson(expectedResponse))
-		);
-
-		return answerApiClient.askQuestion(request).block();
-	}
-
-	void startServer(ClientHttpConnector connector) {
-		this.mockWebServer = new MockWebServer();
-		answerApiClient = new AnswerApiClient(WebClient
-			.builder()
-			.baseUrl(this.mockWebServer.url("/").toString())
-			.clientConnector(connector).build()
-		);
-	}
-
-	@AfterEach
-	void shutdown() throws IOException {
-		if (mockWebServer != null) {
-			this.mockWebServer.shutdown();
-		}
-	}
-
+	private MockWebServer mockWebServer;
 	private Question question;
 	private Answer answer;
 
 	@BeforeEach
 	void setUp() {
 		MockitoAnnotations.openMocks(this);
-
 		question = mock(Question.class);
 		answer = mock(Answer.class);
 
@@ -125,12 +84,50 @@ class QuestionServiceTest extends MockTest {
 			any(QuestionCategory.class)))
 			.thenReturn(Optional.of(List.of(QuestionCore.of(1L, "테스트 질문입니다."))));
 		when(questionRepository.findById(1L)).thenReturn(Optional.of(question));
-		questionService = new QuestionService(questionRepository, answerApiClient, answerManager);
+		questionService = new QuestionService(questionRepository, answerManager);
+		configureAnswerApiClient();
+	}
 
+	private void configureAnswerApiClient() {
 		doAnswer(invocation -> {
 			LLMAskQuestionRequest request = invocation.getArgument(0);
 			return Mono.just(mockAskQuestion(request));
 		}).when(answerApiClient).askQuestion(any(LLMAskQuestionRequest.class));
+	}
+
+	private LLMAnswerResponse mockAskQuestion(LLMAskQuestionRequest request) {
+		startServer(new ReactorClientHttpConnector());
+		MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
+		formData.add("questionType", request.questionType());
+		formData.add("questionCategory", request.questionCategory());
+		formData.add("question", request.question());
+
+		Question testQuestion = Question.of("새로운 질문입니다.", "새로운 질문", QuestionType.SUSI,
+			QuestionCategory.ADMISSION_GUIDELINE);
+		List<AnswerReferenceResponse> references = List.of(AnswerReferenceResponse.of("테스트 title", "테스트 link"));
+		LLMAnswerResponse expectedResponse = LLMAnswerResponse.of(QuestionType.SUSI.getType(),
+			QuestionCategory.ADMISSION_GUIDELINE.getCategory(), Answer.of(testQuestion, "새로운 답변입니다."), references);
+
+		mockWebServer.enqueue(new MockResponse()
+			.setHeader("Content-type", MediaType.APPLICATION_JSON_VALUE)
+			.setResponseCode(200)
+			.setBody(new Gson().toJson(expectedResponse)));
+
+		return answerApiClient.askQuestion(request).block();
+	}
+
+	private void startServer(ClientHttpConnector connector) {
+		this.mockWebServer = new MockWebServer();
+		answerApiClient = new AnswerApiClient(WebClient.builder()
+			.baseUrl(this.mockWebServer.url("/").toString())
+			.clientConnector(connector).build());
+	}
+
+	@AfterEach
+	void tearDown() throws IOException {
+		if (mockWebServer != null) {
+			mockWebServer.shutdown();
+		}
 	}
 
 	@DisplayName("질문 목록을 조회하는데 성공한 경우")
@@ -140,10 +137,8 @@ class QuestionServiceTest extends MockTest {
 		QuestionType type = QuestionType.SUSI;
 		QuestionCategory category = QuestionCategory.ADMISSION_GUIDELINE;
 
-		List<Question> questions = List.of(question);
-		when(
-			questionRepository.findAllByQuestionTypeAndQuestionCategoryOrderByViewCountDesc(type, category)).thenReturn(
-			questions);
+		when(questionRepository.findAllByQuestionTypeAndQuestionCategoryOrderByViewCountDesc(type, category))
+			.thenReturn(List.of(question));
 		when(answerManager.getAnswerByQuestionId(question.getId())).thenReturn(answer);
 
 		// when
@@ -156,14 +151,14 @@ class QuestionServiceTest extends MockTest {
 		assertThat(result.get(0).answer().content()).isEqualTo(answer.getContent());
 	}
 
-	@DisplayName("질문 목록을 조회하는데 성공한 경우 - category 없이 type으로 조회")
+	@DisplayName("질문 목록을 조회하는데 성공한 경우 - 카테고리 없이 타입으로 조회")
 	@Test
 	void 질문_목록_조회_성공_카테고리_없이() {
 		// given
 		QuestionType type = QuestionType.SUSI;
 
-		List<Question> questions = List.of(question);
-		when(questionRepository.findAllByQuestionTypeOrderByViewCountDesc(type)).thenReturn(questions);
+		when(questionRepository.findAllByQuestionTypeOrderByViewCountDesc(type))
+			.thenReturn(List.of(question));
 		when(answerManager.getAnswerByQuestionId(question.getId())).thenReturn(answer);
 
 		// when
@@ -184,30 +179,32 @@ class QuestionServiceTest extends MockTest {
 		Integer cursorViewCount = 0;
 		Long questionId = 0L;
 		Integer size = 5;
+		QuestionType type = QuestionType.SUSI;
+		QuestionCategory category = QuestionCategory.ADMISSION_GUIDELINE;
 		Pageable pageable = PageRequest.of(0, size);
 
-		List<Question> questions = List.of(question);
 		SearchedQuestionsResponse searchedQuestionsResponse = new SearchedQuestionsResponse(1L, "example content");
 		SliceQuestionResponse<SearchedQuestionsResponse> expectedResponse = new SliceQuestionResponse<>(
 			List.of(searchedQuestionsResponse), 0, size, false, null, null);
 
-		when(questionRepository.searchQuestionsOfCursorPagingByContentWithFullTextSearch(content, cursorViewCount,
-			questionId, pageable))
-			.thenReturn(expectedResponse);
+		when(questionRepository.searchQuestionsOfCursorPagingByContentWithFullTextSearch(type, category, content,
+			cursorViewCount,
+			questionId, pageable)).thenReturn(expectedResponse);
 
-		when(questionRepository.searchQuestionsOfCursorPagingByContentWithLikeFunction(content, cursorViewCount,
-			questionId, pageable))
-			.thenReturn(expectedResponse);
+		when(questionRepository.searchQuestionsOfCursorPagingByContentWithLikeFunction(type, category, content,
+			cursorViewCount,
+			questionId, pageable)).thenReturn(expectedResponse);
 
 		// when
-		SliceQuestionResponse<SearchedQuestionsResponse> result = questionService.searchQuestionsOfCursorPaging(content,
+		SliceQuestionResponse<SearchedQuestionsResponse> result = questionService.searchQuestionsOfCursorPaging(type,
+			category, content,
 			cursorViewCount, questionId, size);
 
 		// then
 		assertNotNull(result);
 		assertFalse(result.data().isEmpty());
+		assertFalse(result.hasNext());
 		assertThat(result.data().get(0).content()).isEqualTo("example content");
-		assertThat(result.hasNext()).isFalse();
 	}
 
 	@DisplayName("질문 생성에 성공한 경우")
@@ -219,8 +216,7 @@ class QuestionServiceTest extends MockTest {
 			QuestionCategory.ADMISSION_GUIDELINE, answerRequest);
 		Question question = request.toEntity();
 
-		when(questionRepository.save(question))
-			.thenReturn(question);
+		when(questionRepository.save(question)).thenReturn(question);
 
 		// when
 		questionService.createQuestion(request);

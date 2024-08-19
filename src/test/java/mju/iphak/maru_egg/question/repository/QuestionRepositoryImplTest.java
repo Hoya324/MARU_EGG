@@ -182,11 +182,13 @@ class QuestionRepositoryImplTest extends RepositoryTest {
 	void content로_질문_페이지네이션_조회_실패() {
 		// given
 		String content = "존재하지 않는 질문";
+		QuestionType type = QuestionType.SUSI;
+		QuestionCategory category = QuestionCategory.ADMISSION_GUIDELINE;
 		Pageable pageable = PageRequest.of(0, 3);
 
 		// when
 		SliceQuestionResponse<SearchedQuestionsResponse> result = questionRepositoryImpl.searchQuestionsOfCursorPagingByContentWithFullTextSearch(
-			content, null, null, pageable);
+			type, category, content, null, null, pageable);
 
 		// then
 		assertThat(result.data()).isEmpty();

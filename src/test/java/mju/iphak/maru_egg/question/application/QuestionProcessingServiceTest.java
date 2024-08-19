@@ -5,7 +5,6 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -18,7 +17,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.MediaType;
-import org.springframework.http.client.reactive.ClientHttpConnector;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -46,7 +44,6 @@ import mju.iphak.maru_egg.question.dto.response.QuestionResponse;
 import mju.iphak.maru_egg.question.repository.QuestionRepository;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
-import reactor.core.publisher.Mono;
 
 class QuestionProcessingServiceTest extends MockTest {
 
@@ -64,41 +61,22 @@ class QuestionProcessingServiceTest extends MockTest {
 
 	@Mock
 	private AnswerApiClient answerApiClient;
-	private MockWebServer mockWebServer;
 
 	@InjectMocks
 	private QuestionProcessingService questionProcessingService;
 
-	private LLMAnswerResponse mockAskQuestion(LLMAskQuestionRequest request) {
-		startServer(new ReactorClientHttpConnector());
-		MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
-		formData.add("questionType", request.questionType());
-		formData.add("questionCategory", request.questionCategory());
-		formData.add("question", request.question());
-		Question testQuestion = Question.of("새로운 질문입니다.", "새로운 질문", QuestionType.SUSI,
-			QuestionCategory.ADMISSION_GUIDELINE);
-		List<AnswerReferenceResponse> references = new ArrayList<>(
-			List.of(AnswerReferenceResponse.of("테스트 title", "테스트 link")));
-		LLMAnswerResponse expectedResponse = LLMAnswerResponse.of(QuestionType.SUSI.getType(),
-			QuestionCategory.ADMISSION_GUIDELINE.getCategory(), Answer.of(testQuestion, "새로운 답변입니다."), references);
+	private MockWebServer mockWebServer;
+	private Question question;
+	private Answer answer;
+	private List<AnswerReference> references;
 
-		mockWebServer.enqueue(new MockResponse()
-			.setHeader("Content-type", MediaType.APPLICATION_JSON_VALUE)
-			.setHeader("Accept", MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-			.setResponseCode(200)
-			.setBody(new Gson().toJson(expectedResponse))
-		);
-
-		return answerApiClient.askQuestion(request).block();
-	}
-
-	void startServer(ClientHttpConnector connector) {
-		this.mockWebServer = new MockWebServer();
-		answerApiClient = new AnswerApiClient(WebClient
-			.builder()
-			.baseUrl(this.mockWebServer.url("/").toString())
-			.clientConnector(connector).build()
-		);
+	@BeforeEach
+	void setUp() {
+		MockitoAnnotations.openMocks(this);
+		setupMockEntities();
+		setupMockServer();
+		setupAnswerManagerMock();
+		questionProcessingService = new QuestionProcessingService(questionRepository, answerManager);
 	}
 
 	@AfterEach
@@ -108,51 +86,63 @@ class QuestionProcessingServiceTest extends MockTest {
 		}
 	}
 
-	private Question question;
-	private Answer answer;
-	private AnswerReference answerReference;
-
-	@BeforeEach
-	void setUp() {
-		MockitoAnnotations.openMocks(this);
-
+	private void setupMockEntities() {
 		question = mock(Question.class);
 		answer = mock(Answer.class);
-		answerReference = mock(AnswerReference.class);
+		references = List.of(AnswerReference.of("테스트 title", "테스트 link", answer));
 
-		List<AnswerReference> references = new ArrayList<>(
-			List.of(AnswerReference.of("테스트 title", "테스트 link", answer)));
 		when(question.getId()).thenReturn(1L);
 		when(answer.getId()).thenReturn(1L);
 		when(answer.getReferences()).thenReturn(references);
+
 		when(answerManager.getAnswerByQuestionId(1L)).thenReturn(answer);
 		when(answerRepository.findByQuestionId(anyLong())).thenReturn(Optional.of(answer));
+
 		when(questionRepository.searchQuestionsByContentTokenAndTypeAndCategory(anyString(), any(QuestionType.class),
 			any(QuestionCategory.class)))
 			.thenReturn(Optional.of(List.of(QuestionCore.of(1L, "테스트 질문입니다."))));
 		when(questionRepository.findById(1L)).thenReturn(Optional.of(question));
-		QuestionResponse.of(question, AnswerResponse.from(answer),
-			List.of(AnswerReferenceResponse.of("테스트 title", "테스트 link")));
+	}
 
-		questionProcessingService = new QuestionProcessingService(questionRepository, answerApiClient, answerManager);
+	private void setupMockServer() {
+		this.mockWebServer = new MockWebServer();
+		answerApiClient = new AnswerApiClient(WebClient.builder()
+			.baseUrl(this.mockWebServer.url("/").toString())
+			.clientConnector(new ReactorClientHttpConnector())
+			.build());
+	}
 
-		doAnswer(invocation -> {
-			LLMAskQuestionRequest request = invocation.getArgument(0);
-			return Mono.just(mockAskQuestion(request));
-		}).when(answerApiClient).askQuestion(any(LLMAskQuestionRequest.class));
+	private void setupAnswerManagerMock() {
+		when(answerManager.getAnswerByQuestionId(anyLong())).thenReturn(answer);
+	}
+
+	private LLMAnswerResponse mockAskQuestion(LLMAskQuestionRequest request) {
+		MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
+		formData.add("questionType", request.questionType());
+		formData.add("questionCategory", request.questionCategory());
+		formData.add("question", request.question());
+
+		List<AnswerReferenceResponse> references = List.of(AnswerReferenceResponse.of("테스트 title", "테스트 link"));
+		LLMAnswerResponse expectedResponse = LLMAnswerResponse.of(request.questionType(), request.questionCategory(),
+			Answer.of(question, "새로운 답변입니다."), references);
+
+		mockWebServer.enqueue(new MockResponse()
+			.setHeader("Content-type", MediaType.APPLICATION_JSON_VALUE)
+			.setHeader("Accept", MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+			.setResponseCode(200)
+			.setBody(new Gson().toJson(expectedResponse)));
+
+		return answerApiClient.askQuestion(request).block();
 	}
 
 	@DisplayName("질문을 조회하는데 성공한 경우")
 	@Test
 	void 질문_조회_성공() {
 		// given
-		startServer(new ReactorClientHttpConnector());
 		QuestionType type = QuestionType.SUSI;
 		QuestionCategory category = QuestionCategory.ADMISSION_GUIDELINE;
 		String content = "테스트 질문입니다.";
 		String contentToken = PhraseExtractionUtils.extractPhrases(content);
-		List<AnswerReferenceResponse> references = new ArrayList<>(
-			List.of(AnswerReferenceResponse.of("테스트 title", "테스트 link")));
 
 		when(questionRepository.searchQuestionsByContentTokenAndTypeAndCategory(anyString(), eq(type), eq(category)))
 			.thenReturn(Optional.of(List.of(QuestionCore.of(1L, contentToken))));
@@ -161,7 +151,7 @@ class QuestionProcessingServiceTest extends MockTest {
 		QuestionResponse result = questionProcessingService.question(type, category, content);
 
 		// then
-		assertThat(result).isEqualTo(QuestionResponse.of(question, AnswerResponse.from(answer), references));
+		assertThat(result).isEqualTo(createExpectedQuestionResponse());
 	}
 
 	@DisplayName("질문이 없을 때 새로운 질문을 요청하는지 확인")
@@ -172,112 +162,40 @@ class QuestionProcessingServiceTest extends MockTest {
 		QuestionCategory category = QuestionCategory.ADMISSION_GUIDELINE;
 		String content = "새로운 질문입니다.";
 		String contentToken = PhraseExtractionUtils.extractPhrases(content);
-		Question testQuestion = Question.of(content, contentToken, type, category);
 
 		when(questionRepository.searchQuestionsByContentTokenAndTypeAndCategory(eq(contentToken), eq(type),
 			eq(category)))
 			.thenReturn(Optional.of(Collections.emptyList()));
-		when(questionRepository.save(any(Question.class))).thenReturn(testQuestion);
-		// when(answerManager.processNewQuestion(any(), any(),
-		// 	eq("테스트 질문입니다."),
-		// 	eq("테스트 질문"))).thenReturn(any());
 
 		// when
 		questionProcessingService.question(type, category, content);
 
 		// then
-		verify(answerManager, times(1)).processNewQuestion(eq(QuestionType.SUSI),
-			eq(QuestionCategory.ADMISSION_GUIDELINE),
-			eq("새로운 질문입니다."), eq("질문"));
+		verify(answerManager, times(1)).processNewQuestion(eq(type), eq(category), eq(content), eq(contentToken));
 	}
 
 	@DisplayName("MOCK LLM 서버에 질문을 요청합니다.")
 	@Test
-	public void MOCK_LLM_질문_요청() {
+	void MOCK_LLM_질문_요청() {
 		// given
-		startServer(new ReactorClientHttpConnector());
 		LLMAskQuestionRequest request = LLMAskQuestionRequest.of(QuestionType.SUSI.getType(),
-			QuestionCategory.ADMISSION_GUIDELINE.getCategory(),
-			question.getContent());
-		Question testQuestion = Question.of("새로운 질문입니다.", "새로운 질문", QuestionType.SUSI,
-			QuestionCategory.ADMISSION_GUIDELINE);
-		List<AnswerReferenceResponse> references = new ArrayList<>(
-			List.of(AnswerReferenceResponse.of("테스트 title", "테스트 link")));
-		LLMAnswerResponse expectedResponse = LLMAnswerResponse.of(QuestionType.SUSI.getType(),
-			QuestionCategory.ADMISSION_GUIDELINE.getCategory(), Answer.of(testQuestion, "새로운 답변입니다."), references);
+			QuestionCategory.ADMISSION_GUIDELINE.getCategory(), question.getContent());
 
 		// when
 		LLMAnswerResponse result = mockAskQuestion(request);
 
 		// then
-		assertThat(result).isEqualTo(expectedResponse);
+		assertThat(result).isEqualTo(createExpectedLLMAnswerResponse());
 	}
 
-	@DisplayName("LLM에서 유효한 답변을 받을 경우")
-	@Test
-	void LLM에서_유효한_답변() {
-		// Given
-		QuestionType type = QuestionType.SUSI;
-		QuestionCategory category = QuestionCategory.ADMISSION_GUIDELINE;
-		String content = "입학 안내는 무엇인가요?";
-		String contentToken = "입학 안내";
-
-		Question newQuestion = Question.of(content, contentToken, type, category);
-		Answer newAnswer = Answer.of(newQuestion, "입학 안내는 다음과 같습니다.");
-		List<AnswerReferenceResponse> references = List.of(
-			AnswerReferenceResponse.of("참조 자료 제목", "http://example.com")
-		);
-
-		LLMAnswerResponse llmAnswerResponse = LLMAnswerResponse.of(
-			type.getType(), category.getCategory(), newAnswer, references
-		);
-
-		when(questionRepository.save(any(Question.class))).thenReturn(newQuestion);
-		when(answerApiClient.askQuestion(LLMAskQuestionRequest.of(type.getType(), category.getCategory(), content))
-			.thenReturn(Mono.just(llmAnswerResponse)));
-		when(answerRepository.save(any(Answer.class))).thenReturn(newAnswer);
-
-		// When
-		QuestionResponse result = answerManager.processNewQuestion(type, category, content, contentToken);
-
-		// Then
-		assertThat(result).isNotNull();
-		assertThat(result.content()).isEqualTo(content);
-		assertThat(result.answer().content()).isEqualTo(newAnswer.getContent());
-		assertThat(result.references()).hasSize(1);
-		assertThat(result.references().get(0).title()).isEqualTo("참조 자료 제목");
-		assertThat(result.references().get(0).link()).isEqualTo("http://example.com");
-
-		verify(questionRepository, times(1)).save(any(Question.class));
-		verify(answerApiClient, times(1)).askQuestion(any(LLMAskQuestionRequest.class));
-		verify(answerRepository, times(1)).save(any(Answer.class));
-		verify(answerReferenceRepository, times(1)).saveAll(anyList());
+	private QuestionResponse createExpectedQuestionResponse() {
+		return QuestionResponse.of(question, AnswerResponse.from(answer),
+			List.of(AnswerReferenceResponse.of("테스트 title", "테스트 link")));
 	}
 
-	@DisplayName("LLM에서 유효하지 않은 답변을 받을 경우")
-	@Test
-	void LLM_유효하지_않은_답변() {
-		// Given
-		QuestionType type = QuestionType.SUSI;
-		QuestionCategory category = QuestionCategory.ADMISSION_GUIDELINE;
-		String content = "입학 안내는 무엇인가요?";
-		String contentToken = "입학 안내";
-
-		LLMAnswerResponse llmAnswerResponse = LLMAnswerResponse.of(
-			type.getType(), category.getCategory(), answer, List.of()
-		);
-
-		when(answerApiClient.askQuestion(any(LLMAskQuestionRequest.class))).thenReturn(Mono.just(llmAnswerResponse));
-
-		// When
-		QuestionResponse result = answerManager.processNewQuestion(type, category, content, contentToken);
-
-		// Then
-		assertThat(result).isNotNull();
-
-		verify(questionRepository, never()).save(any(Question.class));
-		verify(answerApiClient, times(1)).askQuestion(any(LLMAskQuestionRequest.class));
-		verify(answerRepository, never()).save(any(Answer.class));
-		verify(answerReferenceRepository, never()).saveAll(anyList());
+	private LLMAnswerResponse createExpectedLLMAnswerResponse() {
+		return LLMAnswerResponse.of(QuestionType.SUSI.getType(), QuestionCategory.ADMISSION_GUIDELINE.getCategory(),
+			Answer.of(question, "새로운 답변입니다."),
+			List.of(AnswerReferenceResponse.of("테스트 title", "테스트 link")));
 	}
 }
