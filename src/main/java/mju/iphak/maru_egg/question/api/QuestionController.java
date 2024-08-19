@@ -60,7 +60,8 @@ public class QuestionController implements QuestionControllerDocs {
 	@GetMapping("/questions/search")
 	public SliceQuestionResponse<SearchedQuestionsResponse> searchQuestions(
 		@Valid @ModelAttribute SearchQuestionsRequest request) {
-		return questionService.searchQuestionsOfCursorPaging(request.content(), request.cursorViewCount(),
+		return questionService.searchQuestionsOfCursorPaging(request.type(), request.category(), request.content(),
+			request.cursorViewCount(),
 			request.questionId(), request.size());
 	}
 

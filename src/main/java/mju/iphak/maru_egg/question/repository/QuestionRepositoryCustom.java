@@ -20,10 +20,10 @@ public interface QuestionRepositoryCustom {
 		final QuestionCategory category);
 
 	SliceQuestionResponse<SearchedQuestionsResponse> searchQuestionsOfCursorPagingByContentWithFullTextSearch(
-		final String content,
+		final QuestionType type, final QuestionCategory category, final String content,
 		final Integer cursorViewCount, final Long questionId, final Pageable pageable);
 
 	SliceQuestionResponse<SearchedQuestionsResponse> searchQuestionsOfCursorPagingByContentWithLikeFunction(
-		final String content,
+		final QuestionType type, final QuestionCategory category, final String content,
 		final Integer cursorViewCount, final Long questionId, final Pageable pageable);
 }
