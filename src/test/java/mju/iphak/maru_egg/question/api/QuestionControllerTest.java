@@ -102,7 +102,7 @@ class QuestionControllerTest extends IntegrationTest {
 			.baseUrl(llmBaseUrl)
 			.build();
 
-		answerApiClient = new AnswerApiClient(answerRepository, webClient);
+		answerApiClient = new AnswerApiClient(webClient);
 
 		ClientResponse clientResponse = ClientResponse.create(HttpStatusCode.valueOf(200))
 			.header("Content-Type", "application/json")

@@ -29,6 +29,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import com.google.gson.Gson;
 
 import mju.iphak.maru_egg.answer.application.AnswerApiClient;
+import mju.iphak.maru_egg.answer.application.AnswerManager;
 import mju.iphak.maru_egg.answer.domain.Answer;
 import mju.iphak.maru_egg.answer.dto.request.CreateAnswerRequest;
 import mju.iphak.maru_egg.answer.dto.request.LLMAskQuestionRequest;
@@ -56,6 +57,9 @@ class QuestionServiceTest extends MockTest {
 
 	@Mock
 	private AnswerRepository answerRepository;
+
+	@Mock
+	private AnswerManager answerManager;
 
 	@Mock
 	private AnswerApiClient answerApiClient;
@@ -89,7 +93,7 @@ class QuestionServiceTest extends MockTest {
 
 	void startServer(ClientHttpConnector connector) {
 		this.mockWebServer = new MockWebServer();
-		answerApiClient = new AnswerApiClient(answerRepository, WebClient
+		answerApiClient = new AnswerApiClient(WebClient
 			.builder()
 			.baseUrl(this.mockWebServer.url("/").toString())
 			.clientConnector(connector).build()
@@ -115,13 +119,13 @@ class QuestionServiceTest extends MockTest {
 
 		when(question.getId()).thenReturn(1L);
 		when(answer.getId()).thenReturn(1L);
-		when(answerApiClient.getAnswerByQuestionId(1L)).thenReturn(answer);
+		when(answerManager.getAnswerByQuestionId(1L)).thenReturn(answer);
 		when(answerRepository.findByQuestionId(anyLong())).thenReturn(Optional.of(answer));
 		when(questionRepository.searchQuestionsByContentTokenAndTypeAndCategory(anyString(), any(QuestionType.class),
 			any(QuestionCategory.class)))
 			.thenReturn(Optional.of(List.of(QuestionCore.of(1L, "테스트 질문입니다."))));
 		when(questionRepository.findById(1L)).thenReturn(Optional.of(question));
-		questionService = new QuestionService(questionRepository, answerApiClient);
+		questionService = new QuestionService(questionRepository, answerApiClient, answerManager);
 
 		doAnswer(invocation -> {
 			LLMAskQuestionRequest request = invocation.getArgument(0);
@@ -140,7 +144,7 @@ class QuestionServiceTest extends MockTest {
 		when(
 			questionRepository.findAllByQuestionTypeAndQuestionCategoryOrderByViewCountDesc(type, category)).thenReturn(
 			questions);
-		when(answerApiClient.getAnswerByQuestionId(question.getId())).thenReturn(answer);
+		when(answerManager.getAnswerByQuestionId(question.getId())).thenReturn(answer);
 
 		// when
 		List<QuestionListItemResponse> result = questionService.getQuestions(type, category);
@@ -160,7 +164,7 @@ class QuestionServiceTest extends MockTest {
 
 		List<Question> questions = List.of(question);
 		when(questionRepository.findAllByQuestionTypeOrderByViewCountDesc(type)).thenReturn(questions);
-		when(answerApiClient.getAnswerByQuestionId(question.getId())).thenReturn(answer);
+		when(answerManager.getAnswerByQuestionId(question.getId())).thenReturn(answer);
 
 		// when
 		List<QuestionListItemResponse> result = questionService.getQuestions(type, null);
@@ -223,6 +227,6 @@ class QuestionServiceTest extends MockTest {
 
 		// then
 		verify(questionRepository, times(1)).save(any(Question.class));
-		verify(answerApiClient, times(1)).createAnswer(any(Question.class), eq(answerRequest));
+		verify(answerManager, times(1)).createAnswer(any(Question.class), eq(answerRequest));
 	}
 }
