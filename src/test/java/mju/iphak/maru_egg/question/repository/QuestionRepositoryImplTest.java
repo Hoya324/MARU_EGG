@@ -185,7 +185,7 @@ class QuestionRepositoryImplTest extends RepositoryTest {
 		Pageable pageable = PageRequest.of(0, 3);
 
 		// when
-		SliceQuestionResponse<SearchedQuestionsResponse> result = questionRepositoryImpl.searchQuestionsOfCursorPagingByContent(
+		SliceQuestionResponse<SearchedQuestionsResponse> result = questionRepositoryImpl.searchQuestionsOfCursorPagingByContentWithFullTextSearch(
 			content, null, null, pageable);
 
 		// then

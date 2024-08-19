@@ -67,7 +67,7 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
 	}
 
 	@Override
-	public SliceQuestionResponse<SearchedQuestionsResponse> searchQuestionsOfCursorPagingByContent(
+	public SliceQuestionResponse<SearchedQuestionsResponse> searchQuestionsOfCursorPagingByContentWithFullTextSearch(
 		final String content,
 		final Integer cursorViewCount, final Long questionId, final Pageable pageable) {
 		QQuestion question = QQuestion.question;

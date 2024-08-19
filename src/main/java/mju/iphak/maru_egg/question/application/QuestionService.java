@@ -44,7 +44,8 @@ public class QuestionService {
 	public SliceQuestionResponse<SearchedQuestionsResponse> searchQuestionsOfCursorPaging(final String content,
 		final Integer cursorViewCount, final Long questionId, final Integer size) {
 		Pageable pageable = PageRequest.of(0, size);
-		return questionRepository.searchQuestionsOfCursorPagingByContent(
+		SliceQuestionResponse<SearchedQuestionsResponse> response;
+		response = questionRepository.searchQuestionsOfCursorPagingByContentWithFullTextSearch(
 			content,
 			cursorViewCount, questionId, pageable);
 	}
