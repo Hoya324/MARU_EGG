@@ -1,8 +1,9 @@
 # MARU EGG
 
-## 대학 입시 챗봇 서비스
+## 명지대학교 RAG기반 AI 입학 문의 챗봇
 
- 
+![90](https://github.com/user-attachments/assets/fa51486b-b4e9-49fe-8fb3-321807c00e91)
+
 ---
 
 ### FE
@@ -108,6 +109,9 @@
 
 <img src="https://img.shields.io/badge/nginx-009639?style=for-the-badge&logo=nginx&logoColor=white">
 <img src="https://img.shields.io/badge/amazon aws-232F3E?style=for-the-badge&logo=amazonaws&logoColor=white">
+<img src="https://img.shields.io/badge/aws ec2-F05032?style=for-the-badge&logo=amazonec2&logoColor=white">
+<img src="https://img.shields.io/badge/aws amazonroute53-F05032?style=for-the-badge&logo=amazonroute53&logoColor=white">
+<img src="https://img.shields.io/badge/aws rds-134?style=for-the-badge&logo=amazonrds&logoColor=white">
 <img src="https://img.shields.io/badge/github actions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white">
 <br>
 
@@ -125,3 +129,10 @@
 ### CI/CD
 
 ![image](https://github.com/user-attachments/assets/ba3f7b00-52c6-471d-ab03-0b1ad9bd7da0)
+
+## 프로젝트를 진행하면서 공유한 글
+
+- [프로젝트 & DB | 텍스트 유사도 검색 어떻게 구현할까?(1) - Elasticsearch를 안 쓴 이유와 MySQL Full Text Index](https://hoya324.tistory.com/56)
+- [프로젝트 | 텍스트 유사도 검색 어떻게 구현할까?(2) - Cosine Similarity과 TF-IDF](https://hoya324.tistory.com/57)
+- [Java & Spring | Swagger 커스텀 ApiResponse 어노테이션 사용기](https://hoya324.tistory.com/58)
+- [Spring, BE | Apache Tomcat 바로 알기 + 웹서버(Nginx와 Apache 비교)를 두는 이유](https://hoya324.tistory.com/60)
