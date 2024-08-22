@@ -38,7 +38,7 @@ public class AnswerManager {
 	private static final String REFERENCE_TEXT_AND_LINK = "**참고자료 %d** : [%s **[바로가기]**](%s)\n\n";
 	private static final String IPHAK_OFFICE_NUMBER_GUIDE = "\n\n입학처 상담 전화번호 : 02-300-1799, 1800";
 	private static final String PAGE_SPLIT_REGEX = "page=";
-	private static final String PAGE_ANNOUNCE = "의 페이지 ";
+	private static final String PAGE_ANNOUNCE = "페이지 ";
 
 	private final QuestionRepository questionRepository;
 	private final AnswerApiClient answerApiClient;
@@ -94,8 +94,8 @@ public class AnswerManager {
 	private static String getGuideAnswer(final List<AnswerReferenceResponse> references) {
 		return BASE_MESSAGE + references.stream()
 			.map(reference -> {
-				String page = PAGE_ANNOUNCE + reference.link().split(PAGE_SPLIT_REGEX)[1];
-				String title = reference.title() + page;
+				String page = reference.link().split(PAGE_SPLIT_REGEX)[1] + PAGE_ANNOUNCE;
+				String title = reference.title() + " " + page;
 				return String.format(REFERENCE_TEXT_AND_LINK,
 					references.indexOf(reference) + 1,
 					title,
