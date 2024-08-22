@@ -35,7 +35,7 @@ public class AnswerManager {
 	private static final String INVALID_ANSWER_ONE = "해당 내용에 대한 정보는 존재하지 않습니다.";
 	private static final String INVALID_ANSWER_TWO = "제공된 정보 내에서 답변할 수 없습니다.";
 	private static final String BASE_MESSAGE = "질문해주신 내용에 대한 적절한 정보을 발견하지 못 했습니다.\n\n대신 질문해주신 내용에 가장 적합한 자료들을 골라봤어요. 참고하셔서 다시 질문해주세요!\n\n\n\n";
-	private static final String REFERENCE_TEXT_AND_LINK = "참고자료 %d : **[%s [바로가기]](%s)**\n\n";
+	private static final String REFERENCE_TEXT_AND_LINK = "**참고자료 %d : [%s [바로가기]](%s)**\n\n";
 	private static final String IPHAK_OFFICE_NUMBER_GUIDE = "\n\n입학처 상담 전화번호 : 02-300-1799, 1800";
 	private static final String PAGE_SPLIT_REGEX = "page=";
 	private static final String PAGE_ANNOUNCE = "의 페이지 ";
