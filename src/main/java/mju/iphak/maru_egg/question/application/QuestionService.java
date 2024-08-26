@@ -28,7 +28,7 @@ import mju.iphak.maru_egg.question.repository.QuestionRepository;
 @Slf4j
 @RequiredArgsConstructor
 @Service
-@Transactional(readOnly = true)
+@Transactional
 public class QuestionService {
 
 	private final QuestionRepository questionRepository;
@@ -41,6 +41,7 @@ public class QuestionService {
 			.collect(Collectors.toList());
 	}
 
+	@Transactional(readOnly = true)
 	public SliceQuestionResponse<SearchedQuestionsResponse> searchQuestionsOfCursorPaging(final QuestionType type,
 		final QuestionCategory category, final String content, final Integer cursorViewCount, final Long questionId,
 		final Integer size) {
@@ -61,7 +62,6 @@ public class QuestionService {
 		return response;
 	}
 
-	@Transactional
 	public void checkQuestion(final Long id, final boolean check) {
 		Question question = questionRepository.findById(id)
 			.orElseThrow(() -> new EntityNotFoundException(
@@ -69,11 +69,17 @@ public class QuestionService {
 		question.updateIsChecked(check);
 	}
 
-	@Transactional
 	public void createQuestion(final CreateQuestionRequest request) {
 		Question question = request.toEntity();
 		questionRepository.save(question);
 		answerManager.createAnswer(question, request.answer());
+	}
+
+	public void deleteQuestion(final Long id) {
+		Question question = questionRepository.findById(id)
+			.orElseThrow(() -> new EntityNotFoundException(
+				String.format(NOT_FOUND_QUESTION_BY_ID.getMessage(), id)));
+		questionRepository.delete(question);
 	}
 
 	private List<Question> findQuestions(final QuestionType type, final QuestionCategory category) {

@@ -175,7 +175,8 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
 		}
 
 		List<SearchedQuestionsResponse> questionResponses = questions.stream()
-			.map(q -> SearchedQuestionsResponse.of(q.getId(), q.getContent()))
+			.map(q -> SearchedQuestionsResponse.
+				of(q.getId(), q.getContent(), q.isChecked()))
 			.collect(Collectors.toList());
 
 		Integer nextCursorViewCount = null;

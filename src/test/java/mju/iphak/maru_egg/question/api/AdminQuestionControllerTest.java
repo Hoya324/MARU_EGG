@@ -98,6 +98,18 @@ class AdminQuestionControllerTest extends IntegrationTest {
 		resultActions.andExpect(status().isOk());
 	}
 
+	@Test
+	void 질문_삭제_API() throws Exception {
+		// given
+		Long id = 1L;
+
+		// when
+		ResultActions resultActions = performDeleteQuestionRequest(id);
+
+		// then
+		resultActions.andExpect(status().isOk());
+	}
+
 	private ResultActions performCheckQuestionRequest(CheckQuestionRequest request) throws Exception {
 		return mvc.perform(post("/api/admin/questions/check")
 				.contentType(MediaType.APPLICATION_JSON)
@@ -115,6 +127,12 @@ class AdminQuestionControllerTest extends IntegrationTest {
 	private ResultActions performCreateQuestionRequest(CreateQuestionRequest request) throws Exception {
 		return mvc.perform(post("/api/admin/questions/new")
 				.content(objectMapper.writeValueAsString(request))
+				.contentType(MediaType.APPLICATION_JSON))
+			.andDo(print());
+	}
+
+	private ResultActions performDeleteQuestionRequest(Long id) throws Exception {
+		return mvc.perform(delete("/api/admin/questions/" + id)
 				.contentType(MediaType.APPLICATION_JSON))
 			.andDo(print());
 	}
