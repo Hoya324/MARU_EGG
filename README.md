@@ -108,7 +108,6 @@
 <br>
 
 <img src="https://img.shields.io/badge/nginx-009639?style=for-the-badge&logo=nginx&logoColor=white">
-<img src="https://img.shields.io/badge/amazon aws-232F3E?style=for-the-badge&logo=amazonaws&logoColor=white">
 <img src="https://img.shields.io/badge/aws ec2-F05032?style=for-the-badge&logo=amazonec2&logoColor=white">
 <img src="https://img.shields.io/badge/aws amazonroute53-F05032?style=for-the-badge&logo=amazonroute53&logoColor=white">
 <img src="https://img.shields.io/badge/aws rds-134?style=for-the-badge&logo=amazonrds&logoColor=white">
