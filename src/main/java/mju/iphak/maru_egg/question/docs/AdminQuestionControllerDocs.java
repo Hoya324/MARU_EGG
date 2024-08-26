@@ -1,5 +1,6 @@
 package mju.iphak.maru_egg.question.docs;
 
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -21,4 +22,9 @@ public interface AdminQuestionControllerDocs {
 		@ApiResponse(responseCode = "200", description = "질문 생성 성공")
 	})
 	void createQuestion(@Valid @RequestBody CreateQuestionRequest request);
+
+	@Operation(summary = "질문 삭제", description = "질문을 삭제하는 API", responses = {
+		@ApiResponse(responseCode = "200", description = "질문 삭제 성공")
+	})
+	void deleteQuestion(@PathVariable("questionId") Long id);
 }
