@@ -6,12 +6,14 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import mju.iphak.maru_egg.answer.domain.Answer;
 import mju.iphak.maru_egg.common.entity.BaseEntity;
 
 @Getter
@@ -38,6 +40,9 @@ public class Question extends BaseEntity {
 
 	@ColumnDefault("false")
 	private boolean isChecked;
+
+	@OneToOne(mappedBy = "question", orphanRemoval = true)
+	private Answer answer;
 
 	public String getDateInformation() {
 		return "생성일자: %s, 마지막 DB 갱신일자: %s".formatted(this.getCreatedAt(), this.getUpdatedAt());

@@ -29,8 +29,8 @@ class AnswerRepositoryTest extends RepositoryTest {
 
 	@BeforeEach
 	public void setUp() throws Exception {
-		Question question = new Question("테스트 질문입니다.", "테스트 질문", QuestionType.JEONGSI,
-			QuestionCategory.ADMISSION_GUIDELINE, 0, false);
+		Question question = Question.of("테스트 질문입니다.", "테스트 질문", QuestionType.JEONGSI,
+			QuestionCategory.ADMISSION_GUIDELINE);
 		questionRepository.save(question);
 		Answer answer = Answer.of(question, "테스트 답변입니다.");
 		answerRepository.save(answer);
