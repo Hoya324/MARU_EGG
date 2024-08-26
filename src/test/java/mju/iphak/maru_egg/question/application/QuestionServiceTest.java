@@ -183,7 +183,8 @@ class QuestionServiceTest extends MockTest {
 		QuestionCategory category = QuestionCategory.ADMISSION_GUIDELINE;
 		Pageable pageable = PageRequest.of(0, size);
 
-		SearchedQuestionsResponse searchedQuestionsResponse = new SearchedQuestionsResponse(1L, "example content");
+		SearchedQuestionsResponse searchedQuestionsResponse = new SearchedQuestionsResponse(1L, "example content",
+			true);
 		SliceQuestionResponse<SearchedQuestionsResponse> expectedResponse = new SliceQuestionResponse<>(
 			List.of(searchedQuestionsResponse), 0, size, false, null, null);
 
