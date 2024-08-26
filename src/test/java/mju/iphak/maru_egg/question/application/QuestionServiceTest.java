@@ -27,6 +27,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import com.google.gson.Gson;
 
+import jakarta.persistence.EntityNotFoundException;
 import mju.iphak.maru_egg.answer.application.AnswerApiClient;
 import mju.iphak.maru_egg.answer.application.AnswerManager;
 import mju.iphak.maru_egg.answer.domain.Answer;
@@ -225,5 +226,36 @@ class QuestionServiceTest extends MockTest {
 		// then
 		verify(questionRepository, times(1)).save(any(Question.class));
 		verify(answerManager, times(1)).createAnswer(any(Question.class), eq(answerRequest));
+	}
+
+	@DisplayName("질문 삭제에 성공한 경우")
+	@Test
+	void 질문_삭제_성공() {
+		// given
+		Long id = 1L;
+		Question question = Question.of("질문", "질문", QuestionType.SUSI, QuestionCategory.ADMISSION_GUIDELINE);
+		when(questionRepository.findById(id)).thenReturn(Optional.ofNullable(question));
+
+		// when
+		questionService.deleteQuestion(id);
+
+		// then
+		verify(questionRepository, times(1)).findById(id);
+		verify(questionRepository, times(1)).delete(any(Question.class));
+	}
+
+	@DisplayName("질문 삭제시에 조회 실패")
+	@Test
+	public void 질문_삭제시_조회_실패_NOTFOUND() {
+		// given
+		Long id = 1L;
+		when(questionRepository.findById(id)).thenReturn(Optional.empty());
+
+		// when & then
+		EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> {
+			questionService.deleteQuestion(id);
+		});
+
+		assertThat("id: 1인 질문을 찾을 수 없습니다.").isEqualTo(exception.getMessage());
 	}
 }
