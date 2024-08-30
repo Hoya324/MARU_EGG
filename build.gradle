@@ -142,6 +142,10 @@ dependencies {
 
     // jwt
     implementation 'com.auth0:java-jwt:3.4.1'
+
+    // 모니터링
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'io.micrometer:micrometer-registry-prometheus'
 }
 
 tasks.named('test') {
