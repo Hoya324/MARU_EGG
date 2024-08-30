@@ -77,7 +77,8 @@ jobs:
         id: docker_build
         uses: docker/build-push-action@v3
         with:
-          context: .
+          context: ./docker  # Dockerfile이 있는 디렉토리를 지정
+          file: ./docker/Dockerfile  # Dockerfile의 경로를 명시적으로 지정
           push: true
           tags: ${{ steps.meta.outputs.tags }}-${{ github.run_number }}
           labels: ${{ steps.meta.outputs.labels }}
