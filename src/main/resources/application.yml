@@ -1,4 +1,7 @@
 spring:
+  application:
+    name: maru-egg
+
   profiles:
     active: ${profile}
 
@@ -29,3 +32,12 @@ springdoc:
     operations-sorter: alpha
     display-request-duration: true
     doc-expansion: none
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: prometheus, health, info
+  metrics:
+    tags:
+      application: ${spring.application.name}
