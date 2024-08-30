@@ -2,11 +2,11 @@ FROM openjdk:17
 
 EXPOSE 8080
 
-# The application's jar file
-ARG JAR_FILE=build/libs/*.jar
+# JAR 파일 경로를 명시적으로 수정
+ARG JAR_FILE=docker/build/libs/*.jar
 
-# Add the application's jar to the container
+# 애플리케이션의 JAR 파일을 컨테이너에 추가
 COPY ${JAR_FILE} MARU_EGG_BE.jar
 
-# Run the jar file
+# JAR 파일 실행
 ENTRYPOINT ["java", "-jar", "MARU_EGG_BE.jar"]
