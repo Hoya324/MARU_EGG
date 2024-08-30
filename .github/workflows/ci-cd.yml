@@ -131,7 +131,7 @@ jobs:
                 image: prom/prometheus
                 container_name: prometheus
                 volumes:
-                  - ./prometheus/config/:/etc/prometheus/
+                  - ./prometheus/config/prometheus.yml:/etc/prometheus/prometheus.yml
                   - ./prometheus/prometheus-volume:/prometheus
                 ports:
                   - '9090:9090'
