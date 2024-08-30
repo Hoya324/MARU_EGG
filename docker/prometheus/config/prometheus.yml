@@ -4,7 +4,8 @@ global:
   evaluation_interval: 2m
   external_labels:
     monitor: 'codelab-monitor'
-  query_log_file: /prometheus/data/query_log_file.log
+  query_log_file: "/prometheus/data/queries.active"
+
 rule_files:
   - "rule.yml"
 
