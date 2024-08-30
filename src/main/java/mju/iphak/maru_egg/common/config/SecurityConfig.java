@@ -72,6 +72,8 @@ public class SecurityConfig {
 					.hasRole("ADMIN")
 					.requestMatchers(new MvcRequestMatcher(introspector, "/maru-egg/api-docs/**"))
 					.permitAll()
+					.requestMatchers(new MvcRequestMatcher(introspector, "/actuator/**"))
+					.permitAll()
 					.requestMatchers(new MvcRequestMatcher(introspector, "/maru-egg/swagger-ui/index.html"))
 					.permitAll()
 					.requestMatchers(new MvcRequestMatcher(introspector, "/maru-egg/swagger-ui/**")) // Swagger UI 접근 허용

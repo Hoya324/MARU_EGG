@@ -1,0 +1,21 @@
+global:
+  scrape_interval: 15s
+  scrape_timeout: 15s
+  evaluation_interval: 2m
+  external_labels:
+    monitor: 'codelab-monitor'
+  query_log_file: query_log_file.log
+rule_files:
+  - "rule.yml"
+
+scrape_configs:
+  - job_name: 'maruegg-job'
+    scrape_interval: 15s
+    scrape_timeout: 10s
+    metrics_path: '/actuator/prometheus'
+    honor_labels: false
+    honor_timestamps: false
+    scheme: 'https'  # HTTPS 프로토콜 사용
+    static_configs:
+      - targets:
+          - 'marueggserver.com'  # 이 부분을 리스트로 감싸서 작성

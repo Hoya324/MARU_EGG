@@ -40,3 +40,4 @@ out/
 
 ./resurces/application-dev.yml!/docker/db/
 !/db/
+!/docker/db/
