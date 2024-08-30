@@ -1,0 +1,42 @@
+services:
+  maru-egg-app:
+    container_name: maru-egg-app
+    image: ${DOCKER_REPO}
+    ports:
+      - "8080:8080"
+    networks:
+      - maru-egg-dev
+    volumes:
+      - /home/ec2-user/logs:/logs
+
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    volumes:
+      - ./prometheus/config/:/etc/prometheus/
+      - ./prometheus/prometheus-volume:/prometheus
+    ports:
+      - '9090:9090'
+    command:
+      - '--web.enable-lifecycle'
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    restart: always
+    depends_on:
+      - maru-egg-app
+    networks:
+      - maru-egg-dev
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana_container
+    ports:
+      - 3000:3000
+    volumes:
+      - ./grafana/volume:/var/lib/grafana
+    restart: always
+    networks:
+      - maru-egg-dev
+    depends_on:
+      - prometheus
+networks:
+  maru-egg-dev:
