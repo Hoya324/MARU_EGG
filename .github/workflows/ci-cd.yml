@@ -156,8 +156,8 @@ jobs:
                   - maru-egg-dev
                 depends_on:
                   - prometheus
-              networks:
-                maru-egg-dev:
+            networks:
+              maru-egg-dev:
             EOF
             echo ${{ secrets.DOCKER_PASSWORD }} | sudo docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
             if [ "$(sudo docker ps -q)" ]; then sudo docker stop $(sudo docker ps -q); fi
