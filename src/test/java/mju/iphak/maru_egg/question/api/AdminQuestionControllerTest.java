@@ -1,43 +1,52 @@
 package mju.iphak.maru_egg.question.api;
 
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import java.util.List;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.MockitoAnnotations;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.ResultActions;
 
-import jakarta.persistence.EntityNotFoundException;
+import mju.iphak.maru_egg.answer.domain.Answer;
 import mju.iphak.maru_egg.answer.dto.request.CreateAnswerRequest;
+import mju.iphak.maru_egg.answer.repository.AnswerRepository;
 import mju.iphak.maru_egg.common.IntegrationTest;
 import mju.iphak.maru_egg.question.application.QuestionService;
+import mju.iphak.maru_egg.question.domain.Question;
 import mju.iphak.maru_egg.question.domain.QuestionCategory;
 import mju.iphak.maru_egg.question.domain.QuestionType;
 import mju.iphak.maru_egg.question.dto.request.CheckQuestionRequest;
 import mju.iphak.maru_egg.question.dto.request.CreateQuestionRequest;
+import mju.iphak.maru_egg.question.repository.QuestionRepository;
 
 @WithMockUser(roles = "ADMIN")
 class AdminQuestionControllerTest extends IntegrationTest {
 
-	@MockBean
+	@Autowired
 	private QuestionService questionService;
+
+	@Autowired
+	private QuestionRepository questionRepository;
+
+	@Autowired
+	private AnswerRepository answerRepository;
 
 	@BeforeEach
 	void setUp() {
-		MockitoAnnotations.openMocks(this);
+		initializeTestData();
 	}
 
 	@Test
 	void 질문_체크_API_정상적인_요청() throws Exception {
 		// given
-		CheckQuestionRequest request = new CheckQuestionRequest(1L);
+		Long questionId = getFirstQuestionId();
+		CheckQuestionRequest request = new CheckQuestionRequest(questionId);
 
 		// when
 		ResultActions resultActions = performCheckQuestionRequest(request);
@@ -62,28 +71,12 @@ class AdminQuestionControllerTest extends IntegrationTest {
 	void 질문_체크_API_존재하지_않는_질문_ID() throws Exception {
 		// given
 		CheckQuestionRequest request = new CheckQuestionRequest(999L);
-		doThrow(new EntityNotFoundException("질문을 찾을 수 없습니다.")).when(questionService)
-			.checkQuestion(anyLong());
 
 		// when
 		ResultActions resultActions = performCheckQuestionRequest(request);
 
 		// then
 		resultActions.andExpect(status().isNotFound());
-	}
-
-	@Test
-	void 질문_체크_API_서버_내부_오류() throws Exception {
-		// given
-		CheckQuestionRequest request = new CheckQuestionRequest(1L);
-		doThrow(new RuntimeException("내부 서버 오류")).when(questionService)
-			.checkQuestion(anyLong());
-
-		// when
-		ResultActions resultActions = performCheckQuestionRequest(request);
-
-		// then
-		resultActions.andExpect(status().isInternalServerError());
 	}
 
 	@Test
@@ -101,13 +94,18 @@ class AdminQuestionControllerTest extends IntegrationTest {
 	@Test
 	void 질문_삭제_API() throws Exception {
 		// given
-		Long id = 1L;
+		Long id = getFirstQuestionId();
 
 		// when
 		ResultActions resultActions = performDeleteQuestionRequest(id);
 
 		// then
 		resultActions.andExpect(status().isOk());
+	}
+
+	private Long getFirstQuestionId() {
+		List<Question> questions = questionRepository.findAll();
+		return questions.get(0).getId();
 	}
 
 	private ResultActions performCheckQuestionRequest(CheckQuestionRequest request) throws Exception {
@@ -141,5 +139,13 @@ class AdminQuestionControllerTest extends IntegrationTest {
 		return new CreateQuestionRequest("example content", QuestionType.SUSI,
 			QuestionCategory.ADMISSION_GUIDELINE,
 			new CreateAnswerRequest("example answer content", 2024));
+	}
+
+	private void initializeTestData() {
+		Question question = Question.of("질문", "질문", QuestionType.SUSI, QuestionCategory.ADMISSION_GUIDELINE);
+		Answer answer = Answer.of(question, "답변");
+
+		questionRepository.saveAndFlush(question);
+		answerRepository.saveAndFlush(answer);
 	}
 }

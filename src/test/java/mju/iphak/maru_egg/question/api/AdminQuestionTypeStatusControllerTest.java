@@ -7,7 +7,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -26,7 +25,6 @@ class AdminQuestionTypeStatusControllerTest extends IntegrationTest {
 
 	@BeforeEach
 	void setUp() {
-		MockitoAnnotations.openMocks(this);
 		questionTypeStatusService.initializeQuestionTypeStatus();
 		questionTypeStatusService.deleteQuestionTypeStatus(QuestionType.JEONGSI);
 	}
@@ -34,7 +32,7 @@ class AdminQuestionTypeStatusControllerTest extends IntegrationTest {
 	@DisplayName("200 질문 상태 초기화")
 	@Test
 	public void 질문_상태_초기화_API_정상적인_요청() throws Exception {
-		// given // when
+		// given & when
 		ResultActions resultActions = performInitializeQuestionTypeStatus();
 
 		// then
@@ -80,5 +78,4 @@ class AdminQuestionTypeStatusControllerTest extends IntegrationTest {
 				.content(objectMapper.writeValueAsString(request)))
 			.andDo(print());
 	}
-
 }
