@@ -18,11 +18,8 @@ class QuestionTest {
 	@DisplayName("질문이 확인 되었을 때 상태 변화 성공한 경우")
 	@Test
 	public void 질문_체크_변경_성공() {
-		// given
-		boolean check = true;
-
-		// when
-		question.updateIsChecked(check);
+		// given // when
+		question.updateIsChecked();
 
 		// then
 		assertThat(question.isChecked()).isTrue();
@@ -31,14 +28,11 @@ class QuestionTest {
 	@DisplayName("질문이 확인 되었을 때 상태 변화 실패한 경우")
 	@Test
 	public void 질문_체크_변경_실패() {
-		// given
-		boolean check = false;
-
-		// when
-		question.updateIsChecked(check);
+		// given // when
+		question.updateIsChecked();
 
 		// then
-		assertThat(question.isChecked()).isNotEqualTo(true);
+		assertThat(question.isChecked()).isNotEqualTo(false);
 	}
 
 }

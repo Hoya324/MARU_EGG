@@ -71,7 +71,7 @@ class AdminAnswerControllerTest extends IntegrationTest {
 	}
 
 	private void performRequestAndExpectStatus(Object content, ResultMatcher expectedStatus) throws Exception {
-		ResultActions resultActions = mvc.perform(post("/api/admin/answers")
+		ResultActions resultActions = mvc.perform(put("/api/admin/answers")
 			.contentType(MediaType.APPLICATION_JSON)
 			.content(objectMapper.writeValueAsString(content)));
 
@@ -79,7 +79,7 @@ class AdminAnswerControllerTest extends IntegrationTest {
 	}
 
 	private void performRequestAndExpectStatus(String content, ResultMatcher expectedStatus) throws Exception {
-		ResultActions resultActions = mvc.perform(post("/api/admin/answers")
+		ResultActions resultActions = mvc.perform(put("/api/admin/answers")
 			.contentType(MediaType.APPLICATION_JSON)
 			.content(content));
 
