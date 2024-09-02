@@ -37,7 +37,7 @@ class AdminQuestionControllerTest extends IntegrationTest {
 	@Test
 	void 질문_체크_API_정상적인_요청() throws Exception {
 		// given
-		CheckQuestionRequest request = new CheckQuestionRequest(1L, true);
+		CheckQuestionRequest request = new CheckQuestionRequest(1L);
 
 		// when
 		ResultActions resultActions = performCheckQuestionRequest(request);
@@ -61,9 +61,9 @@ class AdminQuestionControllerTest extends IntegrationTest {
 	@Test
 	void 질문_체크_API_존재하지_않는_질문_ID() throws Exception {
 		// given
-		CheckQuestionRequest request = new CheckQuestionRequest(999L, true);
+		CheckQuestionRequest request = new CheckQuestionRequest(999L);
 		doThrow(new EntityNotFoundException("질문을 찾을 수 없습니다.")).when(questionService)
-			.checkQuestion(anyLong(), anyBoolean());
+			.checkQuestion(anyLong());
 
 		// when
 		ResultActions resultActions = performCheckQuestionRequest(request);
@@ -75,9 +75,9 @@ class AdminQuestionControllerTest extends IntegrationTest {
 	@Test
 	void 질문_체크_API_서버_내부_오류() throws Exception {
 		// given
-		CheckQuestionRequest request = new CheckQuestionRequest(1L, true);
+		CheckQuestionRequest request = new CheckQuestionRequest(1L);
 		doThrow(new RuntimeException("내부 서버 오류")).when(questionService)
-			.checkQuestion(anyLong(), anyBoolean());
+			.checkQuestion(anyLong());
 
 		// when
 		ResultActions resultActions = performCheckQuestionRequest(request);
@@ -111,14 +111,14 @@ class AdminQuestionControllerTest extends IntegrationTest {
 	}
 
 	private ResultActions performCheckQuestionRequest(CheckQuestionRequest request) throws Exception {
-		return mvc.perform(post("/api/admin/questions/check")
+		return mvc.perform(put("/api/admin/questions/check")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(request)))
 			.andDo(print());
 	}
 
 	private ResultActions performCheckQuestionRequest(String invalidJson) throws Exception {
-		return mvc.perform(post("/api/admin/questions/check")
+		return mvc.perform(put("/api/admin/questions/check")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(invalidJson))
 			.andDo(print());

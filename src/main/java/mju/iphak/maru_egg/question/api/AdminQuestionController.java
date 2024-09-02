@@ -3,6 +3,7 @@ package mju.iphak.maru_egg.question.api;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,9 +29,9 @@ public class AdminQuestionController implements AdminQuestionControllerDocs {
 		@CustomApiResponse(error = "EntityNotFoundException", status = 404, message = "id: 132인 질문을 찾을 수 없습니다.", description = "질문을 찾지 못한 경우"),
 		@CustomApiResponse(error = "InternalServerError", status = 500, message = "내부 서버 오류가 발생했습니다.", description = "내부 서버 오류")
 	})
-	@PostMapping("/check")
+	@PutMapping("/check")
 	public void checkQuestion(@Valid @RequestBody CheckQuestionRequest request) {
-		questionService.checkQuestion(request.questionId(), request.check());
+		questionService.checkQuestion(request.questionId());
 	}
 
 	@CustomApiResponses({

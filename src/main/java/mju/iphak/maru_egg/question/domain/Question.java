@@ -52,8 +52,8 @@ public class Question extends BaseEntity {
 		this.viewCount++;
 	}
 
-	public void updateIsChecked(boolean isChecked) {
-		this.isChecked = isChecked;
+	public void updateIsChecked() {
+		this.isChecked = !this.isChecked;
 	}
 
 	public static Question of(String content, String contentToken, QuestionType questionType,

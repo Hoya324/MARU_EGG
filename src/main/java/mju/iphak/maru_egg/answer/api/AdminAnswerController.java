@@ -1,6 +1,6 @@
 package mju.iphak.maru_egg.answer.api;
 
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,7 +25,7 @@ public class AdminAnswerController implements AdminAnswerControllerDocs {
 		@CustomApiResponse(error = "EntityNotFoundException", status = 404, message = "답변 id가 123131인 답변을 찾을 수 없습니다.", description = "답변을 찾지 못한 경우"),
 		@CustomApiResponse(error = "InternalServerError", status = 500, message = "내부 서버 오류가 발생했습니다.", description = "내부 서버 오류")
 	})
-	@PostMapping()
+	@PutMapping()
 	public void updateAnswerContent(@Valid @RequestBody UpdateAnswerContentRequest request) {
 		answerManager.updateAnswerContent(request.id(), request.content());
 	}
