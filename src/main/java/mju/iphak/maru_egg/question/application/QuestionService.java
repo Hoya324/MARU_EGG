@@ -62,11 +62,11 @@ public class QuestionService {
 		return response;
 	}
 
-	public void checkQuestion(final Long id, final boolean check) {
+	public void checkQuestion(final Long id) {
 		Question question = questionRepository.findById(id)
 			.orElseThrow(() -> new EntityNotFoundException(
 				String.format(NOT_FOUND_QUESTION_BY_ID.getMessage(), id)));
-		question.updateIsChecked(check);
+		question.updateIsChecked();
 	}
 
 	public void createQuestion(final CreateQuestionRequest request) {
