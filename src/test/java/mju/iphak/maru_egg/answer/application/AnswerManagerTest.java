@@ -16,24 +16,14 @@ import org.mockito.MockitoAnnotations;
 import jakarta.persistence.EntityNotFoundException;
 import mju.iphak.maru_egg.answer.domain.Answer;
 import mju.iphak.maru_egg.answer.dto.request.CreateAnswerRequest;
-import mju.iphak.maru_egg.answer.repository.AnswerReferenceRepository;
 import mju.iphak.maru_egg.answer.repository.AnswerRepository;
+import mju.iphak.maru_egg.common.MockTest;
 import mju.iphak.maru_egg.question.domain.Question;
 import mju.iphak.maru_egg.question.domain.QuestionCategory;
 import mju.iphak.maru_egg.question.domain.QuestionType;
 import mju.iphak.maru_egg.question.dto.request.CreateQuestionRequest;
-import mju.iphak.maru_egg.question.repository.QuestionRepository;
 
-public class AnswerManagerTest {
-
-	@Mock
-	private QuestionRepository questionRepository;
-
-	@Mock
-	private AnswerApiClient answerApiClient;
-
-	@Mock
-	private AnswerReferenceRepository answerReferenceRepository;
+public class AnswerManagerTest extends MockTest {
 
 	@Mock
 	private AnswerRepository answerRepository;
