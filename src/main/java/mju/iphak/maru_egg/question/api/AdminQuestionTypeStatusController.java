@@ -1,8 +1,5 @@
 package mju.iphak.maru_egg.question.api;
 
-import java.util.List;
-
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,7 +13,6 @@ import mju.iphak.maru_egg.common.meta.CustomApiResponses;
 import mju.iphak.maru_egg.question.application.QuestionTypeStatusService;
 import mju.iphak.maru_egg.question.docs.AdminQuestionTypeStatusControllerDocs;
 import mju.iphak.maru_egg.question.dto.request.UpdateQuestionTypeStatusRequest;
-import mju.iphak.maru_egg.question.dto.response.QuestionTypeStatusResponse;
 
 @RequiredArgsConstructor
 @RestController
@@ -41,13 +37,5 @@ public class AdminQuestionTypeStatusController implements AdminQuestionTypeStatu
 	@PutMapping()
 	public void updateQuestionTypeStatus(@Valid @RequestBody UpdateQuestionTypeStatusRequest request) {
 		questionTypeStatusService.updateStatus(request.type());
-	}
-
-	@CustomApiResponses({
-		@CustomApiResponse(error = "InternalServerError", status = 500, message = "내부 서버 오류가 발생했습니다.", description = "내부 서버 오류")
-	})
-	@GetMapping()
-	public List<QuestionTypeStatusResponse> getQuestionTypeStatus() {
-		return questionTypeStatusService.getQuestionTypeStatus();
 	}
 }
