@@ -9,10 +9,12 @@ import static org.mockito.Mockito.*;
 import java.util.List;
 import java.util.Optional;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import jakarta.persistence.EntityNotFoundException;
 import mju.iphak.maru_egg.common.MockTest;
@@ -23,11 +25,16 @@ import mju.iphak.maru_egg.question.repository.QuestionTypeStatusRepository;
 
 class QuestionTypeStatusServiceTest extends MockTest {
 
-	@MockBean
+	@Mock
 	private QuestionTypeStatusRepository questionTypeStatusRepository;
 
-	@Autowired
+	@InjectMocks
 	private QuestionTypeStatusService questionTypeStatusService;
+
+	@BeforeEach
+	void setUp() {
+		MockitoAnnotations.openMocks(this);
+	}
 
 	@DisplayName("질문 타입 상태 초기화 성공")
 	@Test
