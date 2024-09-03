@@ -10,12 +10,13 @@ import lombok.RequiredArgsConstructor;
 import mju.iphak.maru_egg.common.meta.CustomApiResponse;
 import mju.iphak.maru_egg.common.meta.CustomApiResponses;
 import mju.iphak.maru_egg.question.application.QuestionTypeStatusService;
+import mju.iphak.maru_egg.question.docs.QuestionTypeStatusControllerDocs;
 import mju.iphak.maru_egg.question.dto.response.QuestionTypeStatusResponse;
 
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/questions/status")
-public class QuestionTypeStatusController {
+public class QuestionTypeStatusController implements QuestionTypeStatusControllerDocs {
 
 	private final QuestionTypeStatusService questionTypeStatusService;
 
