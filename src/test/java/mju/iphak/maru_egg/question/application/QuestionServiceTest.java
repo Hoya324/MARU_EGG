@@ -89,41 +89,6 @@ class QuestionServiceTest extends MockTest {
 		configureAnswerApiClient();
 	}
 
-	private void configureAnswerApiClient() {
-		doAnswer(invocation -> {
-			LLMAskQuestionRequest request = invocation.getArgument(0);
-			return Mono.just(mockAskQuestion(request));
-		}).when(answerApiClient).askQuestion(any(LLMAskQuestionRequest.class));
-	}
-
-	private LLMAnswerResponse mockAskQuestion(LLMAskQuestionRequest request) {
-		startServer(new ReactorClientHttpConnector());
-		MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
-		formData.add("questionType", request.questionType());
-		formData.add("questionCategory", request.questionCategory());
-		formData.add("question", request.question());
-
-		Question testQuestion = Question.of("새로운 질문입니다.", "새로운 질문", QuestionType.SUSI,
-			QuestionCategory.ADMISSION_GUIDELINE);
-		List<AnswerReferenceResponse> references = List.of(AnswerReferenceResponse.of("테스트 title", "테스트 link"));
-		LLMAnswerResponse expectedResponse = LLMAnswerResponse.of(QuestionType.SUSI.getType(),
-			QuestionCategory.ADMISSION_GUIDELINE.getCategory(), Answer.of(testQuestion, "새로운 답변입니다."), references);
-
-		mockWebServer.enqueue(new MockResponse()
-			.setHeader("Content-type", MediaType.APPLICATION_JSON_VALUE)
-			.setResponseCode(200)
-			.setBody(new Gson().toJson(expectedResponse)));
-
-		return answerApiClient.askQuestion(request).block();
-	}
-
-	private void startServer(ClientHttpConnector connector) {
-		this.mockWebServer = new MockWebServer();
-		answerApiClient = new AnswerApiClient(WebClient.builder()
-			.baseUrl(this.mockWebServer.url("/").toString())
-			.clientConnector(connector).build());
-	}
-
 	@AfterEach
 	void tearDown() throws IOException {
 		if (mockWebServer != null) {
@@ -258,4 +223,40 @@ class QuestionServiceTest extends MockTest {
 
 		assertThat("id: 1인 질문을 찾을 수 없습니다.").isEqualTo(exception.getMessage());
 	}
+
+	private void configureAnswerApiClient() {
+		doAnswer(invocation -> {
+			LLMAskQuestionRequest request = invocation.getArgument(0);
+			return Mono.just(mockAskQuestion(request));
+		}).when(answerApiClient).askQuestion(any(LLMAskQuestionRequest.class));
+	}
+
+	private LLMAnswerResponse mockAskQuestion(LLMAskQuestionRequest request) {
+		startServer(new ReactorClientHttpConnector());
+		MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
+		formData.add("questionType", request.questionType());
+		formData.add("questionCategory", request.questionCategory());
+		formData.add("question", request.question());
+
+		Question testQuestion = Question.of("새로운 질문입니다.", "새로운 질문", QuestionType.SUSI,
+			QuestionCategory.ADMISSION_GUIDELINE);
+		List<AnswerReferenceResponse> references = List.of(AnswerReferenceResponse.of("테스트 title", "테스트 link"));
+		LLMAnswerResponse expectedResponse = LLMAnswerResponse.of(QuestionType.SUSI.getType(),
+			QuestionCategory.ADMISSION_GUIDELINE.getCategory(), Answer.of(testQuestion, "새로운 답변입니다."), references);
+
+		mockWebServer.enqueue(new MockResponse()
+			.setHeader("Content-type", MediaType.APPLICATION_JSON_VALUE)
+			.setResponseCode(200)
+			.setBody(new Gson().toJson(expectedResponse)));
+
+		return answerApiClient.askQuestion(request).block();
+	}
+
+	private void startServer(ClientHttpConnector connector) {
+		this.mockWebServer = new MockWebServer();
+		answerApiClient = new AnswerApiClient(WebClient.builder()
+			.baseUrl(this.mockWebServer.url("/").toString())
+			.clientConnector(connector).build());
+	}
+
 }

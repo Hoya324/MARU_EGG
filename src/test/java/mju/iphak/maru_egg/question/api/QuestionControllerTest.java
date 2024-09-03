@@ -64,7 +64,7 @@ class QuestionControllerTest extends IntegrationTest {
 	@BeforeEach
 	void setUp() {
 		setupDatabase();
-		setupEntities();
+		initializeTestData();
 	}
 
 	private void setupDatabase() {
@@ -76,7 +76,7 @@ class QuestionControllerTest extends IntegrationTest {
 		jdbcTemplate.execute("ALTER TABLE questions ADD FULLTEXT INDEX idx_ft_question_content(content)");
 	}
 
-	private void setupEntities() {
+	private void initializeTestData() {
 		content = "수시 원서 일정 알려주세요.";
 		question = questionRepository.save(
 			Question.of(content, "수시 일정", QuestionType.SUSI, QuestionCategory.ADMISSION_GUIDELINE));

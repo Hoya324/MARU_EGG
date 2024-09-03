@@ -32,7 +32,7 @@ class AdminQuestionTypeStatusControllerTest extends IntegrationTest {
 	@DisplayName("200 질문 상태 초기화")
 	@Test
 	public void 질문_상태_초기화_API_정상적인_요청() throws Exception {
-		// given // when
+		// given & when
 		ResultActions resultActions = performInitializeQuestionTypeStatus();
 
 		// then
@@ -78,5 +78,4 @@ class AdminQuestionTypeStatusControllerTest extends IntegrationTest {
 				.content(objectMapper.writeValueAsString(request)))
 			.andDo(print());
 	}
-
 }
