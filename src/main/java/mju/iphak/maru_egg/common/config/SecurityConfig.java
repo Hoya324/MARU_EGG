@@ -70,6 +70,8 @@ public class SecurityConfig {
 					.permitAll()
 					.requestMatchers(new MvcRequestMatcher(introspector, API_PREFIX + "/admin/answers/**"))
 					.hasRole("ADMIN")
+					.requestMatchers(new MvcRequestMatcher(introspector, API_PREFIX + "/admin/questions/**"))
+					.hasRole("ADMIN")
 					.requestMatchers(new MvcRequestMatcher(introspector, "/maru-egg/api-docs/**"))
 					.permitAll()
 					.requestMatchers(new MvcRequestMatcher(introspector, "/actuator/**"))
@@ -82,8 +84,6 @@ public class SecurityConfig {
 					.permitAll()
 					.requestMatchers(new MvcRequestMatcher(introspector, "/v3/api-docs/**")) // Swagger API docs 접근 허용
 					.permitAll()
-					.requestMatchers(new MvcRequestMatcher(introspector, API_PREFIX + "/admin/**"))
-					.hasRole("ADMIN")
 					.anyRequest()
 					.authenticated())
 
