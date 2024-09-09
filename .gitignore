@@ -36,8 +36,5 @@ out/
 ### VS Code ###
 .vscode/
 
-.ap
-
-./resurces/application-dev.yml!/docker/db/
-!/db/
 !/docker/db/
+!/db/
