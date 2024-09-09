@@ -95,11 +95,6 @@ jobs:
           echo "DOCKER_REPO=${{ secrets.DOCKER_REPO }}" >> $GITHUB_ENV
           echo "GITHUB_RUN_NUMBER=${{ github.run_number }}" >> $GITHUB_ENV
 
-      - name: Verify environment variables
-        run: |
-          echo "DOCKER_REPO=${{ secrets.DOCKER_REPO }}"
-          echo "GITHUB_RUN_NUMBER=${{ github.run_number }}"
-
       - name: Check docker-compose.yml file
         run: |
           if [ ! -f docker/docker-compose.yml ]; then
