@@ -106,7 +106,7 @@ jobs:
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.PEM_KEY }}
           source: "docker/docker-compose.yml"
-          target: "/home/${{ secrets.USERNAME }}"
+          target: "/home/${{ secrets.USERNAME }}/docker-compose.yml"
           strip_components: 3
           overwrite: true
           debug: true
@@ -120,10 +120,10 @@ jobs:
           key: ${{ secrets.PEM_KEY }}
           script: |
             cd /home/${{ secrets.USERNAME }}
-            envsubst < docker/docker-compose.yml > docker-compose.yml
+            envsubst < docker-compose.yml > docker-compose-dev.yml
             echo ${{ secrets.DOCKER_PASSWORD }} | sudo docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
             if [ "$(sudo docker ps -q)" ]; then sudo docker stop $(sudo docker ps -q); fi
             if [ "$(sudo docker ps -a -q)" ]; then sudo docker rm $(sudo docker ps -a -q); fi
             sudo docker pull ${{ secrets.DOCKER_REPO }}:${{ steps.meta.outputs.tags }}-${{ github.run_number }}
-            sudo docker-compose up -d
+            sudo docker-compose -f docker-compose-dev.yml up -d
             sudo docker image prune -f
