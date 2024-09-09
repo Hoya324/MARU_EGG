@@ -1,7 +1,7 @@
 services:
   maru-egg-app:
-    container_name: maru-egg-app
-    image: ${DOCKER_REPO}
+    container_name: maru-egg
+    image: ${DOCKER_REPO}:develop-${GITHUB_RUN_NUMBER}
     ports:
       - "8080:8080"
     networks:
@@ -38,5 +38,6 @@ services:
       - maru-egg-dev
     depends_on:
       - prometheus
+
 networks:
   maru-egg-dev:
