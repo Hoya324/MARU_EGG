@@ -1,7 +1,7 @@
 services:
   maru-egg-app:
     container_name: maru-egg
-    image: ${DOCKER_REPO}:develop-${GITHUB_RUN_NUMBER}
+    image: ${DOCKER_REPO}:develop
     ports:
       - "8080:8080"
     networks:
