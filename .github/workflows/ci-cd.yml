@@ -86,7 +86,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
 
-    needs: build
+    needs: integration
 
     steps:
       - name: Checkout repository
