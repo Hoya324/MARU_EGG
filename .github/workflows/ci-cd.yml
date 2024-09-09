@@ -92,7 +92,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Copy docker-compose into instance
+      - name: Check and copy docker-compose into instance
+        run: |
+          if [ ! -f docker/docker-compose.yml ]; then
+            echo "Error: docker/docker-compose.yml not found."
+            exit 1
+          fi
         uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.PUBLIC_DNS }}
