@@ -29,7 +29,6 @@ jobs:
           cd ./src/main/resources
           touch ./application.yml
           echo "${{ secrets.YML }}" > ./application.yml
-        shell: bash
 
       # 환경별 yml 파일 생성 - dev
       - name: make application-dev.yml
@@ -38,7 +37,6 @@ jobs:
           cd ./src/main/resources
           touch ./application-dev.yml
           echo "${{ secrets.YML_DEV }}" > ./application-dev.yml
-        shell: bash
 
       # Gradle 패키지 캐시
       - name: Cache Gradle packages
@@ -85,11 +83,22 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
+
     needs: integration
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+
+      - name: Set environment variables for Docker Compose
+        run: |
+          echo "DOCKER_REPO=${{ secrets.DOCKER_REPO }}" >> $GITHUB_ENV
+          echo "GITHUB_RUN_NUMBER=${{ github.run_number }}" >> $GITHUB_ENV
+
+      - name: Verify environment variables
+        run: |
+          echo "DOCKER_REPO=${{ secrets.DOCKER_REPO }}"
+          echo "GITHUB_RUN_NUMBER=${{ github.run_number }}"
 
       - name: Check docker-compose.yml file
         run: |
@@ -97,11 +106,6 @@ jobs:
             echo "Error: docker/docker-compose.yml not found."
             exit 1
           fi
-
-      - name: Set environment variables for Docker Compose
-        run: |
-          echo "DOCKER_REPO=${{ secrets.DOCKER_REPO }}" >> $GITHUB_ENV
-          echo "GITHUB_RUN_NUMBER=${{ github.run_number }}" >> $GITHUB_ENV
 
       - name: Copy docker-compose into instance
         uses: appleboy/scp-action@master
@@ -124,10 +128,14 @@ jobs:
           key: ${{ secrets.PEM_KEY }}
           script: |
             cd /home/${{ secrets.USERNAME }}
-            envsubst < <(echo "${{ secrets.DOCKER_COMPOSE_DEV }}") > docker-compose-dev.yml
+            export DOCKER_REPO=${{ secrets.DOCKER_REPO }}
+            export GITHUB_RUN_NUMBER=${{ github.run_number }}
+            echo "DOCKER_REPO=${DOCKER_REPO}"
+            echo "GITHUB_RUN_NUMBER=${GITHUB_RUN_NUMBER}"
+            envsubst < docker-compose.yml > docker-compose-dev.yml
             echo ${{ secrets.DOCKER_PASSWORD }} | sudo docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
             if [ "$(sudo docker ps -q)" ]; then sudo docker stop $(sudo docker ps -q); fi
             if [ "$(sudo docker ps -a -q)" ]; then sudo docker rm $(sudo docker ps -a -q); fi
-            sudo docker pull ${{ secrets.DOCKER_REPO }}:develop
+            sudo docker pull ${{ secrets.DOCKER_REPO }}:develop-${{ github.run_number }}
             sudo docker-compose -f docker-compose-dev.yml up -d
             sudo docker image prune -f
