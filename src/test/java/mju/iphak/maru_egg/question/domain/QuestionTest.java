@@ -1,6 +1,7 @@
 package mju.iphak.maru_egg.question.domain;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -35,4 +36,27 @@ class QuestionTest {
 		assertThat(question.isChecked()).isNotEqualTo(false);
 	}
 
+	@Test
+	void updateContent_새로운_content로_업데이트() {
+		// given
+		String newContent = "새로운 답변 내용";
+
+		// when
+		question.updateContent(newContent);
+
+		// then
+		assertEquals(newContent, question.getContent());
+	}
+
+	@Test
+	void updateContent_null_content로_업데이트하지_않음() {
+		// given
+		String originalContent = question.getContent();
+
+		// when
+		question.updateContent(null);
+
+		// then
+		assertEquals(originalContent, question.getContent());
+	}
 }

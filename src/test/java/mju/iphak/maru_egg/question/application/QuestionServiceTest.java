@@ -224,6 +224,21 @@ class QuestionServiceTest extends MockTest {
 		assertThat("id: 1인 질문을 찾을 수 없습니다.").isEqualTo(exception.getMessage());
 	}
 
+	@DisplayName("답변 내용 수정 실패")
+	@Test
+	public void 답변_내용_수정_실패_NOTFOUND() {
+		// given
+		Long id = 1L;
+		when(questionRepository.findById(id)).thenReturn(Optional.empty());
+
+		// when & then
+		EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> {
+			questionService.updateQuestionContent(id, "새로운 내용");
+		});
+
+		assertThat("id: 1인 질문을 찾을 수 없습니다.").isEqualTo(exception.getMessage());
+	}
+
 	private void configureAnswerApiClient() {
 		doAnswer(invocation -> {
 			LLMAskQuestionRequest request = invocation.getArgument(0);

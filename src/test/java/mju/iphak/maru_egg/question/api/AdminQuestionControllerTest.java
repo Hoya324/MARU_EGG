@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.ResultMatcher;
 
 import mju.iphak.maru_egg.answer.domain.Answer;
 import mju.iphak.maru_egg.answer.dto.request.CreateAnswerRequest;
@@ -23,6 +24,7 @@ import mju.iphak.maru_egg.question.domain.QuestionCategory;
 import mju.iphak.maru_egg.question.domain.QuestionType;
 import mju.iphak.maru_egg.question.dto.request.CheckQuestionRequest;
 import mju.iphak.maru_egg.question.dto.request.CreateQuestionRequest;
+import mju.iphak.maru_egg.question.dto.request.UpdateQuestionContentRequest;
 import mju.iphak.maru_egg.question.repository.QuestionRepository;
 
 @WithMockUser(roles = "ADMIN")
@@ -101,6 +103,50 @@ class AdminQuestionControllerTest extends IntegrationTest {
 
 		// then
 		resultActions.andExpect(status().isOk());
+	}
+
+	@Test
+	void 질문_수정_API_정상적인_요청() throws Exception {
+		// given
+		Long questionId = getFirstQuestionId();
+		UpdateQuestionContentRequest request = new UpdateQuestionContentRequest(questionId, "새로운 질문 내용");
+
+		// when & then
+		performRequestAndExpectStatus(request, status().isOk());
+	}
+
+	@Test
+	void 질문_수정_API_잘못된_JSON_형식() throws Exception {
+		// given
+		String invalidJson = "{\"id\": \"ㅇㅇ\", \"content\": \"새로운 질문 내용\"}";
+
+		// when & then
+		performRequestAndExpectStatus(invalidJson, status().isBadRequest());
+	}
+
+	@Test
+	void 질문_수정_API_존재하지_않는_질문_ID() throws Exception {
+		// given
+		UpdateQuestionContentRequest request = new UpdateQuestionContentRequest(999L, "새로운 질문 내용");
+
+		// when & then
+		performRequestAndExpectStatus(request, status().isNotFound());
+	}
+
+	private void performRequestAndExpectStatus(Object content, ResultMatcher expectedStatus) throws Exception {
+		ResultActions resultActions = mvc.perform(put("/api/admin/questions")
+			.contentType(MediaType.APPLICATION_JSON)
+			.content(objectMapper.writeValueAsString(content)));
+
+		resultActions.andExpect(expectedStatus).andDo(print());
+	}
+
+	private void performRequestAndExpectStatus(String content, ResultMatcher expectedStatus) throws Exception {
+		ResultActions resultActions = mvc.perform(put("/api/admin/questions")
+			.contentType(MediaType.APPLICATION_JSON)
+			.content(content));
+
+		resultActions.andExpect(expectedStatus).andDo(print());
 	}
 
 	private Long getFirstQuestionId() {
