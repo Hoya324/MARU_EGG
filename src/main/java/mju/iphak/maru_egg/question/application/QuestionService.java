@@ -93,4 +93,11 @@ public class QuestionService {
 		AnswerResponse answerResponse = AnswerResponse.from(answer);
 		return QuestionListItemResponse.of(question, answerResponse);
 	}
+
+	public void updateQuestionContent(final Long id, final String content) {
+		Question question = questionRepository.findById(id)
+			.orElseThrow(() -> new EntityNotFoundException(
+				String.format(NOT_FOUND_QUESTION_BY_ID.getMessage(), id)));
+		question.updateContent(content);
+	}
 }
