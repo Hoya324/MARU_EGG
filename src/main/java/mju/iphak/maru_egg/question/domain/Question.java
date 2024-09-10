@@ -56,6 +56,10 @@ public class Question extends BaseEntity {
 		this.isChecked = !this.isChecked;
 	}
 
+	public void updateContent(String content) {
+		this.content = content != null ? content : this.content;
+	}
+
 	public static Question of(String content, String contentToken, QuestionType questionType,
 		QuestionCategory questionCategory) {
 		return Question.builder()
