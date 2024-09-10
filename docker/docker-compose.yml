@@ -20,11 +20,12 @@ services:
     command:
       - '--web.enable-lifecycle'
       - '--config.file=/etc/prometheus/prometheus.yml'
-    restart: always
+    restart: on-failure[:3]
     depends_on:
       - maru-egg-app
     networks:
       - maru-egg-dev
+    user: '65534:65534'
 
   grafana:
     image: grafana/grafana:latest
