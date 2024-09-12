@@ -16,5 +16,16 @@ services:
       - ./db/mysql/init:/docker-entrypoint-initdb.d
     command:
       - "--innodb_ft_min_token_size=1"
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana_container
+    ports:
+      - 3000:3000
+    volumes:
+      - ./grafana/volume:/var/lib/grafana
+    restart: always
+    networks:
+      - maru-egg-local
+
 networks:
   maru-egg-local:

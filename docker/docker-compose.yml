@@ -27,18 +27,5 @@ services:
       - maru-egg-dev
     user: '65534:65534'
 
-  grafana:
-    image: grafana/grafana:latest
-    container_name: grafana_container
-    ports:
-      - 3000:3000
-    volumes:
-      - ./grafana/volume:/var/lib/grafana
-    restart: always
-    networks:
-      - maru-egg-dev
-    depends_on:
-      - prometheus
-
 networks:
   maru-egg-dev:
