@@ -37,6 +37,7 @@ import mju.iphak.maru_egg.user.repository.UserRepository;
 public class SecurityConfig {
 
 	private static final String API_PREFIX = "/api";
+	private static final String ADMIN_API_PREFIX = "/api/admin";
 
 	private final LoginService loginService;
 	private final JwtService jwtService;
@@ -68,13 +69,7 @@ public class SecurityConfig {
 					.permitAll()
 					.requestMatchers(new MvcRequestMatcher(introspector, API_PREFIX + "/question/**"))
 					.permitAll()
-					.requestMatchers(new MvcRequestMatcher(introspector, API_PREFIX + "/admin/answers/**"))
-					.hasRole("ADMIN")
-					.requestMatchers(new MvcRequestMatcher(introspector, API_PREFIX + "/admin/questions/**"))
-					.hasRole("ADMIN")
-					.requestMatchers(new MvcRequestMatcher(introspector, API_PREFIX + "/admin/questions/status/**"))
-					.hasRole("ADMIN")
-					.requestMatchers(new MvcRequestMatcher(introspector, API_PREFIX + "/admin/questions/status"))
+					.requestMatchers(new MvcRequestMatcher(introspector, ADMIN_API_PREFIX + "/**"))
 					.hasRole("ADMIN")
 					.requestMatchers(new MvcRequestMatcher(introspector, "/maru-egg/api-docs/**"))
 					.permitAll()
