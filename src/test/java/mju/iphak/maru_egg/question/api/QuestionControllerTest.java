@@ -137,6 +137,20 @@ class QuestionControllerTest extends IntegrationTest {
 			.andExpect(jsonPath("$.data").isArray());
 	}
 
+	@Test
+	void 질문_생성_API_검증_오류_1000자_초과() throws Exception {
+		// given
+		String oversizedContent = "a".repeat(1001); // 1001자로 생성
+		QuestionRequest request = new QuestionRequest(QuestionType.SUSI, QuestionCategory.ADMISSION_GUIDELINE,
+			oversizedContent);
+
+		// when
+		ResultActions resultActions = performPostRequest("/api/questions", request);
+
+		// then
+		verifyValidationError(resultActions, "content", "크기가 0에서 1000 사이여야 합니다");
+	}
+
 	private ResultActions performPostRequest(String url, Object content) throws Exception {
 		return mvc.perform(post(url)
 				.contentType(MediaType.APPLICATION_JSON)
@@ -176,5 +190,13 @@ class QuestionControllerTest extends IntegrationTest {
 			.andExpect(jsonPath("$[0].content").value(expectedContent))
 			.andExpect(jsonPath("$[0].answer.content").isNotEmpty())
 			.andExpect(jsonPath("$[0].answer.renewalYear").isNotEmpty());
+	}
+
+	private void verifyValidationError(ResultActions resultActions, String field, String expectedMessage) throws
+		Exception {
+		resultActions
+			.andExpect(status().isBadRequest())
+			.andExpect(jsonPath("$.message").value(org.hamcrest.Matchers.containsString(expectedMessage)))
+			.andExpect(jsonPath("$.message").value(org.hamcrest.Matchers.containsString(field)));
 	}
 }
