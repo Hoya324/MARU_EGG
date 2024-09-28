@@ -1,4 +1,4 @@
-package mju.iphak.maru_egg.question.dto.response;
+package mju.iphak.maru_egg.question.dao.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
