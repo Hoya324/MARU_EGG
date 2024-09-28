@@ -17,6 +17,7 @@ import mju.iphak.maru_egg.answer.application.AnswerManager;
 import mju.iphak.maru_egg.answer.domain.Answer;
 import mju.iphak.maru_egg.answer.dto.response.AnswerResponse;
 import mju.iphak.maru_egg.common.dto.pagination.SliceQuestionResponse;
+import mju.iphak.maru_egg.question.dao.request.SelectQuestions;
 import mju.iphak.maru_egg.question.domain.Question;
 import mju.iphak.maru_egg.question.domain.QuestionCategory;
 import mju.iphak.maru_egg.question.domain.QuestionType;
@@ -47,18 +48,10 @@ public class QuestionService {
 		final Integer size) {
 		Pageable pageable = PageRequest.of(0, size);
 		SliceQuestionResponse<SearchedQuestionsResponse> response;
-		response = questionRepository.searchQuestionsOfCursorPagingByContentWithLikeFunction(
-			type,
-			category,
-			content,
-			cursorViewCount, questionId, pageable);
-		if (response.data().isEmpty()) {
-			response = questionRepository.searchQuestionsOfCursorPagingByContentWithFullTextSearch(
-				type,
-				category,
-				content,
-				cursorViewCount, questionId, pageable);
-		}
+
+		SelectQuestions selectQuestions = SelectQuestions.of(type, category, content, cursorViewCount, questionId,
+			pageable);
+		response = questionRepository.searchQuestionsOfCursorPaging(selectQuestions);
 		return response;
 	}
 

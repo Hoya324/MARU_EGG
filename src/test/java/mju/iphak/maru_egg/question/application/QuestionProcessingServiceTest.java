@@ -37,10 +37,11 @@ import mju.iphak.maru_egg.answer.dto.response.LLMAnswerResponse;
 import mju.iphak.maru_egg.answer.repository.AnswerRepository;
 import mju.iphak.maru_egg.common.MockTest;
 import mju.iphak.maru_egg.common.utils.PhraseExtractionUtils;
+import mju.iphak.maru_egg.question.dao.request.SelectQuestionCores;
+import mju.iphak.maru_egg.question.dao.response.QuestionCore;
 import mju.iphak.maru_egg.question.domain.Question;
 import mju.iphak.maru_egg.question.domain.QuestionCategory;
 import mju.iphak.maru_egg.question.domain.QuestionType;
-import mju.iphak.maru_egg.question.dto.response.QuestionCore;
 import mju.iphak.maru_egg.question.dto.response.QuestionResponse;
 import mju.iphak.maru_egg.question.repository.QuestionRepository;
 import okhttp3.mockwebserver.MockResponse;
@@ -87,16 +88,17 @@ class QuestionProcessingServiceTest extends MockTest {
 	@Test
 	void 질문_조회_성공() {
 		// given
-		QuestionType type = QuestionType.SUSI;
-		QuestionCategory category = QuestionCategory.ADMISSION_GUIDELINE;
 		String content = "테스트 질문입니다.";
 		String contentToken = PhraseExtractionUtils.extractPhrases(content);
+		SelectQuestionCores selectQuestionCores = SelectQuestionCores.of(QuestionType.SUSI,
+			QuestionCategory.ADMISSION_GUIDELINE, content, contentToken);
 
-		when(questionRepository.searchQuestionsByContentTokenAndTypeAndCategory(anyString(), eq(type), eq(category)))
+		when(questionRepository.searchQuestions(eq(selectQuestionCores)))
 			.thenReturn(Optional.of(List.of(QuestionCore.of(1L, contentToken))));
 
 		// when
-		QuestionResponse result = questionProcessingService.question(type, category, content);
+		QuestionResponse result = questionProcessingService.question(selectQuestionCores.type(),
+			selectQuestionCores.category(), content);
 
 		// then
 		assertThat(result).isEqualTo(createExpectedQuestionResponse());
@@ -106,20 +108,20 @@ class QuestionProcessingServiceTest extends MockTest {
 	@Test
 	void 질문_없을_때_새로운_질문_요청() {
 		// given
-		QuestionType type = QuestionType.SUSI;
-		QuestionCategory category = QuestionCategory.ADMISSION_GUIDELINE;
 		String content = "새로운 질문입니다.";
+		SelectQuestionCores selectQuestionCores = SelectQuestionCores.of(QuestionType.SUSI,
+			QuestionCategory.ADMISSION_GUIDELINE, content, content);
 		String contentToken = PhraseExtractionUtils.extractPhrases(content);
 
-		when(questionRepository.searchQuestionsByContentTokenAndTypeAndCategory(eq(contentToken), eq(type),
-			eq(category)))
+		when(questionRepository.searchQuestions(eq(selectQuestionCores)))
 			.thenReturn(Optional.of(Collections.emptyList()));
 
 		// when
-		questionProcessingService.question(type, category, content);
+		questionProcessingService.question(selectQuestionCores.type(), selectQuestionCores.category(), content);
 
 		// then
-		verify(answerManager, times(1)).processNewQuestion(eq(type), eq(category), eq(content), eq(contentToken));
+		verify(answerManager, times(1)).processNewQuestion(eq(selectQuestionCores.type()),
+			eq(selectQuestionCores.category()), eq(content), eq(contentToken));
 	}
 
 	@DisplayName("질문 조회 시 존재하지 않는 질문 ID로 인한 예외 처리")
@@ -140,19 +142,19 @@ class QuestionProcessingServiceTest extends MockTest {
 	void 질문_검색_서버_내부_오류_빈배열_반환() {
 		// given
 		String contentToken = "서버 오류 테스트";
-		QuestionType type = QuestionType.SUSI;
-		QuestionCategory category = QuestionCategory.ADMISSION_GUIDELINE;
+		SelectQuestionCores selectQuestionCores = SelectQuestionCores.of(QuestionType.SUSI,
+			QuestionCategory.ADMISSION_GUIDELINE, contentToken, contentToken);
 		List<QuestionCore> questionCores = List.of();
 
-		when(questionRepository.searchQuestionsByContentTokenAndTypeAndCategory(eq(contentToken), eq(type),
-			eq(category)))
+		when(questionRepository.searchQuestions(eq(selectQuestionCores)))
 			.thenReturn(Optional.of(questionCores));
 
 		// when
-		questionProcessingService.question(type, category, "서버 오류 테스트");
+		questionProcessingService.question(selectQuestionCores.type(), selectQuestionCores.category(), "서버 오류 테스트");
 
 		// then
-		verify(answerManager, times(1)).processNewQuestion(eq(type), eq(category), eq("서버 오류 테스트"), eq(contentToken));
+		verify(answerManager, times(1)).processNewQuestion(eq(selectQuestionCores.type()),
+			eq(selectQuestionCores.category()), eq("서버 오류 테스트"), eq(contentToken));
 	}
 
 	@DisplayName("MOCK LLM 서버에 질문을 요청합니다.")
@@ -192,8 +194,7 @@ class QuestionProcessingServiceTest extends MockTest {
 		when(answerManager.getAnswerByQuestionId(1L)).thenReturn(answer);
 		when(answerRepository.findByQuestionId(anyLong())).thenReturn(Optional.of(answer));
 
-		when(questionRepository.searchQuestionsByContentTokenAndTypeAndCategory(anyString(), any(QuestionType.class),
-			any(QuestionCategory.class)))
+		when(questionRepository.searchQuestions(any(SelectQuestionCores.class)))
 			.thenReturn(Optional.of(List.of(QuestionCore.of(1L, "테스트 질문입니다."))));
 		when(questionRepository.findById(1L)).thenReturn(Optional.of(question));
 	}
