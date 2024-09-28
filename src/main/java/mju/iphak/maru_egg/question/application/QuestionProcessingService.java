@@ -59,12 +59,9 @@ public class QuestionProcessingService {
 		return getExistingQuestionResponse(questionId);
 	}
 
-	private List<QuestionCore> getQuestionCores(QuestionType type, QuestionCategory category, String contentToken) {
-		return category == null ?
-			questionRepository.searchQuestionsByContentTokenAndType(contentToken, type)
-				.orElse(Collections.emptyList()) :
-			questionRepository.searchQuestionsByContentTokenAndTypeAndCategory(contentToken, type, category)
-				.orElse(Collections.emptyList());
+	private List<QuestionCore> getQuestionCores(SelectQuestionCores selectQuestionCores) {
+		return questionRepository.searchQuestions(selectQuestionCores)
+			.orElse(Collections.emptyList());
 	}
 
 	private QuestionResponse getExistingQuestionResponse(Long questionId) {

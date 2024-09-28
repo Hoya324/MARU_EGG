@@ -2,6 +2,7 @@ package mju.iphak.maru_egg.question.repository;
 
 import static mju.iphak.maru_egg.question.domain.QQuestion.*;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -19,10 +20,12 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import mju.iphak.maru_egg.common.dto.pagination.SliceQuestionResponse;
+import mju.iphak.maru_egg.question.dao.request.SelectQuestionCores;
+import mju.iphak.maru_egg.question.dao.request.SelectQuestions;
+import mju.iphak.maru_egg.question.dao.response.QuestionCore;
 import mju.iphak.maru_egg.question.domain.Question;
 import mju.iphak.maru_egg.question.domain.QuestionCategory;
 import mju.iphak.maru_egg.question.domain.QuestionType;
-import mju.iphak.maru_egg.question.dto.response.QuestionCore;
 import mju.iphak.maru_egg.question.dto.response.SearchedQuestionsResponse;
 
 @Repository
@@ -33,42 +36,36 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
 
 	private final JPAQueryFactory queryFactory;
 
-	@Override
-	public Optional<List<QuestionCore>> searchQuestionsByContentTokenAndType(final String contentToken,
-		final QuestionType type) {
-		NumberTemplate<Double> booleanTemplate = createBooleanTemplate(contentToken);
-		List<Tuple> tuples = queryFactory.select(question.id, question.contentToken)
-			.from(question)
-			.where(booleanTemplate.gt(0).and(question.questionType.eq(type)))
-			.fetch();
-
-		List<QuestionCore> result = tuples.stream()
-			.map(tuple -> QuestionCore.of(tuple.get(question.id), tuple.get(question.contentToken)))
-			.collect(Collectors.toList());
-
-		return Optional.of(result);
+	public Optional<List<QuestionCore>> searchQuestions(final SelectQuestionCores selectQuestionCores) {
+		return Optional.of(
+			searchQuestionsByContentTokenAndType(
+				selectQuestionCores.content(),
+				selectQuestionCores.contentToken(),
+				selectQuestionCores.type(),
+				selectQuestionCores.category()
+			).orElse(Collections.emptyList())
+		);
 	}
 
 	@Override
-	public Optional<List<QuestionCore>> searchQuestionsByContentTokenAndTypeAndCategory(final String contentToken,
-		final QuestionType type, final QuestionCategory category) {
-		NumberTemplate<Double> booleanTemplate = createBooleanTemplate(contentToken);
-		List<Tuple> tuples = queryFactory.select(question.id, question.contentToken)
-			.from(question)
-			.where(booleanTemplate.gt(0)
-				.and(question.questionType.eq(type))
-				.and(question.questionCategory.eq(category)))
-			.fetch();
-
-		List<QuestionCore> result = tuples.stream()
-			.map(tuple -> QuestionCore.of(tuple.get(question.id), tuple.get(question.contentToken)))
-			.collect(Collectors.toList());
-
-		return Optional.of(result);
+	public SliceQuestionResponse<SearchedQuestionsResponse> searchQuestionsOfCursorPaging(
+		final SelectQuestions selectQuestions) {
+		SliceQuestionResponse<SearchedQuestionsResponse> response = searchQuestionsOfCursorPagingByContentWithLikeFunction(
+			selectQuestions.type(),
+			selectQuestions.category(),
+			selectQuestions.content(),
+			selectQuestions.pageable());
+		if (response.data().isEmpty()) {
+			response = searchQuestionsOfCursorPagingByContentWithFullTextSearch(
+				selectQuestions.type(),
+				selectQuestions.category(),
+				selectQuestions.content(),
+				selectQuestions.cursorViewCount(), selectQuestions.questionId(), selectQuestions.pageable());
+		}
+		return response;
 	}
 
-	@Override
-	public SliceQuestionResponse<SearchedQuestionsResponse> searchQuestionsOfCursorPagingByContentWithFullTextSearch(
+	private SliceQuestionResponse<SearchedQuestionsResponse> searchQuestionsOfCursorPagingByContentWithFullTextSearch(
 		final QuestionType type, final QuestionCategory category, final String content,
 		final Integer cursorViewCount, final Long questionId, final Pageable pageable) {
 
@@ -76,7 +73,7 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
 		Integer viewCountCursorKey = getValidCursorViewCount(cursorViewCount);
 		Long questionIdCursorKey = getValidCursorQuestionId(questionId);
 
-		NumberTemplate<Double> booleanTemplate = createBooleanTemplate(content);
+		NumberTemplate<Double> booleanTemplate = createBooleanTemplateByContentToken(content);
 		BooleanExpression cursorPredicate = createCursorPredicate(viewCountCursorKey, questionIdCursorKey);
 
 		List<Question> questions = fetchQuestions(type, category, booleanTemplate, cursorPredicate, pageSize);
@@ -84,10 +81,8 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
 		return buildSliceQuestionResponse(pageable, pageSize, questions);
 	}
 
-	@Override
-	public SliceQuestionResponse<SearchedQuestionsResponse> searchQuestionsOfCursorPagingByContentWithLikeFunction(
-		final QuestionType type, final QuestionCategory category, final String content,
-		final Integer cursorViewCount, final Long questionId, final Pageable pageable) {
+	private SliceQuestionResponse<SearchedQuestionsResponse> searchQuestionsOfCursorPagingByContentWithLikeFunction(
+		final QuestionType type, final QuestionCategory category, final String content, final Pageable pageable) {
 
 		int pageSize = pageable.getPageSize();
 
@@ -100,7 +95,47 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
 		return buildSliceQuestionResponse(pageable, pageSize, questions);
 	}
 
-	private NumberTemplate<Double> createBooleanTemplate(String content) {
+	private Optional<List<QuestionCore>> searchQuestionsByContentTokenAndType(
+		final String content, final String contentToken, final QuestionType type, final QuestionCategory category) {
+
+		NumberTemplate<Double> booleanTemplate = createBooleanTemplateByContent(content);
+
+		List<Tuple> tuples = fetchQuestionsByContentAndTypeAndCategory(booleanTemplate, type, category);
+
+		if (tuples.isEmpty()) {
+			booleanTemplate = createBooleanTemplateByContentToken(contentToken);
+			tuples = fetchQuestionsByContentAndTypeAndCategory(booleanTemplate, type, category);
+		}
+
+		List<QuestionCore> result = tuples.stream()
+			.map(tuple -> QuestionCore.of(tuple.get(question.id), tuple.get(question.contentToken)))
+			.collect(Collectors.toList());
+
+		return Optional.of(result);
+	}
+
+	private List<Tuple> fetchQuestionsByContentAndTypeAndCategory(
+		NumberTemplate<Double> booleanTemplate, QuestionType type, QuestionCategory category) {
+
+		BooleanBuilder whereClause = new BooleanBuilder();
+		whereClause.and(booleanTemplate.gt(0));
+		whereClause.and(question.questionType.eq(type));
+
+		if (category != null) {
+			whereClause.and(question.questionCategory.eq(category));
+		}
+
+		return queryFactory.select(question.id, question.contentToken)
+			.from(question)
+			.where(whereClause)
+			.fetch();
+	}
+
+	private NumberTemplate<Double> createBooleanTemplateByContentToken(String contentToken) {
+		return Expressions.numberTemplate(Double.class, "function('match', {0}, {1})", question.content, contentToken);
+	}
+
+	private NumberTemplate<Double> createBooleanTemplateByContent(String content) {
 		return Expressions.numberTemplate(Double.class, "function('match', {0}, {1})", question.content, content);
 	}
 
@@ -175,8 +210,7 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
 		}
 
 		List<SearchedQuestionsResponse> questionResponses = questions.stream()
-			.map(q -> SearchedQuestionsResponse.
-				of(q.getId(), q.getContent(), q.isChecked()))
+			.map(q -> SearchedQuestionsResponse.of(q.getId(), q.getContent(), q.isChecked()))
 			.collect(Collectors.toList());
 
 		Integer nextCursorViewCount = null;
