@@ -20,7 +20,7 @@ services:
     command:
       - '--web.enable-lifecycle'
       - '--config.file=/etc/prometheus/prometheus.yml'
-    restart: on-failure[:3]
+    restart: on-failure
     depends_on:
       - maru-egg-app
     networks:
