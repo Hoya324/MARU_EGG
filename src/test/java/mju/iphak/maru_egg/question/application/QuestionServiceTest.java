@@ -38,11 +38,13 @@ import mju.iphak.maru_egg.answer.dto.response.LLMAnswerResponse;
 import mju.iphak.maru_egg.answer.repository.AnswerRepository;
 import mju.iphak.maru_egg.common.MockTest;
 import mju.iphak.maru_egg.common.dto.pagination.SliceQuestionResponse;
+import mju.iphak.maru_egg.question.dao.request.SelectQuestionCores;
+import mju.iphak.maru_egg.question.dao.request.SelectQuestions;
+import mju.iphak.maru_egg.question.dao.response.QuestionCore;
 import mju.iphak.maru_egg.question.domain.Question;
 import mju.iphak.maru_egg.question.domain.QuestionCategory;
 import mju.iphak.maru_egg.question.domain.QuestionType;
 import mju.iphak.maru_egg.question.dto.request.CreateQuestionRequest;
-import mju.iphak.maru_egg.question.dto.response.QuestionCore;
 import mju.iphak.maru_egg.question.dto.response.QuestionListItemResponse;
 import mju.iphak.maru_egg.question.dto.response.SearchedQuestionsResponse;
 import mju.iphak.maru_egg.question.repository.QuestionRepository;
@@ -81,8 +83,7 @@ class QuestionServiceTest extends MockTest {
 		when(answer.getId()).thenReturn(1L);
 		when(answerManager.getAnswerByQuestionId(1L)).thenReturn(answer);
 		when(answerRepository.findByQuestionId(anyLong())).thenReturn(Optional.of(answer));
-		when(questionRepository.searchQuestionsByContentTokenAndTypeAndCategory(anyString(), any(QuestionType.class),
-			any(QuestionCategory.class)))
+		when(questionRepository.searchQuestions(any(SelectQuestionCores.class)))
 			.thenReturn(Optional.of(List.of(QuestionCore.of(1L, "테스트 질문입니다."))));
 		when(questionRepository.findById(1L)).thenReturn(Optional.of(question));
 		questionService = new QuestionService(questionRepository, answerManager);
@@ -144,27 +145,22 @@ class QuestionServiceTest extends MockTest {
 		String content = "example content";
 		Integer cursorViewCount = 0;
 		Long questionId = 0L;
-		Integer size = 5;
-		QuestionType type = QuestionType.SUSI;
-		QuestionCategory category = QuestionCategory.ADMISSION_GUIDELINE;
+		int size = 5;
 		Pageable pageable = PageRequest.of(0, size);
+		SelectQuestions selectQuestions = SelectQuestions.of(QuestionType.SUSI, QuestionCategory.ADMISSION_GUIDELINE,
+			content, cursorViewCount, questionId, pageable);
 
 		SearchedQuestionsResponse searchedQuestionsResponse = new SearchedQuestionsResponse(1L, "example content",
 			true);
 		SliceQuestionResponse<SearchedQuestionsResponse> expectedResponse = new SliceQuestionResponse<>(
 			List.of(searchedQuestionsResponse), 0, size, false, null, null);
 
-		when(questionRepository.searchQuestionsOfCursorPagingByContentWithFullTextSearch(type, category, content,
-			cursorViewCount,
-			questionId, pageable)).thenReturn(expectedResponse);
-
-		when(questionRepository.searchQuestionsOfCursorPagingByContentWithLikeFunction(type, category, content,
-			cursorViewCount,
-			questionId, pageable)).thenReturn(expectedResponse);
+		when(questionRepository.searchQuestionsOfCursorPaging(selectQuestions)).thenReturn(expectedResponse);
 
 		// when
-		SliceQuestionResponse<SearchedQuestionsResponse> result = questionService.searchQuestionsOfCursorPaging(type,
-			category, content,
+		SliceQuestionResponse<SearchedQuestionsResponse> result = questionService.searchQuestionsOfCursorPaging(
+			selectQuestions.type(),
+			selectQuestions.category(), content,
 			cursorViewCount, questionId, size);
 
 		// then

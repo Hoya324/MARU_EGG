@@ -23,11 +23,13 @@ import mju.iphak.maru_egg.answer.domain.Answer;
 import mju.iphak.maru_egg.answer.repository.AnswerRepository;
 import mju.iphak.maru_egg.common.RepositoryTest;
 import mju.iphak.maru_egg.common.dto.pagination.SliceQuestionResponse;
+import mju.iphak.maru_egg.question.dao.request.SelectQuestionCores;
+import mju.iphak.maru_egg.question.dao.request.SelectQuestions;
+import mju.iphak.maru_egg.question.dao.response.QuestionCore;
 import mju.iphak.maru_egg.question.domain.QQuestion;
 import mju.iphak.maru_egg.question.domain.Question;
 import mju.iphak.maru_egg.question.domain.QuestionCategory;
 import mju.iphak.maru_egg.question.domain.QuestionType;
-import mju.iphak.maru_egg.question.dto.response.QuestionCore;
 import mju.iphak.maru_egg.question.dto.response.SearchedQuestionsResponse;
 
 class QuestionRepositoryImplTest extends RepositoryTest {
@@ -109,7 +111,7 @@ class QuestionRepositoryImplTest extends RepositoryTest {
 		QQuestion question = QQuestion.question;
 		String contentToken = "수시 입학 요강 대해";
 		QuestionType type = QuestionType.SUSI;
-		NumberTemplate<Double> numberTemplate = createBooleanTemplate(question, contentToken);
+		NumberTemplate<Double> numberTemplate = createBooleanTemplateByContentToken(question, contentToken);
 
 		// when
 		List<Question> results = queryFactory.selectFrom(question)
@@ -126,11 +128,11 @@ class QuestionRepositoryImplTest extends RepositoryTest {
 	void contentToken_type으로_질문_검색_실패() {
 		// given
 		String invalidContentToken = "잘못된 질문";
-		QuestionType type = QuestionType.SUSI;
+		SelectQuestionCores selectQuestionCores = SelectQuestionCores.of(QuestionType.SUSI, null, invalidContentToken,
+			invalidContentToken);
 
 		// when
-		Optional<List<QuestionCore>> result = questionRepositoryImpl.searchQuestionsByContentTokenAndType(
-			invalidContentToken, type);
+		Optional<List<QuestionCore>> result = questionRepositoryImpl.searchQuestions(selectQuestionCores);
 
 		// then
 		assertThat(result).isPresent();
@@ -145,7 +147,7 @@ class QuestionRepositoryImplTest extends RepositoryTest {
 		String contentToken = "수시 입학 요강 대해";
 		QuestionType type = QuestionType.SUSI;
 		QuestionCategory category = QuestionCategory.ADMISSION_GUIDELINE;
-		NumberTemplate<Double> numberTemplate = createBooleanTemplate(question, contentToken);
+		NumberTemplate<Double> numberTemplate = createBooleanTemplateByContentToken(question, contentToken);
 
 		// when
 		List<String> results = queryFactory.select(question.contentToken)
@@ -165,12 +167,12 @@ class QuestionRepositoryImplTest extends RepositoryTest {
 	void contentToken_type_Category로_질문_검색_실패() {
 		// given
 		String invalidContentToken = "잘못된 질문";
-		QuestionType type = QuestionType.SUSI;
-		QuestionCategory category = QuestionCategory.ADMISSION_GUIDELINE;
+		SelectQuestionCores selectQuestionCores = SelectQuestionCores.of(QuestionType.SUSI,
+			QuestionCategory.ADMISSION_GUIDELINE, invalidContentToken,
+			invalidContentToken);
 
 		// when
-		Optional<List<QuestionCore>> result = questionRepositoryImpl.searchQuestionsByContentTokenAndTypeAndCategory(
-			invalidContentToken, type, category);
+		Optional<List<QuestionCore>> result = questionRepositoryImpl.searchQuestions(selectQuestionCores);
 
 		// then
 		assertThat(result).isPresent();
@@ -182,13 +184,13 @@ class QuestionRepositoryImplTest extends RepositoryTest {
 	void content로_질문_페이지네이션_조회_실패() {
 		// given
 		String content = "존재하지 않는 질문";
-		QuestionType type = QuestionType.SUSI;
-		QuestionCategory category = QuestionCategory.ADMISSION_GUIDELINE;
 		Pageable pageable = PageRequest.of(0, 3);
+		SelectQuestions selectQuestions = SelectQuestions.of(QuestionType.SUSI, QuestionCategory.ADMISSION_GUIDELINE,
+			content, null, null, pageable);
 
 		// when
-		SliceQuestionResponse<SearchedQuestionsResponse> result = questionRepositoryImpl.searchQuestionsOfCursorPagingByContentWithFullTextSearch(
-			type, category, content, null, null, pageable);
+		SliceQuestionResponse<SearchedQuestionsResponse> result = questionRepositoryImpl.searchQuestionsOfCursorPaging(
+			selectQuestions);
 
 		// then
 		assertThat(result.data()).isEmpty();
@@ -199,7 +201,7 @@ class QuestionRepositoryImplTest extends RepositoryTest {
 		QQuestion question = QQuestion.question;
 		String contentToken = "수시 입학 요강 대해";
 		QuestionType type = QuestionType.SUSI;
-		NumberTemplate<Double> numberTemplate = createBooleanTemplate(question, contentToken);
+		NumberTemplate<Double> numberTemplate = createBooleanTemplateByContentToken(question, contentToken);
 
 		List<String> results = queryFactory.select(question.contentToken)
 			.from(question)
@@ -216,7 +218,7 @@ class QuestionRepositoryImplTest extends RepositoryTest {
 		QQuestion question = QQuestion.question;
 		String contentToken = "수시 입학 요강 대해";
 
-		NumberTemplate<Double> numberTemplate = createBooleanTemplate(question, contentToken);
+		NumberTemplate<Double> numberTemplate = createBooleanTemplateByContentToken(question, contentToken);
 
 		// when
 		List<Question> results = queryFactory.selectFrom(question)
@@ -233,7 +235,7 @@ class QuestionRepositoryImplTest extends RepositoryTest {
 		// given
 		QQuestion question = QQuestion.question;
 		String invalidContentToken = "존재하지 않는 질문";
-		NumberTemplate<Double> numberTemplate = createBooleanTemplate(question, invalidContentToken);
+		NumberTemplate<Double> numberTemplate = createBooleanTemplateByContentToken(question, invalidContentToken);
 
 		// when
 		List<Question> results = queryFactory.selectFrom(question)
@@ -244,7 +246,7 @@ class QuestionRepositoryImplTest extends RepositoryTest {
 		assertThat(results).isEmpty();
 	}
 
-	private NumberTemplate<Double> createBooleanTemplate(QQuestion question, String content) {
+	private NumberTemplate<Double> createBooleanTemplateByContentToken(QQuestion question, String content) {
 		return Expressions.numberTemplate(Double.class, "function('match', {0}, {1})", question.content, content);
 	}
 }
