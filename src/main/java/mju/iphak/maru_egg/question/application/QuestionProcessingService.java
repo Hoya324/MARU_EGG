@@ -18,10 +18,11 @@ import mju.iphak.maru_egg.answer.dto.response.AnswerReferenceResponse;
 import mju.iphak.maru_egg.answer.dto.response.AnswerResponse;
 import mju.iphak.maru_egg.common.utils.NLP.TextSimilarityUtils;
 import mju.iphak.maru_egg.common.utils.PhraseExtractionUtils;
+import mju.iphak.maru_egg.question.dao.request.SelectQuestionCores;
+import mju.iphak.maru_egg.question.dao.response.QuestionCore;
 import mju.iphak.maru_egg.question.domain.Question;
 import mju.iphak.maru_egg.question.domain.QuestionCategory;
 import mju.iphak.maru_egg.question.domain.QuestionType;
-import mju.iphak.maru_egg.question.dto.response.QuestionCore;
 import mju.iphak.maru_egg.question.dto.response.QuestionResponse;
 import mju.iphak.maru_egg.question.repository.QuestionRepository;
 
@@ -39,7 +40,8 @@ public class QuestionProcessingService {
 	public QuestionResponse question(final QuestionType type, final QuestionCategory category, final String content) {
 		String contentToken = PhraseExtractionUtils.extractPhrases(content);
 
-		List<QuestionCore> questionCores = getQuestionCores(type, category, contentToken);
+		SelectQuestionCores selectQuestionCores = SelectQuestionCores.of(type, category, content, contentToken);
+		List<QuestionCore> questionCores = getQuestionCores(selectQuestionCores);
 		if (questionCores.isEmpty()) {
 			log.info("저장된 질문이 없어 새롭게 LLM서버에 질문을 요청합니다.");
 			return answerManager.processNewQuestion(type, category, content, contentToken);
