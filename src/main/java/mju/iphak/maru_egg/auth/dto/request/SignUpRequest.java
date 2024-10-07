@@ -1,7 +1,6 @@
 package mju.iphak.maru_egg.auth.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -9,8 +8,6 @@ import jakarta.validation.constraints.Size;
 @Schema(description = "회원가입 요청 DTO")
 public record SignUpRequest(
 
-	@Schema(description = "이메일", example = "test@gmail.com")
-	@Email(message = "이메일 형식을 지켜주세요.")
 	@NotBlank(message = "email은 비어있을 수 없습니다.")
 	String email,
 
