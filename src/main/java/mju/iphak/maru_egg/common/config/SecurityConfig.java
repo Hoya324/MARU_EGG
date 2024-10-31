@@ -69,6 +69,8 @@ public class SecurityConfig {
 					.permitAll()
 					.requestMatchers(new MvcRequestMatcher(introspector, API_PREFIX + "/question/**"))
 					.permitAll()
+					.requestMatchers(new MvcRequestMatcher(introspector, API_PREFIX + "/admissions/**"))
+					.permitAll()
 					.requestMatchers(new MvcRequestMatcher(introspector, ADMIN_API_PREFIX + "/**"))
 					.hasRole("ADMIN")
 					.requestMatchers(new MvcRequestMatcher(introspector, "/maru-egg/api-docs/**"))
