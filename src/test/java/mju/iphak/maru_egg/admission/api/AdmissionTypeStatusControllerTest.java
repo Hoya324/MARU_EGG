@@ -21,7 +21,7 @@ class AdmissionTypeStatusControllerTest extends IntegrationTest {
 
 	@BeforeEach
 	void setUp() {
-		admissionTypeStatusService.initializeQuestionTypeStatus();
+		admissionTypeStatusService.initializeAdmissionTypeStatus();
 	}
 
 	@DisplayName("200 전체 질문타입과 상태 조회")

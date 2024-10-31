@@ -21,7 +21,7 @@ public class AdminAdmissionTypeStatusController implements AdminAdmissionTypeSta
 
 	@PostMapping("/init")
 	public void initializeQuestionTypeStatus() {
-		admissionTypeStatusService.initializeQuestionTypeStatus();
+		admissionTypeStatusService.initializeAdmissionTypeStatus();
 	}
 
 	@PutMapping()

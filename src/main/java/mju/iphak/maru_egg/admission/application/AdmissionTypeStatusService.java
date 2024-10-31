@@ -23,7 +23,7 @@ public class AdmissionTypeStatusService {
 
 	private final AdmissionTypeStatusRepository admissionTypeStatusRepository;
 
-	public void initializeQuestionTypeStatus() {
+	public void initializeAdmissionTypeStatus() {
 		List<AdmissionTypeStatus> admissionTypeStatuses = AdmissionTypeStatus.initialize();
 		if (!isDatabaseEmpty()) {
 			admissionTypeStatusRepository.deleteAll();
@@ -34,11 +34,11 @@ public class AdmissionTypeStatusService {
 	public void updateStatus(final AdmissionType type) {
 		AdmissionTypeStatus admissionTypeStatus = admissionTypeStatusRepository.findByAdmissionType(type)
 			.orElseThrow(() -> new EntityNotFoundException(
-				String.format(NOT_FOUND_QUESTION_TYPE_STATUS.getMessage(), type)));
+				String.format(NOT_FOUND_ADMISSION_TYPE_STATUS.getMessage(), type)));
 		admissionTypeStatus.updateStatus();
 	}
 
-	public List<AdmissionTypeStatusResponse> getQuestionTypeStatus() {
+	public List<AdmissionTypeStatusResponse> getAdmissionTypeStatus() {
 		List<AdmissionTypeStatus> admissionTypeStatuses = admissionTypeStatusRepository.findAll();
 		return admissionTypeStatuses.stream()
 			.map(questionTypeStatus -> AdmissionTypeStatusResponse.of(questionTypeStatus.getAdmissionType(),
@@ -46,8 +46,14 @@ public class AdmissionTypeStatusService {
 			.toList();
 	}
 
-	public void deleteQuestionTypeStatus(AdmissionType type) {
+	public void deleteAdmissionTypeStatus(AdmissionType type) {
 		admissionTypeStatusRepository.deleteByAdmissionType(type);
+	}
+
+	public AdmissionTypeStatus findByAdmissionType(AdmissionType type) {
+		return admissionTypeStatusRepository.findByAdmissionType(type)
+			.orElseThrow(() -> new EntityNotFoundException(
+				String.format(NOT_FOUND_ADMISSION_TYPE_STATUS.getMessage(), type.getType())));
 	}
 
 	private boolean isDatabaseEmpty() {

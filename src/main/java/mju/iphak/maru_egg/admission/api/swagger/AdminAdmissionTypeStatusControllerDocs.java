@@ -10,7 +10,7 @@ import mju.iphak.maru_egg.admission.dto.request.UpdateAdmissionTypeStatusRequest
 import mju.iphak.maru_egg.common.meta.CustomApiResponse;
 import mju.iphak.maru_egg.common.meta.CustomApiResponses;
 
-@Tag(name = "Admin QuestionTypeStatus API", description = "어드민 질문타입 상태 관련 API 입니다.")
+@Tag(name = "Admin AdmissionTypeStatus API", description = "어드민 입학타입 상태 관련 API 입니다.")
 public interface AdminAdmissionTypeStatusControllerDocs {
 
 	@Operation(summary = "질문타입 초기화", description = "현재 제공 중인 질문 타입에 대해 DB에 초기화합니다.", responses = {

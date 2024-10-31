@@ -38,12 +38,12 @@ class AdmissionTypeStatusServiceTest extends MockTest {
 
 	@DisplayName("질문 타입 상태 초기화 성공")
 	@Test
-	void initializeQuestionTypeStatus_Success() {
+	void initializeAdmissionTypeStatus_Success() {
 		// given
 		when(admissionTypeStatusRepository.count()).thenReturn(1L);
 
 		// when
-		admissionTypeStatusService.initializeQuestionTypeStatus();
+		admissionTypeStatusService.initializeAdmissionTypeStatus();
 
 		// then
 		verify(admissionTypeStatusRepository, times(1)).deleteAll();
@@ -76,19 +76,19 @@ class AdmissionTypeStatusServiceTest extends MockTest {
 		// when & then
 		EntityNotFoundException exception = assertThrows(EntityNotFoundException.class,
 			() -> admissionTypeStatusService.updateStatus(type));
-		assertThat(exception.getMessage()).isEqualTo(String.format(NOT_FOUND_QUESTION_TYPE_STATUS.getMessage(), type));
+		assertThat(exception.getMessage()).isEqualTo(String.format(NOT_FOUND_ADMISSION_TYPE_STATUS.getMessage(), type));
 	}
 
 	@DisplayName("질문 타입 상태 목록 조회 성공")
 	@Test
-	void getQuestionTypeStatus_Success() {
+	void getAdmissionTypeStatus_Success() {
 		// given
 		AdmissionTypeStatus status1 = new AdmissionTypeStatus(AdmissionType.SUSI, true);
 		AdmissionTypeStatus status2 = new AdmissionTypeStatus(AdmissionType.JEONGSI, false);
 		when(admissionTypeStatusRepository.findAll()).thenReturn(List.of(status1, status2));
 
 		// when
-		List<AdmissionTypeStatusResponse> result = admissionTypeStatusService.getQuestionTypeStatus();
+		List<AdmissionTypeStatusResponse> result = admissionTypeStatusService.getAdmissionTypeStatus();
 
 		// then
 		verify(admissionTypeStatusRepository, times(1)).findAll();
@@ -101,12 +101,12 @@ class AdmissionTypeStatusServiceTest extends MockTest {
 
 	@DisplayName("질문 타입 상태 삭제 성공")
 	@Test
-	void deleteQuestionTypeStatus_Success() {
+	void deleteAdmissionTypeStatus_Success() {
 		// given
 		AdmissionType type = AdmissionType.SUSI;
 
 		// when
-		admissionTypeStatusService.deleteQuestionTypeStatus(type);
+		admissionTypeStatusService.deleteAdmissionTypeStatus(type);
 
 		// then
 		verify(admissionTypeStatusRepository, times(1)).deleteByAdmissionType(eq(type));

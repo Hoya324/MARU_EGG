@@ -25,6 +25,6 @@ public class AdmissionTypeStatusController implements AdmissionTypeStatusControl
 	})
 	@GetMapping()
 	public List<AdmissionTypeStatusResponse> getQuestionTypeStatus() {
-		return admissionTypeStatusService.getQuestionTypeStatus();
+		return admissionTypeStatusService.getAdmissionTypeStatus();
 	}
 }

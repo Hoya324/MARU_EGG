@@ -47,7 +47,7 @@ public class AdmissionTypeDetailService {
 	public AdmissionTypeDetailResponse findOne(Long id) {
 		AdmissionTypeDetail admissionTypeDetail = admissionTypeDetailRepository.findById(id)
 			.orElseThrow(
-				() -> new EntityNotFoundException(String.format(NOT_FOUND_QUESTION_TYPE_DETAILS.getMessage(), id)));
+				() -> new EntityNotFoundException(String.format(NOT_FOUND_ADMISSION_TYPE_DETAILS.getMessage(), id)));
 		return AdmissionTypeDetailResponse.from(admissionTypeDetail);
 	}
 
@@ -55,14 +55,14 @@ public class AdmissionTypeDetailService {
 		AdmissionTypeDetail admissionTypeDetail = admissionTypeDetailRepository.findById(admissionTypeDetailId)
 			.orElseThrow(
 				() -> new EntityNotFoundException(
-					String.format(NOT_FOUND_QUESTION_TYPE_DETAILS.getMessage(), admissionTypeDetailId)));
+					String.format(NOT_FOUND_ADMISSION_TYPE_DETAILS.getMessage(), admissionTypeDetailId)));
 		admissionTypeDetail.updateDetailName(name);
 	}
 
 	public void delete(Long id) {
 		AdmissionTypeDetail admissionTypeDetail = admissionTypeDetailRepository.findById(id)
 			.orElseThrow(
-				() -> new EntityNotFoundException(String.format(NOT_FOUND_QUESTION_TYPE_DETAILS.getMessage(), id)));
+				() -> new EntityNotFoundException(String.format(NOT_FOUND_ADMISSION_TYPE_DETAILS.getMessage(), id)));
 		admissionTypeDetailRepository.delete(admissionTypeDetail);
 	}
 }
