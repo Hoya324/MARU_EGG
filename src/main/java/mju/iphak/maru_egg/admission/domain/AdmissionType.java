@@ -1,4 +1,4 @@
-package mju.iphak.maru_egg.question.domain;
+package mju.iphak.maru_egg.admission.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
 @Schema(description = "질문 타입", enumAsRef = true)
 @Getter
 @RequiredArgsConstructor
-public enum QuestionType {
+public enum AdmissionType {
 	@JsonProperty("SUSI") SUSI("수시"),
 	@JsonProperty("JEONGSI") JEONGSI("정시"),
 	@JsonProperty("PYEONIP") PYEONIP("편입학");

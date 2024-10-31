@@ -1,4 +1,4 @@
-package mju.iphak.maru_egg.question.domain;
+package mju.iphak.maru_egg.admission.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
 @Schema(description = "질문 카테고리", enumAsRef = true)
 @Getter
 @RequiredArgsConstructor
-public enum QuestionCategory {
+public enum AdmissionCategory {
 	@JsonProperty("ADMISSION_GUIDELINE") ADMISSION_GUIDELINE("모집요강"),
 	@JsonProperty("PASSING_RESULT") PASSING_RESULT("입시결과"),
 	@JsonProperty("PAST_QUESTIONS") PAST_QUESTIONS("기출문제"),
@@ -22,7 +22,7 @@ public enum QuestionCategory {
 		return this.category;
 	}
 
-	public static QuestionCategory convertToCategory(String category) {
+	public static AdmissionCategory convertToCategory(String category) {
 		if (category.equals(ADMISSION_GUIDELINE.getCategory())) {
 			return ADMISSION_GUIDELINE;
 		}

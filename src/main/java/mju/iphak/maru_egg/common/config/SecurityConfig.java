@@ -1,5 +1,6 @@
 package mju.iphak.maru_egg.common.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
@@ -36,6 +37,9 @@ import mju.iphak.maru_egg.user.repository.UserRepository;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
+	@Value("${custom.swagger.key}")
+	private String swaggerKey;
+
 	private static final String API_PREFIX = "/api";
 	private static final String ADMIN_API_PREFIX = "/api/admin";
 
@@ -69,6 +73,8 @@ public class SecurityConfig {
 					.permitAll()
 					.requestMatchers(new MvcRequestMatcher(introspector, API_PREFIX + "/question/**"))
 					.permitAll()
+					.requestMatchers(new MvcRequestMatcher(introspector, API_PREFIX + "/admissions/**"))
+					.permitAll()
 					.requestMatchers(new MvcRequestMatcher(introspector, ADMIN_API_PREFIX + "/**"))
 					.hasRole("ADMIN")
 					.requestMatchers(new MvcRequestMatcher(introspector, "/maru-egg/api-docs/**"))
@@ -77,11 +83,15 @@ public class SecurityConfig {
 					.permitAll()
 					.requestMatchers(new MvcRequestMatcher(introspector, "/grafana/**"))
 					.permitAll()
-					.requestMatchers(new MvcRequestMatcher(introspector, "/maru-egg/swagger-ui/index.html"))
+					.requestMatchers(
+						new MvcRequestMatcher(introspector, String.format("/%s/swagger-ui**", swaggerKey)))
 					.permitAll()
-					.requestMatchers(new MvcRequestMatcher(introspector, "/maru-egg/swagger-ui/**")) // Swagger UI 접근 허용
+					.requestMatchers(new MvcRequestMatcher(introspector, "/api-docs/**"))
 					.permitAll()
-					.requestMatchers(new MvcRequestMatcher(introspector, "/v3/api-docs/**")) // Swagger API docs 접근 허용
+					.requestMatchers(new MvcRequestMatcher(introspector, "/v3/api-docs/**"))
+					.permitAll().
+					requestMatchers(
+						new MvcRequestMatcher(introspector, String.format("/%s/swagger-ui/**", swaggerKey)))
 					.permitAll()
 					.anyRequest()
 					.authenticated())

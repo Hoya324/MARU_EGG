@@ -65,18 +65,23 @@ public class SwaggerConfig {
 
 	private void handleCustomApiResponses(ApiResponses apiResponses, HandlerMethod handlerMethod) {
 		Method method = handlerMethod.getMethod();
+
 		CustomApiResponses customApiResponses = method.getAnnotation(CustomApiResponses.class);
+		if (customApiResponses == null) {
+			for (Class<?> customApiInterface : handlerMethod.getBeanType().getInterfaces()) {
+				try {
+					Method interfaceMethod = customApiInterface.getMethod(method.getName(), method.getParameterTypes());
+					customApiResponses = interfaceMethod.getAnnotation(CustomApiResponses.class);
+					if (customApiResponses != null) {
+						break;
+					}
+				} catch (NoSuchMethodException e) {
+				}
+			}
+		}
+
 		if (customApiResponses != null) {
 			for (CustomApiResponse customApiResponse : customApiResponses.value()) {
-				ApiResponse apiResponse = new ApiResponse();
-				apiResponse.setDescription(customApiResponse.description());
-				addContent(apiResponse, customApiResponse.error(), customApiResponse.status(),
-					customApiResponse.message(), customApiResponse.isArray());
-				apiResponses.addApiResponse(String.valueOf(customApiResponse.status()), apiResponse);
-			}
-		} else {
-			CustomApiResponse customApiResponse = method.getAnnotation(CustomApiResponse.class);
-			if (customApiResponse != null) {
 				ApiResponse apiResponse = new ApiResponse();
 				apiResponse.setDescription(customApiResponse.description());
 				addContent(apiResponse, customApiResponse.error(), customApiResponse.status(),

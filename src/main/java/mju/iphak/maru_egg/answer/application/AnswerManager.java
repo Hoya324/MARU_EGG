@@ -20,9 +20,9 @@ import mju.iphak.maru_egg.answer.dto.response.AnswerResponse;
 import mju.iphak.maru_egg.answer.dto.response.LLMAnswerResponse;
 import mju.iphak.maru_egg.answer.repository.AnswerReferenceRepository;
 import mju.iphak.maru_egg.answer.repository.AnswerRepository;
+import mju.iphak.maru_egg.admission.domain.AdmissionCategory;
+import mju.iphak.maru_egg.admission.domain.AdmissionType;
 import mju.iphak.maru_egg.question.domain.Question;
-import mju.iphak.maru_egg.question.domain.QuestionCategory;
-import mju.iphak.maru_egg.question.domain.QuestionType;
 import mju.iphak.maru_egg.question.dto.response.QuestionResponse;
 import mju.iphak.maru_egg.question.repository.QuestionRepository;
 
@@ -45,7 +45,7 @@ public class AnswerManager {
 	private final AnswerReferenceRepository answerReferenceRepository;
 	private final AnswerRepository answerRepository;
 
-	public QuestionResponse processNewQuestion(QuestionType type, QuestionCategory category, String content,
+	public QuestionResponse processNewQuestion(AdmissionType type, AdmissionCategory category, String content,
 		String contentToken) {
 		LLMAskQuestionRequest askQuestionRequest = LLMAskQuestionRequest.of(
 			type.getType(),
@@ -81,10 +81,10 @@ public class AnswerManager {
 		answerRepository.save(answer);
 	}
 
-	private QuestionResponse saveAndGetQuestionResponse(final QuestionType type, final String content,
+	private QuestionResponse saveAndGetQuestionResponse(final AdmissionType type, final String content,
 		final String contentToken, final LLMAnswerResponse llmAnswerResponse) {
 		Question newQuestion = saveQuestion(type,
-			QuestionCategory.convertToCategory(llmAnswerResponse.questionCategory()), content, contentToken);
+			AdmissionCategory.convertToCategory(llmAnswerResponse.questionCategory()), content, contentToken);
 		Answer newAnswer = saveAnswer(newQuestion, llmAnswerResponse.answer());
 		saveAnswerReferences(newAnswer, llmAnswerResponse.references());
 
@@ -109,7 +109,7 @@ public class AnswerManager {
 			|| llmAnswerResponse.answer().contains(INVALID_ANSWER_TWO);
 	}
 
-	private Question saveQuestion(QuestionType type, QuestionCategory category, String content, String contentToken) {
+	private Question saveQuestion(AdmissionType type, AdmissionCategory category, String content, String contentToken) {
 		Question question = Question.of(content, contentToken, type, category);
 		return questionRepository.save(question);
 	}

@@ -13,14 +13,14 @@ import org.springframework.transaction.annotation.Transactional;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import mju.iphak.maru_egg.admission.domain.AdmissionCategory;
+import mju.iphak.maru_egg.admission.domain.AdmissionType;
 import mju.iphak.maru_egg.answer.application.AnswerManager;
 import mju.iphak.maru_egg.answer.domain.Answer;
 import mju.iphak.maru_egg.answer.dto.response.AnswerResponse;
 import mju.iphak.maru_egg.common.dto.pagination.SliceQuestionResponse;
 import mju.iphak.maru_egg.question.dao.request.SelectQuestions;
 import mju.iphak.maru_egg.question.domain.Question;
-import mju.iphak.maru_egg.question.domain.QuestionCategory;
-import mju.iphak.maru_egg.question.domain.QuestionType;
 import mju.iphak.maru_egg.question.dto.request.CreateQuestionRequest;
 import mju.iphak.maru_egg.question.dto.response.QuestionListItemResponse;
 import mju.iphak.maru_egg.question.dto.response.SearchedQuestionsResponse;
@@ -35,7 +35,7 @@ public class QuestionService {
 	private final QuestionRepository questionRepository;
 	private final AnswerManager answerManager;
 
-	public List<QuestionListItemResponse> getQuestions(final QuestionType type, final QuestionCategory category) {
+	public List<QuestionListItemResponse> getQuestions(final AdmissionType type, final AdmissionCategory category) {
 		List<Question> questions = findQuestions(type, category);
 		return questions.stream()
 			.map(question -> createQuestionResponse(question, answerManager.getAnswerByQuestionId(question.getId())))
@@ -43,8 +43,8 @@ public class QuestionService {
 	}
 
 	@Transactional(readOnly = true)
-	public SliceQuestionResponse<SearchedQuestionsResponse> searchQuestionsOfCursorPaging(final QuestionType type,
-		final QuestionCategory category, final String content, final Integer cursorViewCount, final Long questionId,
+	public SliceQuestionResponse<SearchedQuestionsResponse> searchQuestionsOfCursorPaging(final AdmissionType type,
+		final AdmissionCategory category, final String content, final Integer cursorViewCount, final Long questionId,
 		final Integer size) {
 		Pageable pageable = PageRequest.of(0, size);
 		SliceQuestionResponse<SearchedQuestionsResponse> response;
@@ -75,11 +75,11 @@ public class QuestionService {
 		questionRepository.delete(question);
 	}
 
-	private List<Question> findQuestions(final QuestionType type, final QuestionCategory category) {
+	private List<Question> findQuestions(final AdmissionType type, final AdmissionCategory category) {
 		if (category == null) {
-			return questionRepository.findAllByQuestionTypeOrderByViewCountDesc(type);
+			return questionRepository.findAllByAdmissionTypeOrderByViewCountDesc(type);
 		}
-		return questionRepository.findAllByQuestionTypeAndQuestionCategoryOrderByViewCountDesc(type, category);
+		return questionRepository.findAllByAdmissionTypeAndAdmissionCategoryOrderByViewCountDesc(type, category);
 	}
 
 	private QuestionListItemResponse createQuestionResponse(final Question question, final Answer answer) {

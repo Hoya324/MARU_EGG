@@ -23,9 +23,9 @@ import mju.iphak.maru_egg.answer.repository.AnswerRepository;
 import mju.iphak.maru_egg.common.IntegrationTest;
 import mju.iphak.maru_egg.question.application.QuestionProcessingService;
 import mju.iphak.maru_egg.question.application.QuestionService;
+import mju.iphak.maru_egg.admission.domain.AdmissionCategory;
+import mju.iphak.maru_egg.admission.domain.AdmissionType;
 import mju.iphak.maru_egg.question.domain.Question;
-import mju.iphak.maru_egg.question.domain.QuestionCategory;
-import mju.iphak.maru_egg.question.domain.QuestionType;
 import mju.iphak.maru_egg.question.dto.request.FindQuestionsRequest;
 import mju.iphak.maru_egg.question.dto.request.QuestionRequest;
 import mju.iphak.maru_egg.question.dto.request.SearchQuestionsRequest;
@@ -79,7 +79,7 @@ class QuestionControllerTest extends IntegrationTest {
 	private void initializeTestData() {
 		content = "수시 원서 일정 알려주세요.";
 		question = questionRepository.save(
-			Question.of(content, "수시 일정", QuestionType.SUSI, QuestionCategory.ADMISSION_GUIDELINE));
+			Question.of(content, "수시 일정", AdmissionType.SUSI, AdmissionCategory.ADMISSION_GUIDELINE));
 		answer = answerRepository.save(Answer.of(question, "수시 일정은 2024년 12월 19일(목)부터 ..."));
 		answerReferenceRepository.save(AnswerReference.of("테스트 title", "테스트 link", answer));
 	}
@@ -87,7 +87,8 @@ class QuestionControllerTest extends IntegrationTest {
 	@Test
 	void 질문_API() throws Exception {
 		// given
-		QuestionRequest request = new QuestionRequest(QuestionType.SUSI, QuestionCategory.ADMISSION_GUIDELINE, content);
+		QuestionRequest request = new QuestionRequest(AdmissionType.SUSI, AdmissionCategory.ADMISSION_GUIDELINE,
+			content);
 
 		// when
 		ResultActions resultActions = performPostRequest("/api/questions", request);
@@ -99,8 +100,8 @@ class QuestionControllerTest extends IntegrationTest {
 	@Test
 	void 질문_목록_조회_API() throws Exception {
 		// given
-		FindQuestionsRequest request = new FindQuestionsRequest(QuestionType.SUSI,
-			QuestionCategory.ADMISSION_GUIDELINE);
+		FindQuestionsRequest request = new FindQuestionsRequest(AdmissionType.SUSI,
+			AdmissionCategory.ADMISSION_GUIDELINE);
 
 		// when
 		ResultActions resultActions = performGetFindQuestionsRequest("/api/questions", request);
@@ -112,7 +113,7 @@ class QuestionControllerTest extends IntegrationTest {
 	@Test
 	void 질문_목록_조회_API_카테고리_없이() throws Exception {
 		// given
-		FindQuestionsRequest request = new FindQuestionsRequest(QuestionType.SUSI, null);
+		FindQuestionsRequest request = new FindQuestionsRequest(AdmissionType.SUSI, null);
 
 		// when
 		ResultActions resultActions = performGetFindQuestionsRequest("/api/questions", request);
@@ -124,8 +125,8 @@ class QuestionControllerTest extends IntegrationTest {
 	@Test
 	void 질문_자동완성_API() throws Exception {
 		// given
-		QuestionType type = QuestionType.SUSI;
-		QuestionCategory category = QuestionCategory.ADMISSION_GUIDELINE;
+		AdmissionType type = AdmissionType.SUSI;
+		AdmissionCategory category = AdmissionCategory.ADMISSION_GUIDELINE;
 		SearchQuestionsRequest request = new SearchQuestionsRequest(type, category, "example content", 5, 0, 0L);
 
 		// when
@@ -141,7 +142,7 @@ class QuestionControllerTest extends IntegrationTest {
 	void 질문_생성_API_검증_오류_1000자_초과() throws Exception {
 		// given
 		String oversizedContent = "a".repeat(1001); // 1001자로 생성
-		QuestionRequest request = new QuestionRequest(QuestionType.SUSI, QuestionCategory.ADMISSION_GUIDELINE,
+		QuestionRequest request = new QuestionRequest(AdmissionType.SUSI, AdmissionCategory.ADMISSION_GUIDELINE,
 			oversizedContent);
 
 		// when

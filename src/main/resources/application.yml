@@ -21,17 +21,21 @@ jwt:
 
 springdoc:
   api-docs:
-    path: /maru-egg/api-docs
+    path: /api-docs
     groups:
       enabled: true
   swagger-ui:
-    path: /maru-egg/api-docs.html
+    path: /local/swagger-ui.html
     enabled: true
     groups-order: ASC
     tags-sorter: alpha
     operations-sorter: alpha
     display-request-duration: true
     doc-expansion: none
+
+custom:
+  swagger:
+    key: local
 
 management:
   endpoints:

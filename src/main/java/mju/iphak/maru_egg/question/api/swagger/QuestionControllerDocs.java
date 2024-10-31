@@ -1,4 +1,4 @@
-package mju.iphak.maru_egg.question.docs;
+package mju.iphak.maru_egg.question.api.swagger;
 
 import java.util.List;
 

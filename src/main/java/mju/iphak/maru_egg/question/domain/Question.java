@@ -13,6 +13,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import mju.iphak.maru_egg.admission.domain.AdmissionCategory;
+import mju.iphak.maru_egg.admission.domain.AdmissionType;
 import mju.iphak.maru_egg.answer.domain.Answer;
 import mju.iphak.maru_egg.common.entity.BaseEntity;
 
@@ -30,10 +32,10 @@ public class Question extends BaseEntity {
 	private String contentToken;
 
 	@Enumerated(EnumType.STRING)
-	private QuestionType questionType;
+	private AdmissionType admissionType;
 
 	@Enumerated(EnumType.STRING)
-	private QuestionCategory questionCategory;
+	private AdmissionCategory admissionCategory;
 
 	@Column(name = "view_count", nullable = false)
 	private int viewCount;
@@ -60,24 +62,24 @@ public class Question extends BaseEntity {
 		this.content = content != null ? content : this.content;
 	}
 
-	public static Question of(String content, String contentToken, QuestionType questionType,
-		QuestionCategory questionCategory) {
+	public static Question of(String content, String contentToken, AdmissionType admissionType,
+		AdmissionCategory admissionCategory) {
 		return Question.builder()
 			.content(content)
 			.contentToken(contentToken)
-			.questionType(questionType)
-			.questionCategory(questionCategory)
+			.admissionType(admissionType)
+			.admissionCategory(admissionCategory)
 			.isChecked(false)
 			.build();
 	}
 
-	public static Question create(String content, String contentToken, QuestionType questionType,
-		QuestionCategory questionCategory) {
+	public static Question create(String content, String contentToken, AdmissionType admissionType,
+		AdmissionCategory admissionCategory) {
 		return Question.builder()
 			.content(content)
 			.contentToken(contentToken)
-			.questionType(questionType)
-			.questionCategory(questionCategory)
+			.admissionType(admissionType)
+			.admissionCategory(admissionCategory)
 			.isChecked(true)
 			.build();
 	}

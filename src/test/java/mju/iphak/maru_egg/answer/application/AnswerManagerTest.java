@@ -18,9 +18,9 @@ import mju.iphak.maru_egg.answer.domain.Answer;
 import mju.iphak.maru_egg.answer.dto.request.CreateAnswerRequest;
 import mju.iphak.maru_egg.answer.repository.AnswerRepository;
 import mju.iphak.maru_egg.common.MockTest;
+import mju.iphak.maru_egg.admission.domain.AdmissionCategory;
+import mju.iphak.maru_egg.admission.domain.AdmissionType;
 import mju.iphak.maru_egg.question.domain.Question;
-import mju.iphak.maru_egg.question.domain.QuestionCategory;
-import mju.iphak.maru_egg.question.domain.QuestionType;
 import mju.iphak.maru_egg.question.dto.request.CreateQuestionRequest;
 
 public class AnswerManagerTest extends MockTest {
@@ -60,8 +60,8 @@ public class AnswerManagerTest extends MockTest {
 	public void 답변_생성_성공() {
 		// given
 		CreateAnswerRequest answerRequest = new CreateAnswerRequest("example answer content", 2024);
-		CreateQuestionRequest request = new CreateQuestionRequest("example content", QuestionType.SUSI,
-			QuestionCategory.ADMISSION_GUIDELINE, answerRequest);
+		CreateQuestionRequest request = new CreateQuestionRequest("example content", AdmissionType.SUSI,
+			AdmissionCategory.ADMISSION_GUIDELINE, answerRequest);
 		Question question = request.toEntity();
 		Answer answer = answerRequest.toEntity(question);
 

@@ -28,6 +28,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 import com.google.gson.Gson;
 
 import jakarta.persistence.EntityNotFoundException;
+import mju.iphak.maru_egg.admission.domain.AdmissionCategory;
+import mju.iphak.maru_egg.admission.domain.AdmissionType;
 import mju.iphak.maru_egg.answer.application.AnswerApiClient;
 import mju.iphak.maru_egg.answer.application.AnswerManager;
 import mju.iphak.maru_egg.answer.domain.Answer;
@@ -42,8 +44,6 @@ import mju.iphak.maru_egg.question.dao.request.SelectQuestionCores;
 import mju.iphak.maru_egg.question.dao.request.SelectQuestions;
 import mju.iphak.maru_egg.question.dao.response.QuestionCore;
 import mju.iphak.maru_egg.question.domain.Question;
-import mju.iphak.maru_egg.question.domain.QuestionCategory;
-import mju.iphak.maru_egg.question.domain.QuestionType;
 import mju.iphak.maru_egg.question.dto.request.CreateQuestionRequest;
 import mju.iphak.maru_egg.question.dto.response.QuestionListItemResponse;
 import mju.iphak.maru_egg.question.dto.response.SearchedQuestionsResponse;
@@ -101,10 +101,10 @@ class QuestionServiceTest extends MockTest {
 	@Test
 	void 질문_목록_조회_성공() {
 		// given
-		QuestionType type = QuestionType.SUSI;
-		QuestionCategory category = QuestionCategory.ADMISSION_GUIDELINE;
+		AdmissionType type = AdmissionType.SUSI;
+		AdmissionCategory category = AdmissionCategory.ADMISSION_GUIDELINE;
 
-		when(questionRepository.findAllByQuestionTypeAndQuestionCategoryOrderByViewCountDesc(type, category))
+		when(questionRepository.findAllByAdmissionTypeAndAdmissionCategoryOrderByViewCountDesc(type, category))
 			.thenReturn(List.of(question));
 		when(answerManager.getAnswerByQuestionId(question.getId())).thenReturn(answer);
 
@@ -122,9 +122,9 @@ class QuestionServiceTest extends MockTest {
 	@Test
 	void 질문_목록_조회_성공_카테고리_없이() {
 		// given
-		QuestionType type = QuestionType.SUSI;
+		AdmissionType type = AdmissionType.SUSI;
 
-		when(questionRepository.findAllByQuestionTypeOrderByViewCountDesc(type))
+		when(questionRepository.findAllByAdmissionTypeOrderByViewCountDesc(type))
 			.thenReturn(List.of(question));
 		when(answerManager.getAnswerByQuestionId(question.getId())).thenReturn(answer);
 
@@ -147,7 +147,7 @@ class QuestionServiceTest extends MockTest {
 		Long questionId = 0L;
 		int size = 5;
 		Pageable pageable = PageRequest.of(0, size);
-		SelectQuestions selectQuestions = SelectQuestions.of(QuestionType.SUSI, QuestionCategory.ADMISSION_GUIDELINE,
+		SelectQuestions selectQuestions = SelectQuestions.of(AdmissionType.SUSI, AdmissionCategory.ADMISSION_GUIDELINE,
 			content, cursorViewCount, questionId, pageable);
 
 		SearchedQuestionsResponse searchedQuestionsResponse = new SearchedQuestionsResponse(1L, "example content",
@@ -175,8 +175,8 @@ class QuestionServiceTest extends MockTest {
 	void 질문_생성_성공() {
 		// given
 		CreateAnswerRequest answerRequest = new CreateAnswerRequest("example answer content", 2024);
-		CreateQuestionRequest request = new CreateQuestionRequest("example content", QuestionType.SUSI,
-			QuestionCategory.ADMISSION_GUIDELINE, answerRequest);
+		CreateQuestionRequest request = new CreateQuestionRequest("example content", AdmissionType.SUSI,
+			AdmissionCategory.ADMISSION_GUIDELINE, answerRequest);
 		Question question = request.toEntity();
 
 		when(questionRepository.save(question)).thenReturn(question);
@@ -194,7 +194,7 @@ class QuestionServiceTest extends MockTest {
 	void 질문_삭제_성공() {
 		// given
 		Long id = 1L;
-		Question question = Question.of("질문", "질문", QuestionType.SUSI, QuestionCategory.ADMISSION_GUIDELINE);
+		Question question = Question.of("질문", "질문", AdmissionType.SUSI, AdmissionCategory.ADMISSION_GUIDELINE);
 		when(questionRepository.findById(id)).thenReturn(Optional.ofNullable(question));
 
 		// when
@@ -249,11 +249,11 @@ class QuestionServiceTest extends MockTest {
 		formData.add("questionCategory", request.questionCategory());
 		formData.add("question", request.question());
 
-		Question testQuestion = Question.of("새로운 질문입니다.", "새로운 질문", QuestionType.SUSI,
-			QuestionCategory.ADMISSION_GUIDELINE);
+		Question testQuestion = Question.of("새로운 질문입니다.", "새로운 질문", AdmissionType.SUSI,
+			AdmissionCategory.ADMISSION_GUIDELINE);
 		List<AnswerReferenceResponse> references = List.of(AnswerReferenceResponse.of("테스트 title", "테스트 link"));
-		LLMAnswerResponse expectedResponse = LLMAnswerResponse.of(QuestionType.SUSI.getType(),
-			QuestionCategory.ADMISSION_GUIDELINE.getCategory(), Answer.of(testQuestion, "새로운 답변입니다."), references);
+		LLMAnswerResponse expectedResponse = LLMAnswerResponse.of(AdmissionType.SUSI.getType(),
+			AdmissionCategory.ADMISSION_GUIDELINE.getCategory(), Answer.of(testQuestion, "새로운 답변입니다."), references);
 
 		mockWebServer.enqueue(new MockResponse()
 			.setHeader("Content-type", MediaType.APPLICATION_JSON_VALUE)

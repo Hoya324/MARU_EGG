@@ -20,9 +20,9 @@ import mju.iphak.maru_egg.common.utils.NLP.TextSimilarityUtils;
 import mju.iphak.maru_egg.common.utils.PhraseExtractionUtils;
 import mju.iphak.maru_egg.question.dao.request.SelectQuestionCores;
 import mju.iphak.maru_egg.question.dao.response.QuestionCore;
+import mju.iphak.maru_egg.admission.domain.AdmissionCategory;
+import mju.iphak.maru_egg.admission.domain.AdmissionType;
 import mju.iphak.maru_egg.question.domain.Question;
-import mju.iphak.maru_egg.question.domain.QuestionCategory;
-import mju.iphak.maru_egg.question.domain.QuestionType;
 import mju.iphak.maru_egg.question.dto.response.QuestionResponse;
 import mju.iphak.maru_egg.question.repository.QuestionRepository;
 
@@ -37,7 +37,7 @@ public class QuestionProcessingService {
 	private final QuestionRepository questionRepository;
 	private final AnswerManager answerManager;
 
-	public QuestionResponse question(final QuestionType type, final QuestionCategory category, final String content) {
+	public QuestionResponse question(final AdmissionType type, final AdmissionCategory category, final String content) {
 		String contentToken = PhraseExtractionUtils.extractPhrases(content);
 
 		SelectQuestionCores selectQuestionCores = SelectQuestionCores.of(type, category, content, contentToken);

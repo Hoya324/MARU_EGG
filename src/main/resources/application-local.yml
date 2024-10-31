@@ -24,3 +24,5 @@ logging:
         type:
           descriptor:
             sql: trace
+server:
+  port: 8082

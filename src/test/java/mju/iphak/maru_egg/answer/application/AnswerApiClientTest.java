@@ -22,9 +22,9 @@ import mju.iphak.maru_egg.answer.dto.request.LLMAskQuestionRequest;
 import mju.iphak.maru_egg.answer.dto.response.AnswerReferenceResponse;
 import mju.iphak.maru_egg.answer.dto.response.LLMAnswerResponse;
 import mju.iphak.maru_egg.common.MockTest;
+import mju.iphak.maru_egg.admission.domain.AdmissionCategory;
+import mju.iphak.maru_egg.admission.domain.AdmissionType;
 import mju.iphak.maru_egg.question.domain.Question;
-import mju.iphak.maru_egg.question.domain.QuestionCategory;
-import mju.iphak.maru_egg.question.domain.QuestionType;
 import reactor.core.publisher.Mono;
 
 public class AnswerApiClientTest extends MockTest {
@@ -59,8 +59,8 @@ public class AnswerApiClientTest extends MockTest {
 	public void LLM_질문_요청() {
 		// given
 		LLMAskQuestionRequest request = LLMAskQuestionRequest.of(
-			QuestionType.SUSI.getType(),
-			QuestionCategory.ADMISSION_GUIDELINE.getCategory(),
+			AdmissionType.SUSI.getType(),
+			AdmissionCategory.ADMISSION_GUIDELINE.getCategory(),
 			question.getContent()
 		);
 
@@ -73,8 +73,8 @@ public class AnswerApiClientTest extends MockTest {
 
 		// then
 		assertThat(result).isNotNull();
-		assertThat(result.questionType()).isEqualTo(question.getQuestionType().getType());
-		assertThat(result.questionCategory()).isEqualTo(question.getQuestionCategory().getCategory());
+		assertThat(result.questionType()).isEqualTo(question.getAdmissionType().getType());
+		assertThat(result.questionCategory()).isEqualTo(question.getAdmissionCategory().getCategory());
 		assertThat(result.references()).isNotNull();
 	}
 
@@ -82,8 +82,8 @@ public class AnswerApiClientTest extends MockTest {
 		return Question.of(
 			"수시 일정 알려주세요.",
 			"수시 일정",
-			QuestionType.SUSI,
-			QuestionCategory.ADMISSION_GUIDELINE
+			AdmissionType.SUSI,
+			AdmissionCategory.ADMISSION_GUIDELINE
 		);
 	}
 
@@ -109,8 +109,8 @@ public class AnswerApiClientTest extends MockTest {
 			.header("Content-Type", MediaType.APPLICATION_JSON_VALUE)
 			.body(String.format(
 				"{\"questionType\":\"%s\",\"questionCategory\":\"%s\",\"answer\":\"%s\"}",
-				question.getQuestionType().getType(),
-				question.getQuestionCategory().getCategory(),
+				question.getAdmissionType().getType(),
+				question.getAdmissionCategory().getCategory(),
 				answer.getContent()
 			))
 			.build();

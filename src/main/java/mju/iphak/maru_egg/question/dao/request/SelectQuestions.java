@@ -3,20 +3,20 @@ package mju.iphak.maru_egg.question.dao.request;
 import org.springframework.data.domain.Pageable;
 
 import lombok.Builder;
-import mju.iphak.maru_egg.question.domain.QuestionCategory;
-import mju.iphak.maru_egg.question.domain.QuestionType;
+import mju.iphak.maru_egg.admission.domain.AdmissionCategory;
+import mju.iphak.maru_egg.admission.domain.AdmissionType;
 
 @Builder
 public record SelectQuestions(
-	QuestionType type,
-	QuestionCategory category,
+	AdmissionType type,
+	AdmissionCategory category,
 	String content,
 	Integer cursorViewCount,
 	Long questionId,
 	Pageable pageable
 ) {
-	public static SelectQuestions of(QuestionType type,
-		QuestionCategory category,
+	public static SelectQuestions of(AdmissionType type,
+		AdmissionCategory category,
 		String content,
 		Integer cursorViewCount,
 		Long questionId,
