@@ -1,4 +1,4 @@
-package mju.iphak.maru_egg.question.domain;
+package mju.iphak.maru_egg.admission.domain;
 
 import java.util.Arrays;
 import java.util.List;
@@ -21,11 +21,11 @@ import mju.iphak.maru_egg.common.entity.BaseEntity;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-@Table(name = "question_type_status")
-public class QuestionTypeStatus extends BaseEntity {
+@Table(name = "admission_type_status")
+public class AdmissionTypeStatus extends BaseEntity {
 
 	@Enumerated(EnumType.STRING)
-	private QuestionType questionType;
+	private AdmissionType admissionType;
 
 	@ColumnDefault("true")
 	private boolean isActivated;
@@ -34,16 +34,16 @@ public class QuestionTypeStatus extends BaseEntity {
 		this.isActivated = !this.isActivated;
 	}
 
-	public static List<QuestionTypeStatus> initialize() {
-		QuestionType[] types = QuestionType.values();
+	public static List<AdmissionTypeStatus> initialize() {
+		AdmissionType[] types = AdmissionType.values();
 		return Arrays.stream(types)
-			.map(QuestionTypeStatus::of)
+			.map(AdmissionTypeStatus::of)
 			.toList();
 	}
 
-	public static QuestionTypeStatus of(QuestionType type) {
-		return QuestionTypeStatus.builder()
-			.questionType(type)
+	public static AdmissionTypeStatus of(AdmissionType type) {
+		return AdmissionTypeStatus.builder()
+			.admissionType(type)
 			.isActivated(true)
 			.build();
 	}

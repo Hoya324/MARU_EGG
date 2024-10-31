@@ -1,4 +1,4 @@
-package mju.iphak.maru_egg.question.api;
+package mju.iphak.maru_egg.admission.api;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
@@ -11,17 +11,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
 
+import mju.iphak.maru_egg.admission.application.AdmissionTypeStatusService;
 import mju.iphak.maru_egg.common.IntegrationTest;
-import mju.iphak.maru_egg.question.application.QuestionTypeStatusService;
 
-class QuestionTypeStatusControllerTest extends IntegrationTest {
+class AdmissionTypeStatusControllerTest extends IntegrationTest {
 
 	@Autowired
-	private QuestionTypeStatusService questionTypeStatusService;
+	private AdmissionTypeStatusService admissionTypeStatusService;
 
 	@BeforeEach
 	void setUp() {
-		questionTypeStatusService.initializeQuestionTypeStatus();
+		admissionTypeStatusService.initializeQuestionTypeStatus();
 	}
 
 	@DisplayName("200 전체 질문타입과 상태 조회")
@@ -38,7 +38,7 @@ class QuestionTypeStatusControllerTest extends IntegrationTest {
 	}
 
 	private ResultActions performGetQuestionTypeStatus() throws Exception {
-		return mvc.perform(get("/api/questions/status")
+		return mvc.perform(get("/api/admissions/status")
 				.contentType(MediaType.APPLICATION_JSON))
 			.andDo(print());
 	}

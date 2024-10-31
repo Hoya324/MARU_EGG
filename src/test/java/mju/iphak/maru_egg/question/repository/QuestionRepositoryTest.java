@@ -9,12 +9,12 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import mju.iphak.maru_egg.admission.domain.AdmissionCategory;
+import mju.iphak.maru_egg.admission.domain.AdmissionType;
 import mju.iphak.maru_egg.answer.domain.Answer;
 import mju.iphak.maru_egg.answer.repository.AnswerRepository;
 import mju.iphak.maru_egg.common.RepositoryTest;
 import mju.iphak.maru_egg.question.domain.Question;
-import mju.iphak.maru_egg.question.domain.QuestionCategory;
-import mju.iphak.maru_egg.question.domain.QuestionType;
 
 class QuestionRepositoryTest extends RepositoryTest {
 
@@ -29,19 +29,19 @@ class QuestionRepositoryTest extends RepositoryTest {
 
 	@BeforeEach
 	public void setUp() throws Exception {
-		question = Question.of("테스트 질문 예시 예시입니다.", "테스트 질문 예시", QuestionType.SUSI,
-			QuestionCategory.ADMISSION_GUIDELINE);
+		question = Question.of("테스트 질문 예시 예시입니다.", "테스트 질문 예시", AdmissionType.SUSI,
+			AdmissionCategory.ADMISSION_GUIDELINE);
 		questionRepository.save(question);
-		Question additionalQuestion1 = Question.of("추가1 테스트 질문 예시입니다.", "추가 테스트 질문 예시", QuestionType.SUSI,
-			QuestionCategory.ADMISSION_GUIDELINE);
+		Question additionalQuestion1 = Question.of("추가1 테스트 질문 예시입니다.", "추가 테스트 질문 예시", AdmissionType.SUSI,
+			AdmissionCategory.ADMISSION_GUIDELINE);
 		questionRepository.save(additionalQuestion1);
-		Question additionalQuestion2 = Question.of("추가2 테스트 질문 예시입니다.", "추가 테스트 질문 예시", QuestionType.SUSI,
-			QuestionCategory.ADMISSION_GUIDELINE);
+		Question additionalQuestion2 = Question.of("추가2 테스트 질문 예시입니다.", "추가 테스트 질문 예시", AdmissionType.SUSI,
+			AdmissionCategory.ADMISSION_GUIDELINE);
 		questionRepository.save(additionalQuestion2);
-		Question additionalQuestion3 = Question.of("추가3 테스트 질문 예시입니다.", "추가 테스트 질문 예시", QuestionType.SUSI,
-			QuestionCategory.ADMISSION_GUIDELINE);
+		Question additionalQuestion3 = Question.of("추가3 테스트 질문 예시입니다.", "추가 테스트 질문 예시", AdmissionType.SUSI,
+			AdmissionCategory.ADMISSION_GUIDELINE);
 		questionRepository.save(additionalQuestion3);
-		Question additionalQuestionUNCLASSIFIED = Question.of("추가4 테스트 질문 예시입니다.", "추가 테스트 질문 예시", QuestionType.SUSI,
+		Question additionalQuestionUNCLASSIFIED = Question.of("추가4 테스트 질문 예시입니다.", "추가 테스트 질문 예시", AdmissionType.SUSI,
 			null);
 		questionRepository.save(additionalQuestionUNCLASSIFIED);
 
@@ -53,11 +53,12 @@ class QuestionRepositoryTest extends RepositoryTest {
 	@Test
 	void 질문_조회_성공() {
 		// given
-		QuestionType type = QuestionType.SUSI;
-		QuestionCategory category = QuestionCategory.ADMISSION_GUIDELINE;
+		AdmissionType type = AdmissionType.SUSI;
+		AdmissionCategory category = AdmissionCategory.ADMISSION_GUIDELINE;
 
 		// when
-		List<Question> questions = questionRepository.findAllByQuestionTypeAndQuestionCategoryOrderByViewCountDesc(type,
+		List<Question> questions = questionRepository.findAllByAdmissionTypeAndAdmissionCategoryOrderByViewCountDesc(
+			type,
 			category);
 
 		// then
@@ -70,11 +71,11 @@ class QuestionRepositoryTest extends RepositoryTest {
 	@Test
 	void 질문_조회_실패() {
 		// given
-		QuestionType invalidType = QuestionType.JEONGSI;
-		QuestionCategory category = QuestionCategory.ADMISSION_GUIDELINE;
+		AdmissionType invalidType = AdmissionType.JEONGSI;
+		AdmissionCategory category = AdmissionCategory.ADMISSION_GUIDELINE;
 
 		// when
-		List<Question> questions = questionRepository.findAllByQuestionTypeAndQuestionCategoryOrderByViewCountDesc(
+		List<Question> questions = questionRepository.findAllByAdmissionTypeAndAdmissionCategoryOrderByViewCountDesc(
 			invalidType, category);
 
 		// then
@@ -85,10 +86,10 @@ class QuestionRepositoryTest extends RepositoryTest {
 	@Test
 	void 질문_조회_성공_카테고리_없이() {
 		// given
-		QuestionType type = QuestionType.SUSI;
+		AdmissionType type = AdmissionType.SUSI;
 
 		// when
-		List<Question> questions = questionRepository.findAllByQuestionTypeOrderByViewCountDesc(type);
+		List<Question> questions = questionRepository.findAllByAdmissionTypeOrderByViewCountDesc(type);
 
 		// then
 		assertThat(questions).isNotEmpty();
@@ -100,10 +101,10 @@ class QuestionRepositoryTest extends RepositoryTest {
 	@Test
 	void 질문_조회_실패_타입만으로() {
 		// given
-		QuestionType invalidType = QuestionType.JEONGSI;
+		AdmissionType invalidType = AdmissionType.JEONGSI;
 
 		// when
-		List<Question> questions = questionRepository.findAllByQuestionTypeOrderByViewCountDesc(invalidType);
+		List<Question> questions = questionRepository.findAllByAdmissionTypeOrderByViewCountDesc(invalidType);
 
 		// then
 		assertThat(questions.isEmpty()).isTrue();

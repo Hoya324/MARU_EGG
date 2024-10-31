@@ -20,9 +20,9 @@ import mju.iphak.maru_egg.answer.domain.Answer;
 import mju.iphak.maru_egg.answer.dto.request.UpdateAnswerContentRequest;
 import mju.iphak.maru_egg.answer.repository.AnswerRepository;
 import mju.iphak.maru_egg.common.IntegrationTest;
+import mju.iphak.maru_egg.admission.domain.AdmissionType;
 import mju.iphak.maru_egg.question.domain.Question;
-import mju.iphak.maru_egg.question.domain.QuestionCategory;
-import mju.iphak.maru_egg.question.domain.QuestionType;
+import mju.iphak.maru_egg.admission.domain.AdmissionCategory;
 import mju.iphak.maru_egg.question.repository.QuestionRepository;
 
 @WithMockUser(roles = "ADMIN")
@@ -93,7 +93,7 @@ class AdminAnswerControllerTest extends IntegrationTest {
 	}
 
 	private void initializeTestData() {
-		Question question = Question.of("질문", "질문", QuestionType.SUSI, QuestionCategory.ADMISSION_GUIDELINE);
+		Question question = Question.of("질문", "질문", AdmissionType.SUSI, AdmissionCategory.ADMISSION_GUIDELINE);
 		Answer answer = Answer.of(question, "답변");
 
 		questionRepository.saveAndFlush(question);

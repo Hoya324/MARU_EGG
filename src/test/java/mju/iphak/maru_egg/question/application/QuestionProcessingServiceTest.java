@@ -39,9 +39,9 @@ import mju.iphak.maru_egg.common.MockTest;
 import mju.iphak.maru_egg.common.utils.PhraseExtractionUtils;
 import mju.iphak.maru_egg.question.dao.request.SelectQuestionCores;
 import mju.iphak.maru_egg.question.dao.response.QuestionCore;
+import mju.iphak.maru_egg.admission.domain.AdmissionCategory;
+import mju.iphak.maru_egg.admission.domain.AdmissionType;
 import mju.iphak.maru_egg.question.domain.Question;
-import mju.iphak.maru_egg.question.domain.QuestionCategory;
-import mju.iphak.maru_egg.question.domain.QuestionType;
 import mju.iphak.maru_egg.question.dto.response.QuestionResponse;
 import mju.iphak.maru_egg.question.repository.QuestionRepository;
 import okhttp3.mockwebserver.MockResponse;
@@ -90,8 +90,8 @@ class QuestionProcessingServiceTest extends MockTest {
 		// given
 		String content = "테스트 질문입니다.";
 		String contentToken = PhraseExtractionUtils.extractPhrases(content);
-		SelectQuestionCores selectQuestionCores = SelectQuestionCores.of(QuestionType.SUSI,
-			QuestionCategory.ADMISSION_GUIDELINE, content, contentToken);
+		SelectQuestionCores selectQuestionCores = SelectQuestionCores.of(AdmissionType.SUSI,
+			AdmissionCategory.ADMISSION_GUIDELINE, content, contentToken);
 
 		when(questionRepository.searchQuestions(eq(selectQuestionCores)))
 			.thenReturn(Optional.of(List.of(QuestionCore.of(1L, contentToken))));
@@ -109,8 +109,8 @@ class QuestionProcessingServiceTest extends MockTest {
 	void 질문_없을_때_새로운_질문_요청() {
 		// given
 		String content = "새로운 질문입니다.";
-		SelectQuestionCores selectQuestionCores = SelectQuestionCores.of(QuestionType.SUSI,
-			QuestionCategory.ADMISSION_GUIDELINE, content, content);
+		SelectQuestionCores selectQuestionCores = SelectQuestionCores.of(AdmissionType.SUSI,
+			AdmissionCategory.ADMISSION_GUIDELINE, content, content);
 		String contentToken = PhraseExtractionUtils.extractPhrases(content);
 
 		when(questionRepository.searchQuestions(eq(selectQuestionCores)))
@@ -142,8 +142,8 @@ class QuestionProcessingServiceTest extends MockTest {
 	void 질문_검색_서버_내부_오류_빈배열_반환() {
 		// given
 		String contentToken = "서버 오류 테스트";
-		SelectQuestionCores selectQuestionCores = SelectQuestionCores.of(QuestionType.SUSI,
-			QuestionCategory.ADMISSION_GUIDELINE, contentToken, contentToken);
+		SelectQuestionCores selectQuestionCores = SelectQuestionCores.of(AdmissionType.SUSI,
+			AdmissionCategory.ADMISSION_GUIDELINE, contentToken, contentToken);
 		List<QuestionCore> questionCores = List.of();
 
 		when(questionRepository.searchQuestions(eq(selectQuestionCores)))
@@ -161,8 +161,8 @@ class QuestionProcessingServiceTest extends MockTest {
 	@Test
 	void MOCK_LLM_질문_요청() {
 		// given
-		LLMAskQuestionRequest request = LLMAskQuestionRequest.of(QuestionType.SUSI.getType(),
-			QuestionCategory.ADMISSION_GUIDELINE.getCategory(), question.getContent());
+		LLMAskQuestionRequest request = LLMAskQuestionRequest.of(AdmissionType.SUSI.getType(),
+			AdmissionCategory.ADMISSION_GUIDELINE.getCategory(), question.getContent());
 
 		// when
 		LLMAnswerResponse result = mockAskQuestion(request);
@@ -177,7 +177,7 @@ class QuestionProcessingServiceTest extends MockTest {
 	}
 
 	private LLMAnswerResponse createExpectedLLMAnswerResponse() {
-		return LLMAnswerResponse.of(QuestionType.SUSI.getType(), QuestionCategory.ADMISSION_GUIDELINE.getCategory(),
+		return LLMAnswerResponse.of(AdmissionType.SUSI.getType(), AdmissionCategory.ADMISSION_GUIDELINE.getCategory(),
 			Answer.of(question, "새로운 답변입니다."),
 			List.of(AnswerReferenceResponse.of("테스트 title", "테스트 link")));
 	}

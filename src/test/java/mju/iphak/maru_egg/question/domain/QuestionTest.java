@@ -7,13 +7,16 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import mju.iphak.maru_egg.admission.domain.AdmissionCategory;
+import mju.iphak.maru_egg.admission.domain.AdmissionType;
+
 class QuestionTest {
 
 	private Question question;
 
 	@BeforeEach
 	void setUp() {
-		question = Question.of("질문입니다.", "질문", QuestionType.SUSI, QuestionCategory.ADMISSION_GUIDELINE);
+		question = Question.of("질문입니다.", "질문", AdmissionType.SUSI, AdmissionCategory.ADMISSION_GUIDELINE);
 	}
 
 	@DisplayName("질문이 확인 되었을 때 상태 변화 성공한 경우")

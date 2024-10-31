@@ -19,6 +19,8 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import mju.iphak.maru_egg.admission.domain.AdmissionCategory;
+import mju.iphak.maru_egg.admission.domain.AdmissionType;
 import mju.iphak.maru_egg.answer.domain.Answer;
 import mju.iphak.maru_egg.answer.repository.AnswerRepository;
 import mju.iphak.maru_egg.common.RepositoryTest;
@@ -28,8 +30,6 @@ import mju.iphak.maru_egg.question.dao.request.SelectQuestions;
 import mju.iphak.maru_egg.question.dao.response.QuestionCore;
 import mju.iphak.maru_egg.question.domain.QQuestion;
 import mju.iphak.maru_egg.question.domain.Question;
-import mju.iphak.maru_egg.question.domain.QuestionCategory;
-import mju.iphak.maru_egg.question.domain.QuestionType;
 import mju.iphak.maru_egg.question.dto.response.SearchedQuestionsResponse;
 
 class QuestionRepositoryImplTest extends RepositoryTest {
@@ -68,36 +68,36 @@ class QuestionRepositoryImplTest extends RepositoryTest {
 
 		// 데이터 삽입
 		jdbcTemplate.update(
-			"INSERT INTO questions (id, content, content_token, question_type, question_category, view_count) VALUES (?, ?, ?, ?, ?, ?)",
-			1L, "수시 입학 요강에 대해 알려주세요.", "수시 입학 요강 대해", QuestionType.SUSI.name(),
-			QuestionCategory.ADMISSION_GUIDELINE.name(), 0);
+			"INSERT INTO questions (id, content, content_token, admission_type, admission_category, view_count) VALUES (?, ?, ?, ?, ?, ?)",
+			1L, "수시 입학 요강에 대해 알려주세요.", "수시 입학 요강 대해", AdmissionType.SUSI.name(),
+			AdmissionCategory.ADMISSION_GUIDELINE.name(), 0);
 		jdbcTemplate.update(
-			"INSERT INTO questions (id, content, content_token, question_type, question_category, view_count) VALUES (?, ?, ?, ?, ?, ?)",
-			2L, "수시 시험 일정 알려줘", "수시 시험 일정", QuestionType.SUSI.name(), QuestionCategory.ADMISSION_GUIDELINE.name(), 0);
+			"INSERT INTO questions (id, content, content_token, admission_type, admission_category, view_count) VALUES (?, ?, ?, ?, ?, ?)",
+			2L, "수시 시험 일정 알려줘", "수시 시험 일정", AdmissionType.SUSI.name(), AdmissionCategory.ADMISSION_GUIDELINE.name(), 0);
 		jdbcTemplate.update(
-			"INSERT INTO questions (id, content, content_token, question_type, question_category, view_count) VALUES (?, ?, ?, ?, ?, ?)",
-			3L, "수시 시기 알려줘", "수시 시기", QuestionType.SUSI.name(), QuestionCategory.ADMISSION_GUIDELINE.name(), 0);
+			"INSERT INTO questions (id, content, content_token, admission_type, admission_category, view_count) VALUES (?, ?, ?, ?, ?, ?)",
+			3L, "수시 시기 알려줘", "수시 시기", AdmissionType.SUSI.name(), AdmissionCategory.ADMISSION_GUIDELINE.name(), 0);
 		jdbcTemplate.update(
-			"INSERT INTO questions (id, content, content_token, question_type, question_category, view_count) VALUES (?, ?, ?, ?, ?, ?)",
-			4L, "수시 면접 일정 알려줘", "수시 면접 일정", QuestionType.SUSI.name(), QuestionCategory.ADMISSION_GUIDELINE.name(), 0);
+			"INSERT INTO questions (id, content, content_token, admission_type, admission_category, view_count) VALUES (?, ?, ?, ?, ?, ?)",
+			4L, "수시 면접 일정 알려줘", "수시 면접 일정", AdmissionType.SUSI.name(), AdmissionCategory.ADMISSION_GUIDELINE.name(), 0);
 		jdbcTemplate.update(
-			"INSERT INTO questions (id, content, content_token, question_type, question_category, view_count) VALUES (?, ?, ?, ?, ?, ?)",
-			5L, "수시", "수시", QuestionType.SUSI.name(), QuestionCategory.ADMISSION_GUIDELINE.name(), 0);
+			"INSERT INTO questions (id, content, content_token, admission_type, admission_category, view_count) VALUES (?, ?, ?, ?, ?, ?)",
+			5L, "수시", "수시", AdmissionType.SUSI.name(), AdmissionCategory.ADMISSION_GUIDELINE.name(), 0);
 		jdbcTemplate.update(
-			"INSERT INTO questions (id, content, content_token, question_type, question_category, view_count) VALUES (?, ?, ?, ?, ?, ?)",
-			6L, "2024 정시 입학 요강에 대해 알려주세요.", "정시 입학 요강 대해", QuestionType.SUSI.name(),
-			QuestionCategory.ADMISSION_GUIDELINE.name(), 0);
+			"INSERT INTO questions (id, content, content_token, admission_type, admission_category, view_count) VALUES (?, ?, ?, ?, ?, ?)",
+			6L, "2024 정시 입학 요강에 대해 알려주세요.", "정시 입학 요강 대해", AdmissionType.SUSI.name(),
+			AdmissionCategory.ADMISSION_GUIDELINE.name(), 0);
 		jdbcTemplate.update(
-			"INSERT INTO questions (id, content, content_token, question_type, question_category, view_count) VALUES (?, ?, ?, ?, ?, ?)",
-			7L, "시기 알려줘", "시기", QuestionType.SUSI.name(), QuestionCategory.ADMISSION_GUIDELINE.name(), 0);
+			"INSERT INTO questions (id, content, content_token, admission_type, admission_category, view_count) VALUES (?, ?, ?, ?, ?, ?)",
+			7L, "시기 알려줘", "시기", AdmissionType.SUSI.name(), AdmissionCategory.ADMISSION_GUIDELINE.name(), 0);
 		jdbcTemplate.update(
-			"INSERT INTO questions (id, content, content_token, question_type, question_category, view_count) VALUES (?, ?, ?, ?, ?, ?)",
-			8L, "2024 장시 입학 요강에 대해 알려주세요.", "장시 입학 요강 대해", QuestionType.SUSI.name(),
-			QuestionCategory.ADMISSION_GUIDELINE.name(), 0);
+			"INSERT INTO questions (id, content, content_token, admission_type, admission_category, view_count) VALUES (?, ?, ?, ?, ?, ?)",
+			8L, "2024 장시 입학 요강에 대해 알려주세요.", "장시 입학 요강 대해", AdmissionType.SUSI.name(),
+			AdmissionCategory.ADMISSION_GUIDELINE.name(), 0);
 		jdbcTemplate.update(
-			"INSERT INTO questions (id, content, content_token, question_type, question_category, view_count) VALUES (?, ?, ?, ?, ?, ?)",
-			9L, "2024 수시 입학 요강에 대해 알려주세요.", "2024 수시 입학 요강 대해", QuestionType.SUSI.name(),
-			QuestionCategory.ADMISSION_GUIDELINE.name(), 0);
+			"INSERT INTO questions (id, content, content_token, admission_type, admission_category, view_count) VALUES (?, ?, ?, ?, ?, ?)",
+			9L, "2024 수시 입학 요강에 대해 알려주세요.", "2024 수시 입학 요강 대해", AdmissionType.SUSI.name(),
+			AdmissionCategory.ADMISSION_GUIDELINE.name(), 0);
 
 		question = questionRepository.findById(1L).orElseThrow();
 
@@ -110,12 +110,12 @@ class QuestionRepositoryImplTest extends RepositoryTest {
 		// given
 		QQuestion question = QQuestion.question;
 		String contentToken = "수시 입학 요강 대해";
-		QuestionType type = QuestionType.SUSI;
+		AdmissionType type = AdmissionType.SUSI;
 		NumberTemplate<Double> numberTemplate = createBooleanTemplateByContentToken(question, contentToken);
 
 		// when
 		List<Question> results = queryFactory.selectFrom(question)
-			.where(numberTemplate.gt(0.0).or(numberTemplate.eq(0.0)).and(question.questionType.eq(type)))
+			.where(numberTemplate.gt(0.0).or(numberTemplate.eq(0.0)).and(question.admissionType.eq(type)))
 			.fetch();
 
 		// then
@@ -128,7 +128,7 @@ class QuestionRepositoryImplTest extends RepositoryTest {
 	void contentToken_type으로_질문_검색_실패() {
 		// given
 		String invalidContentToken = "잘못된 질문";
-		SelectQuestionCores selectQuestionCores = SelectQuestionCores.of(QuestionType.SUSI, null, invalidContentToken,
+		SelectQuestionCores selectQuestionCores = SelectQuestionCores.of(AdmissionType.SUSI, null, invalidContentToken,
 			invalidContentToken);
 
 		// when
@@ -145,8 +145,8 @@ class QuestionRepositoryImplTest extends RepositoryTest {
 		// given
 		QQuestion question = QQuestion.question;
 		String contentToken = "수시 입학 요강 대해";
-		QuestionType type = QuestionType.SUSI;
-		QuestionCategory category = QuestionCategory.ADMISSION_GUIDELINE;
+		AdmissionType type = AdmissionType.SUSI;
+		AdmissionCategory category = AdmissionCategory.ADMISSION_GUIDELINE;
 		NumberTemplate<Double> numberTemplate = createBooleanTemplateByContentToken(question, contentToken);
 
 		// when
@@ -154,8 +154,8 @@ class QuestionRepositoryImplTest extends RepositoryTest {
 			.from(question)
 			.where(numberTemplate.gt(0.0)
 				.or(numberTemplate.eq(0.0))
-				.and(question.questionType.eq(type))
-				.and(question.questionCategory.eq(category)))
+				.and(question.admissionType.eq(type))
+				.and(question.admissionCategory.eq(category)))
 			.fetch();
 
 		// then
@@ -167,8 +167,8 @@ class QuestionRepositoryImplTest extends RepositoryTest {
 	void contentToken_type_Category로_질문_검색_실패() {
 		// given
 		String invalidContentToken = "잘못된 질문";
-		SelectQuestionCores selectQuestionCores = SelectQuestionCores.of(QuestionType.SUSI,
-			QuestionCategory.ADMISSION_GUIDELINE, invalidContentToken,
+		SelectQuestionCores selectQuestionCores = SelectQuestionCores.of(AdmissionType.SUSI,
+			AdmissionCategory.ADMISSION_GUIDELINE, invalidContentToken,
 			invalidContentToken);
 
 		// when
@@ -185,7 +185,7 @@ class QuestionRepositoryImplTest extends RepositoryTest {
 		// given
 		String content = "존재하지 않는 질문";
 		Pageable pageable = PageRequest.of(0, 3);
-		SelectQuestions selectQuestions = SelectQuestions.of(QuestionType.SUSI, QuestionCategory.ADMISSION_GUIDELINE,
+		SelectQuestions selectQuestions = SelectQuestions.of(AdmissionType.SUSI, AdmissionCategory.ADMISSION_GUIDELINE,
 			content, null, null, pageable);
 
 		// when
@@ -200,12 +200,12 @@ class QuestionRepositoryImplTest extends RepositoryTest {
 	void contentToken_type() {
 		QQuestion question = QQuestion.question;
 		String contentToken = "수시 입학 요강 대해";
-		QuestionType type = QuestionType.SUSI;
+		AdmissionType type = AdmissionType.SUSI;
 		NumberTemplate<Double> numberTemplate = createBooleanTemplateByContentToken(question, contentToken);
 
 		List<String> results = queryFactory.select(question.contentToken)
 			.from(question)
-			.where(numberTemplate.gt(0.0).or(numberTemplate.eq(0.0)).and(question.questionType.eq(type)))
+			.where(numberTemplate.gt(0.0).or(numberTemplate.eq(0.0)).and(question.admissionType.eq(type)))
 			.fetch();
 
 		assertThat(results).isNotEmpty();

@@ -4,13 +4,13 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import mju.iphak.maru_egg.admission.domain.AdmissionCategory;
+import mju.iphak.maru_egg.admission.domain.AdmissionType;
 import mju.iphak.maru_egg.question.domain.Question;
-import mju.iphak.maru_egg.question.domain.QuestionCategory;
-import mju.iphak.maru_egg.question.domain.QuestionType;
 
 public interface QuestionRepository extends JpaRepository<Question, Long>, QuestionRepositoryCustom {
-	List<Question> findAllByQuestionTypeAndQuestionCategoryOrderByViewCountDesc(QuestionType type,
-		QuestionCategory category);
+	List<Question> findAllByAdmissionTypeAndAdmissionCategoryOrderByViewCountDesc(AdmissionType type,
+		AdmissionCategory category);
 
-	List<Question> findAllByQuestionTypeOrderByViewCountDesc(QuestionType type);
+	List<Question> findAllByAdmissionTypeOrderByViewCountDesc(AdmissionType type);
 }

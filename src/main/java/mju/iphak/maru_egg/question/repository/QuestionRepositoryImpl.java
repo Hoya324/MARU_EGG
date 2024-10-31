@@ -19,13 +19,13 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import mju.iphak.maru_egg.admission.domain.AdmissionCategory;
+import mju.iphak.maru_egg.admission.domain.AdmissionType;
 import mju.iphak.maru_egg.common.dto.pagination.SliceQuestionResponse;
 import mju.iphak.maru_egg.question.dao.request.SelectQuestionCores;
 import mju.iphak.maru_egg.question.dao.request.SelectQuestions;
 import mju.iphak.maru_egg.question.dao.response.QuestionCore;
 import mju.iphak.maru_egg.question.domain.Question;
-import mju.iphak.maru_egg.question.domain.QuestionCategory;
-import mju.iphak.maru_egg.question.domain.QuestionType;
 import mju.iphak.maru_egg.question.dto.response.SearchedQuestionsResponse;
 
 @Repository
@@ -66,7 +66,7 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
 	}
 
 	private SliceQuestionResponse<SearchedQuestionsResponse> searchQuestionsOfCursorPagingByContentWithFullTextSearch(
-		final QuestionType type, final QuestionCategory category, final String content,
+		final AdmissionType type, final AdmissionCategory category, final String content,
 		final Integer cursorViewCount, final Long questionId, final Pageable pageable) {
 
 		int pageSize = pageable.getPageSize();
@@ -82,7 +82,7 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
 	}
 
 	private SliceQuestionResponse<SearchedQuestionsResponse> searchQuestionsOfCursorPagingByContentWithLikeFunction(
-		final QuestionType type, final QuestionCategory category, final String content, final Pageable pageable) {
+		final AdmissionType type, final AdmissionCategory category, final String content, final Pageable pageable) {
 
 		int pageSize = pageable.getPageSize();
 
@@ -96,7 +96,7 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
 	}
 
 	private Optional<List<QuestionCore>> searchQuestionsByContentTokenAndType(
-		final String content, final String contentToken, final QuestionType type, final QuestionCategory category) {
+		final String content, final String contentToken, final AdmissionType type, final AdmissionCategory category) {
 
 		NumberTemplate<Double> booleanTemplate = createBooleanTemplateByContent(content);
 
@@ -115,14 +115,14 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
 	}
 
 	private List<Tuple> fetchQuestionsByContentAndTypeAndCategory(
-		NumberTemplate<Double> booleanTemplate, QuestionType type, QuestionCategory category) {
+		NumberTemplate<Double> booleanTemplate, AdmissionType type, AdmissionCategory category) {
 
 		BooleanBuilder whereClause = new BooleanBuilder();
 		whereClause.and(booleanTemplate.gt(0));
-		whereClause.and(question.questionType.eq(type));
+		whereClause.and(question.admissionType.eq(type));
 
 		if (category != null) {
-			whereClause.and(question.questionCategory.eq(category));
+			whereClause.and(question.admissionCategory.eq(category));
 		}
 
 		return queryFactory.select(question.id, question.contentToken)
@@ -160,7 +160,7 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
 	}
 
 	private List<Question> fetchQuestions(
-		final QuestionType type, final QuestionCategory category,
+		final AdmissionType type, final AdmissionCategory category,
 		NumberTemplate<Double> booleanTemplate, BooleanExpression cursorPredicate, int pageSize) {
 
 		BooleanBuilder whereClause = new BooleanBuilder();
@@ -171,11 +171,11 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
 		}
 
 		if (type != null) {
-			whereClause.and(question.questionType.eq(type));
+			whereClause.and(question.admissionType.eq(type));
 		}
 
 		if (category != null) {
-			whereClause.and(question.questionCategory.eq(category));
+			whereClause.and(question.admissionCategory.eq(category));
 		}
 
 		return queryFactory.selectFrom(question)
@@ -185,17 +185,17 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
 			.fetch();
 	}
 
-	private BooleanBuilder buildWhereClause(final QuestionType type, final QuestionCategory category,
+	private BooleanBuilder buildWhereClause(final AdmissionType type, final AdmissionCategory category,
 		final String content) {
 		BooleanBuilder whereClause = new BooleanBuilder();
 		if (content != null && !content.isEmpty()) {
 			whereClause.and(question.content.contains(content));
 		}
 		if (type != null) {
-			whereClause.and(question.questionType.eq(type));
+			whereClause.and(question.admissionType.eq(type));
 		}
 		if (category != null) {
-			whereClause.and(question.questionCategory.eq(category));
+			whereClause.and(question.admissionCategory.eq(category));
 		}
 		return whereClause;
 	}
