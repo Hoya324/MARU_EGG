@@ -27,6 +27,7 @@ public enum ErrorCode {
 	NOT_FOUND_USER(NOT_FOUND, "유저 이메일이 %s인 유저를 찾을 수 없습니다."),
 	NOT_FOUND_WEBCLIENT(NOT_FOUND, "%s에서 값을 불러오지 못 했습니다."),
 	NOT_FOUND_QUESTION_TYPE_STATUS(NOT_FOUND, "질문 타입이 %s인 질문 상태를 찾을 수 없습니다."),
+	NOT_FOUND_QUESTION_TYPE_DETAILS(NOT_FOUND, "id가 %s인 질문 타입 상세를 찾을 수 없습니다."),
 
 	// 500 error
 	INTERNAL_ERROR_SIMILARITY(INTERNAL_SERVER_ERROR, "contentToken: %s, question: %s인 질문의 유사도를 검사하는 도중 오류가 발생했습니다."),
