@@ -6,10 +6,10 @@ import mju.iphak.maru_egg.admission.domain.AdmissionType;
 
 @Builder
 public record AdmissionTypeStatusResponse(
-	@Schema(description = "질문 타입(수시, 정시, 편입학)", allowableValues = {"SUSI", "JEONGSI", "PYEONIP"})
+	@Schema(description = "입학 전형(수시, 정시, 편입학)", allowableValues = {"SUSI", "JEONGSI", "PYEONIP"})
 	AdmissionType type,
 
-	@Schema(description = "활성화된 질문타입 (true면 활성화, false면 비활성화)", example = "true")
+	@Schema(description = "활성화된 입학 전형 (true면 활성화, false면 비활성화)", example = "true")
 	boolean isActivated
 ) {
 	public static AdmissionTypeStatusResponse of(AdmissionType type, boolean isActivated) {

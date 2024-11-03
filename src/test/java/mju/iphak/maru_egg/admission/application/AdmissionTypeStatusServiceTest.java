@@ -36,7 +36,7 @@ class AdmissionTypeStatusServiceTest extends MockTest {
 		MockitoAnnotations.openMocks(this);
 	}
 
-	@DisplayName("질문 타입 상태 초기화 성공")
+	@DisplayName("입학 전형 상태 초기화 성공")
 	@Test
 	void initializeAdmissionTypeStatus_Success() {
 		// given
@@ -50,7 +50,7 @@ class AdmissionTypeStatusServiceTest extends MockTest {
 		verify(admissionTypeStatusRepository, times(1)).saveAll(any());
 	}
 
-	@DisplayName("질문 타입 상태 업데이트 성공")
+	@DisplayName("입학 전형 상태 업데이트 성공")
 	@Test
 	void updateStatus_Success() {
 		// given
@@ -66,7 +66,7 @@ class AdmissionTypeStatusServiceTest extends MockTest {
 		assertThat(status.isActivated()).isFalse();
 	}
 
-	@DisplayName("질문 타입 상태 업데이트 실패 - 타입 상태 없음")
+	@DisplayName("입학 전형 상태 업데이트 실패 - 타입 상태 없음")
 	@Test
 	void updateStatus_Failure_EntityNotFound() {
 		// given
@@ -79,7 +79,7 @@ class AdmissionTypeStatusServiceTest extends MockTest {
 		assertThat(exception.getMessage()).isEqualTo(String.format(NOT_FOUND_ADMISSION_TYPE_STATUS.getMessage(), type));
 	}
 
-	@DisplayName("질문 타입 상태 목록 조회 성공")
+	@DisplayName("입학 전형 상태 목록 조회 성공")
 	@Test
 	void getAdmissionTypeStatus_Success() {
 		// given
@@ -99,7 +99,7 @@ class AdmissionTypeStatusServiceTest extends MockTest {
 		assertThat(result.get(1).isActivated()).isFalse();
 	}
 
-	@DisplayName("질문 타입 상태 삭제 성공")
+	@DisplayName("입학 전형 상태 삭제 성공")
 	@Test
 	void deleteAdmissionTypeStatus_Success() {
 		// given

@@ -11,11 +11,11 @@ import mju.iphak.maru_egg.admission.domain.AdmissionType;
 @ParameterObject
 public record FindQuestionsRequest(
 
-	@Schema(description = "질문 타입(수시, 정시, 편입학)", allowableValues = {"SUSI", "JEONGSI", "PYEONIP"})
-	@NotNull(message = "질문 타입은 비어있을 수 없습니다.")
+	@Schema(description = "입학 전형 타입(수시, 정시, 편입학)", allowableValues = {"SUSI", "JEONGSI", "PYEONIP"})
+	@NotNull(message = "입학 전형 타입은 비어있을 수 없습니다.")
 	AdmissionType type,
 
-	@Schema(description = "질문 카테고리(모집요강, 입시결과, 기출 문제)", allowableValues = {"ADMISSION_GUIDELINE", "PASSING_RESULT",
+	@Schema(description = "입학 전형 카테고리(모집요강, 입시결과, 기출 문제)", allowableValues = {"ADMISSION_GUIDELINE", "PASSING_RESULT",
 		"PAST_QUESTIONS", "INTERVIEW_PRACTICAL_TEST"})
 	AdmissionCategory category
 ) {

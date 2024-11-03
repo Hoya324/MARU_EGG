@@ -53,9 +53,9 @@ class AdminAdmissionTypeStatusControllerTest extends IntegrationTest {
 		resultActions.andExpect(status().isOk());
 	}
 
-	@DisplayName("404 질문타입 상태 변경")
+	@DisplayName("404 입학 전형 상태 변경")
 	@Test
-	public void 질문타입_상태_변경_API_존재하지_않는_질문_타입() throws Exception {
+	public void 입학_전형_상태_변경_API_존재하지_않는_질문_타입() throws Exception {
 		// given
 		UpdateAdmissionTypeStatusRequest request = new UpdateAdmissionTypeStatusRequest(AdmissionType.JEONGSI);
 

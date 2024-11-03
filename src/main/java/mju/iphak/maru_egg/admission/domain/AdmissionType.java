@@ -6,7 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-@Schema(description = "질문 타입", enumAsRef = true)
+@Schema(description = "입학 전형", enumAsRef = true)
 @Getter
 @RequiredArgsConstructor
 public enum AdmissionType {

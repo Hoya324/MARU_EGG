@@ -10,10 +10,10 @@ import mju.iphak.maru_egg.answer.domain.Answer;
 
 public record LLMAnswerResponse(
 
-	@Schema(description = "질문 타입(수시, 정시, 편입학)", allowableValues = {"SUSI", "JEONGSI", "PYEONIP"})
+	@Schema(description = "입학 전형 타입(수시, 정시, 편입학)", allowableValues = {"SUSI", "JEONGSI", "PYEONIP"})
 	String questionType,
 
-	@Schema(description = "질문 내용", allowableValues = {"ADMISSION_GUIDELINE", "PASSING_RESULT",
+	@Schema(description = "입학 전형 카테고리", allowableValues = {"ADMISSION_GUIDELINE", "PASSING_RESULT",
 		"PAST_QUESTIONS", "INTERVIEW_PRACTICAL_TEST"})
 	String questionCategory,
 

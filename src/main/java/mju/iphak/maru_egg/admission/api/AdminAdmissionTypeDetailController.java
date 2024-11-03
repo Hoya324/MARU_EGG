@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import mju.iphak.maru_egg.admission.api.swagger.AdminAdmissionTypeDetailControllerDocs;
 import mju.iphak.maru_egg.admission.application.AdmissionTypeDetailService;
 import mju.iphak.maru_egg.admission.dto.request.CreateAdmissionTypeDetailRequest;
+import mju.iphak.maru_egg.admission.dto.request.UpdateAdmissionTypeDetailRequest;
 
 @RestController
 @RequestMapping("/api/admin/admissions")
@@ -26,8 +27,9 @@ public class AdminAdmissionTypeDetailController implements AdminAdmissionTypeDet
 	}
 
 	@PutMapping("/{id}")
-	public void update(@PathVariable("id") Long admissionTypeDetailId, @RequestBody String name) {
-		admissionTypeDetailService.update(admissionTypeDetailId, name);
+	public void update(@PathVariable("id") Long admissionTypeDetailId,
+		@RequestBody UpdateAdmissionTypeDetailRequest request) {
+		admissionTypeDetailService.update(admissionTypeDetailId, request.name());
 	}
 
 	@DeleteMapping("/{id}")
