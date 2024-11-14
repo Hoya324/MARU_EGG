@@ -16,6 +16,7 @@ import mju.iphak.maru_egg.admission.application.AdmissionTypeDetailService;
 import mju.iphak.maru_egg.admission.application.AdmissionTypeStatusService;
 import mju.iphak.maru_egg.admission.domain.AdmissionType;
 import mju.iphak.maru_egg.admission.dto.request.CreateAdmissionTypeDetailRequest;
+import mju.iphak.maru_egg.admission.dto.request.UpdateAdmissionTypeDetailRequest;
 import mju.iphak.maru_egg.common.IntegrationTest;
 
 @WithMockUser(roles = "ADMIN")
@@ -55,12 +56,14 @@ class AdminAdmissionTypeDetailControllerTest extends IntegrationTest {
 	void updateAdmissionTypeDetail() throws Exception {
 		// given
 		Long admissionTypeDetailId = admissionTypeDetailService.findAll().get(0).id();
-		String updatedName = "Updated Detail Name";
+		String updatedName = "UpdatedName";
+		UpdateAdmissionTypeDetailRequest updateAdmissionTypeDetailRequest = new UpdateAdmissionTypeDetailRequest(
+			updatedName);
 
 		// when
 		ResultActions result = mvc.perform(put("/api/admin/admissions/{id}", admissionTypeDetailId)
 				.contentType(MediaType.APPLICATION_JSON)
-				.content(updatedName))
+				.content(objectMapper.writeValueAsString(updateAdmissionTypeDetailRequest)))
 			.andDo(print());
 
 		// then
