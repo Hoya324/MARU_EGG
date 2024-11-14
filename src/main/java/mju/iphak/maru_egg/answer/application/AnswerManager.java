@@ -11,6 +11,8 @@ import org.springframework.transaction.annotation.Transactional;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import mju.iphak.maru_egg.admission.domain.AdmissionCategory;
+import mju.iphak.maru_egg.admission.domain.AdmissionType;
 import mju.iphak.maru_egg.answer.domain.Answer;
 import mju.iphak.maru_egg.answer.domain.AnswerReference;
 import mju.iphak.maru_egg.answer.dto.request.CreateAnswerRequest;
@@ -20,8 +22,6 @@ import mju.iphak.maru_egg.answer.dto.response.AnswerResponse;
 import mju.iphak.maru_egg.answer.dto.response.LLMAnswerResponse;
 import mju.iphak.maru_egg.answer.repository.AnswerReferenceRepository;
 import mju.iphak.maru_egg.answer.repository.AnswerRepository;
-import mju.iphak.maru_egg.admission.domain.AdmissionCategory;
-import mju.iphak.maru_egg.admission.domain.AdmissionType;
 import mju.iphak.maru_egg.question.domain.Question;
 import mju.iphak.maru_egg.question.dto.response.QuestionResponse;
 import mju.iphak.maru_egg.question.repository.QuestionRepository;
@@ -33,7 +33,8 @@ import mju.iphak.maru_egg.question.repository.QuestionRepository;
 public class AnswerManager {
 
 	private static final String INVALID_ANSWER_ONE = "해당 내용에 대한 정보는 존재하지 않습니다.";
-	private static final String INVALID_ANSWER_TWO = "제공된 정보 내에서 답변할 수 없습니다.";
+	private static final String INVALID_ANSWER_TWO = "제공된 정보 내에서";
+	private static final String INVALID_ANSWER_THREE = "구체적인 정보를 찾을 수 없습니다.";
 	private static final String BASE_MESSAGE = "질문해주신 내용에 대한 적절한 정보을 발견하지 못 했습니다.\n\n대신 질문해주신 내용에 가장 적합한 자료들을 골라봤어요. 참고하셔서 다시 질문해주세요!\n\n\n\n";
 	private static final String REFERENCE_TEXT_AND_LINK = "**참고자료 %d** : [%s **[바로가기]**](%s)\n\n";
 	private static final String IPHAK_OFFICE_NUMBER_GUIDE = "\n\n입학처 상담 전화번호 : 02-300-1799, 1800";
@@ -106,7 +107,8 @@ public class AnswerManager {
 
 	private boolean isInvalidAnswer(LLMAnswerResponse llmAnswerResponse) {
 		return llmAnswerResponse.answer() == null || llmAnswerResponse.answer().contains(INVALID_ANSWER_ONE)
-			|| llmAnswerResponse.answer().contains(INVALID_ANSWER_TWO);
+			|| llmAnswerResponse.answer().contains(INVALID_ANSWER_TWO)
+			|| llmAnswerResponse.answer().contains(INVALID_ANSWER_THREE);
 	}
 
 	private Question saveQuestion(AdmissionType type, AdmissionCategory category, String content, String contentToken) {
