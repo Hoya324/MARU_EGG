@@ -10,8 +10,6 @@ import lombok.RequiredArgsConstructor;
 import mju.iphak.maru_egg.admission.api.swagger.AdmissionTypeStatusControllerDocs;
 import mju.iphak.maru_egg.admission.application.AdmissionTypeStatusService;
 import mju.iphak.maru_egg.admission.dto.response.AdmissionTypeStatusResponse;
-import mju.iphak.maru_egg.common.meta.CustomApiResponse;
-import mju.iphak.maru_egg.common.meta.CustomApiResponses;
 
 @RequiredArgsConstructor
 @RestController
@@ -20,9 +18,6 @@ public class AdmissionTypeStatusController implements AdmissionTypeStatusControl
 
 	private final AdmissionTypeStatusService admissionTypeStatusService;
 
-	@CustomApiResponses({
-		@CustomApiResponse(error = "InternalServerError", status = 500, message = "내부 서버 오류가 발생했습니다.", description = "내부 서버 오류")
-	})
 	@GetMapping()
 	public List<AdmissionTypeStatusResponse> getQuestionTypeStatus() {
 		return admissionTypeStatusService.getAdmissionTypeStatus();
