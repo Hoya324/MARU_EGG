@@ -131,7 +131,7 @@
 
 ## 프로젝트를 진행하면서 공유한 글
 
-- [프로젝트 & DB | 텍스트 유사도 검색 어떻게 구현할까?(1) - Elasticsearch를 안 쓴 이유와 MySQL Full Text Index](https://hoya324.tistory.com/56)
-- [프로젝트 | 텍스트 유사도 검색 어떻게 구현할까?(2) - Cosine Similarity과 TF-IDF](https://hoya324.tistory.com/57)
+- [프로젝트 & DB | MySQL의 Full Text Index와 TF-IDF, Cosine Similarity로 DB 내 유사한 Text 추출하기(without Elasticsearch)](https://hoya324.tistory.com/56)
+- [프로젝트 & BDP | Java(Spring)에서 TF-IDF와 Cosine Similarity를 활용한 문장간 유사도 측정 방법](https://hoya324.tistory.com/57)
 - [Java & Spring | Swagger 커스텀 ApiResponse 어노테이션 사용기](https://hoya324.tistory.com/58)
 - [Spring, BE | Apache Tomcat 바로 알기 + 웹서버(Nginx와 Apache 비교)를 두는 이유](https://hoya324.tistory.com/60)
