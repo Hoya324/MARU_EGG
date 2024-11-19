@@ -1,4 +1,4 @@
-package mju.iphak.maru_egg.question.api.admin;
+package mju.iphak.maru_egg.question.api;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;

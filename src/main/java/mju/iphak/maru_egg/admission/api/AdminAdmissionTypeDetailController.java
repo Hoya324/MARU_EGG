@@ -1,4 +1,4 @@
-package mju.iphak.maru_egg.admission.api.admin;
+package mju.iphak.maru_egg.admission.api;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
