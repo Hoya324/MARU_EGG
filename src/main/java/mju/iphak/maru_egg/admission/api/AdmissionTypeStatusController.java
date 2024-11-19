@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
 import mju.iphak.maru_egg.admission.api.swagger.AdmissionTypeStatusControllerDocs;
-import mju.iphak.maru_egg.admission.application.AdmissionTypeStatusService;
+import mju.iphak.maru_egg.admission.application.status.find.FindAllAdmissionTypeStatus;
 import mju.iphak.maru_egg.admission.dto.response.AdmissionTypeStatusResponse;
 
 @RequiredArgsConstructor
@@ -16,10 +16,10 @@ import mju.iphak.maru_egg.admission.dto.response.AdmissionTypeStatusResponse;
 @RequestMapping("/api/admissions/status")
 public class AdmissionTypeStatusController implements AdmissionTypeStatusControllerDocs {
 
-	private final AdmissionTypeStatusService admissionTypeStatusService;
+	private final FindAllAdmissionTypeStatus findAllAdmissionTypeStatus;
 
 	@GetMapping()
-	public List<AdmissionTypeStatusResponse> getQuestionTypeStatus() {
-		return admissionTypeStatusService.getAdmissionTypeStatus();
+	public List<AdmissionTypeStatusResponse> findAllAdmissionTypeStatus() {
+		return findAllAdmissionTypeStatus.invoke();
 	}
 }

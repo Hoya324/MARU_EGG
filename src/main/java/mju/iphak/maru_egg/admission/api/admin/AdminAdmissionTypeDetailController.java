@@ -1,4 +1,4 @@
-package mju.iphak.maru_egg.admission.api;
+package mju.iphak.maru_egg.admission.api.admin;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -10,7 +10,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
 import mju.iphak.maru_egg.admission.api.swagger.AdminAdmissionTypeDetailControllerDocs;
-import mju.iphak.maru_egg.admission.application.AdmissionTypeDetailService;
+import mju.iphak.maru_egg.admission.application.detail.create.CreateAdmissionTypeDetail;
+import mju.iphak.maru_egg.admission.application.detail.delete.DeleteAdmissionTypeDetail;
+import mju.iphak.maru_egg.admission.application.detail.update.UpdateAdmissionTypeDetail;
 import mju.iphak.maru_egg.admission.dto.request.CreateAdmissionTypeDetailRequest;
 import mju.iphak.maru_egg.admission.dto.request.UpdateAdmissionTypeDetailRequest;
 
@@ -19,21 +21,23 @@ import mju.iphak.maru_egg.admission.dto.request.UpdateAdmissionTypeDetailRequest
 @RequiredArgsConstructor
 public class AdminAdmissionTypeDetailController implements AdminAdmissionTypeDetailControllerDocs {
 
-	private final AdmissionTypeDetailService admissionTypeDetailService;
+	private final DeleteAdmissionTypeDetail deleteAdmissionTypeDetail;
+	private final CreateAdmissionTypeDetail createAdmissionTypeDetail;
+	private final UpdateAdmissionTypeDetail updateAdmissionTypeDetail;
 
 	@PostMapping("/detail")
 	public void create(@RequestBody CreateAdmissionTypeDetailRequest request) {
-		admissionTypeDetailService.create(request.detail(), request.type());
+		createAdmissionTypeDetail.invoke(request.detail(), request.type());
 	}
 
 	@PutMapping("/{id}")
 	public void update(@PathVariable("id") Long admissionTypeDetailId,
 		@RequestBody UpdateAdmissionTypeDetailRequest request) {
-		admissionTypeDetailService.update(admissionTypeDetailId, request.name());
+		updateAdmissionTypeDetail.invoke(admissionTypeDetailId, request.name());
 	}
 
 	@DeleteMapping("/{id}")
 	public void delete(@PathVariable("id") Long id) {
-		admissionTypeDetailService.delete(id);
+		deleteAdmissionTypeDetail.invoke(id);
 	}
 }

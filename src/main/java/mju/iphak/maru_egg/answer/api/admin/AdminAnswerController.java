@@ -1,4 +1,4 @@
-package mju.iphak.maru_egg.answer.api;
+package mju.iphak.maru_egg.answer.api.admin;
 
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;

@@ -11,23 +11,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
 
-import mju.iphak.maru_egg.admission.application.AdmissionTypeDetailService;
-import mju.iphak.maru_egg.admission.application.AdmissionTypeStatusService;
+import mju.iphak.maru_egg.admission.application.detail.create.CreateAdmissionTypeDetail;
+import mju.iphak.maru_egg.admission.application.status.init.InitAdmissionTypeStatusService;
 import mju.iphak.maru_egg.admission.domain.AdmissionType;
 import mju.iphak.maru_egg.common.IntegrationTest;
 
 class AdmissionTypeDetailControllerTest extends IntegrationTest {
 
 	@Autowired
-	private AdmissionTypeStatusService admissionTypeStatusService;
+	private CreateAdmissionTypeDetail createAdmissionTypeDetail;
 
 	@Autowired
-	private AdmissionTypeDetailService admissionTypeDetailService;
+	private InitAdmissionTypeStatusService initAdmissionTypeStatusService;
 
 	@BeforeEach
 	void setUp() {
-		admissionTypeStatusService.initializeAdmissionTypeStatus();
-		admissionTypeDetailService.create("학교장추천전형", AdmissionType.SUSI);
+		initAdmissionTypeStatusService.invoke();
+		createAdmissionTypeDetail.invoke("학교장추천전형", AdmissionType.SUSI);
 	}
 
 	@DisplayName("200 전체 질문타입 상세 조회")

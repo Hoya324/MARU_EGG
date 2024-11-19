@@ -1,4 +1,4 @@
-package mju.iphak.maru_egg.admission.api;
+package mju.iphak.maru_egg.admission.api.admin;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
@@ -12,8 +12,10 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.ResultActions;
 
-import mju.iphak.maru_egg.admission.application.AdmissionTypeDetailService;
-import mju.iphak.maru_egg.admission.application.AdmissionTypeStatusService;
+import mju.iphak.maru_egg.admission.application.detail.create.CreateAdmissionTypeDetailService;
+import mju.iphak.maru_egg.admission.application.detail.find.FindAllAdmissionTypeDetailService;
+import mju.iphak.maru_egg.admission.application.status.find.FindAdmissionTypeStatusService;
+import mju.iphak.maru_egg.admission.application.status.init.InitAdmissionTypeStatusService;
 import mju.iphak.maru_egg.admission.domain.AdmissionType;
 import mju.iphak.maru_egg.admission.dto.request.CreateAdmissionTypeDetailRequest;
 import mju.iphak.maru_egg.admission.dto.request.UpdateAdmissionTypeDetailRequest;
@@ -23,15 +25,21 @@ import mju.iphak.maru_egg.common.IntegrationTest;
 class AdminAdmissionTypeDetailControllerTest extends IntegrationTest {
 
 	@Autowired
-	private AdmissionTypeStatusService admissionTypeStatusService;
+	private FindAdmissionTypeStatusService findAdmissionTypeStatusService;
 
 	@Autowired
-	private AdmissionTypeDetailService admissionTypeDetailService;
+	private FindAllAdmissionTypeDetailService findAllAdmissionTypeDetail;
+
+	@Autowired
+	private CreateAdmissionTypeDetailService createAdmissionTypeDetail;
+
+	@Autowired
+	private InitAdmissionTypeStatusService initAdmissionTypeStatus;
 
 	@BeforeEach
 	void setUp() {
-		admissionTypeStatusService.initializeAdmissionTypeStatus();
-		admissionTypeDetailService.create("학교장추천전형", AdmissionType.SUSI);
+		initAdmissionTypeStatus.invoke();
+		createAdmissionTypeDetail.invoke("학교장추천전형", AdmissionType.SUSI);
 	}
 
 	@DisplayName("POST /api/admin/admissions/detail - 전형 유형 세부정보 생성")
@@ -55,7 +63,7 @@ class AdminAdmissionTypeDetailControllerTest extends IntegrationTest {
 	@Test
 	void updateAdmissionTypeDetail() throws Exception {
 		// given
-		Long admissionTypeDetailId = admissionTypeDetailService.findAll().get(0).id();
+		Long admissionTypeDetailId = findAllAdmissionTypeDetail.invoke().get(0).id();
 		String updatedName = "UpdatedName";
 		UpdateAdmissionTypeDetailRequest updateAdmissionTypeDetailRequest = new UpdateAdmissionTypeDetailRequest(
 			updatedName);
@@ -74,7 +82,7 @@ class AdminAdmissionTypeDetailControllerTest extends IntegrationTest {
 	@Test
 	void deleteAdmissionTypeDetail() throws Exception {
 		// given
-		Long admissionTypeDetailId = admissionTypeDetailService.findAll().get(0).id();
+		Long admissionTypeDetailId = findAllAdmissionTypeDetail.invoke().get(0).id();
 
 		// when
 		ResultActions result = mvc.perform(delete("/api/admin/admissions/" + admissionTypeDetailId)

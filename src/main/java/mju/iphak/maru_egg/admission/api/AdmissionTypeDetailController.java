@@ -9,7 +9,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
 import mju.iphak.maru_egg.admission.api.swagger.AdmissionTypeDetailControllerDocs;
-import mju.iphak.maru_egg.admission.application.AdmissionTypeDetailService;
+import mju.iphak.maru_egg.admission.application.detail.find.FindAllAdmissionTypeDetail;
+import mju.iphak.maru_egg.admission.application.detail.find.FindAllByAdmissionType;
 import mju.iphak.maru_egg.admission.domain.AdmissionType;
 import mju.iphak.maru_egg.admission.dto.response.AdmissionTypeDetailResponse;
 
@@ -18,15 +19,16 @@ import mju.iphak.maru_egg.admission.dto.response.AdmissionTypeDetailResponse;
 @RequiredArgsConstructor
 public class AdmissionTypeDetailController implements AdmissionTypeDetailControllerDocs {
 
-	private final AdmissionTypeDetailService admissionTypeDetailService;
+	private final FindAllAdmissionTypeDetail findAllAdmissionTypeDetail;
+	private final FindAllByAdmissionType findAllByAdmissionType;
 
 	@GetMapping("/details")
 	public List<AdmissionTypeDetailResponse> getAll() {
-		return admissionTypeDetailService.findAll();
+		return findAllAdmissionTypeDetail.invoke();
 	}
 
 	@GetMapping("/details/{type}")
 	public List<AdmissionTypeDetailResponse> getAllByType(@PathVariable("type") AdmissionType type) {
-		return admissionTypeDetailService.findAllByAdmissionType(type);
+		return findAllByAdmissionType.invoke(type);
 	}
 }

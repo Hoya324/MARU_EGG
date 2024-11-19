@@ -1,4 +1,4 @@
-package mju.iphak.maru_egg.admission.api;
+package mju.iphak.maru_egg.admission.api.admin;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
@@ -12,7 +12,9 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.ResultActions;
 
-import mju.iphak.maru_egg.admission.application.AdmissionTypeStatusService;
+import mju.iphak.maru_egg.admission.application.status.delete.DeleteAdmissionTypeStatusService;
+import mju.iphak.maru_egg.admission.application.status.find.FindAdmissionTypeStatusService;
+import mju.iphak.maru_egg.admission.application.status.init.InitAdmissionTypeStatusService;
 import mju.iphak.maru_egg.admission.domain.AdmissionType;
 import mju.iphak.maru_egg.admission.dto.request.UpdateAdmissionTypeStatusRequest;
 import mju.iphak.maru_egg.common.IntegrationTest;
@@ -21,12 +23,18 @@ import mju.iphak.maru_egg.common.IntegrationTest;
 class AdminAdmissionTypeStatusControllerTest extends IntegrationTest {
 
 	@Autowired
-	private AdmissionTypeStatusService admissionTypeStatusService;
+	private FindAdmissionTypeStatusService findAdmissionTypeStatusService;
+
+	@Autowired
+	private DeleteAdmissionTypeStatusService deleteAdmissionTypeStatus;
+
+	@Autowired
+	private InitAdmissionTypeStatusService initAdmissionTypeStatus;
 
 	@BeforeEach
 	void setUp() {
-		admissionTypeStatusService.initializeAdmissionTypeStatus();
-		admissionTypeStatusService.deleteAdmissionTypeStatus(AdmissionType.JEONGSI);
+		initAdmissionTypeStatus.invoke();
+		deleteAdmissionTypeStatus.invoke(AdmissionType.JEONGSI);
 	}
 
 	@DisplayName("200 질문 상태 초기화")

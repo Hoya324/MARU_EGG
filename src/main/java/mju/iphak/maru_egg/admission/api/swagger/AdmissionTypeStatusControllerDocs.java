@@ -18,5 +18,5 @@ public interface AdmissionTypeStatusControllerDocs {
 	@CustomApiResponses({
 		@CustomApiResponse(error = "InternalServerError", status = 500, message = "내부 서버 오류가 발생했습니다.", description = "내부 서버 오류")
 	})
-	List<AdmissionTypeStatusResponse> getQuestionTypeStatus();
+	List<AdmissionTypeStatusResponse> findAllAdmissionTypeStatus();
 }
