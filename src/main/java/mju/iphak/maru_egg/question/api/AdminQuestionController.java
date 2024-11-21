@@ -40,6 +40,6 @@ public class AdminQuestionController implements AdminQuestionControllerDocs {
 
 	@DeleteMapping("/{questionId}")
 	public void deleteQuestion(@PathVariable("questionId") Long id) {
-		questionService.deleteQuestion(id);
+		deleteQuestion.invoke(id);
 	}
 }
