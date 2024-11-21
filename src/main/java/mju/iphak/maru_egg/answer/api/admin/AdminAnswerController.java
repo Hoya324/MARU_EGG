@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import mju.iphak.maru_egg.answer.api.swagger.AdminAnswerControllerDocs;
-import mju.iphak.maru_egg.answer.application.AnswerManager;
+import mju.iphak.maru_egg.answer.application.update.UpdateAnswerContent;
 import mju.iphak.maru_egg.answer.dto.request.UpdateAnswerContentRequest;
 
 @RequiredArgsConstructor
@@ -16,10 +16,10 @@ import mju.iphak.maru_egg.answer.dto.request.UpdateAnswerContentRequest;
 @RequestMapping("/api/admin/answers")
 public class AdminAnswerController implements AdminAnswerControllerDocs {
 
-	private final AnswerManager answerManager;
+	private final UpdateAnswerContent updateAnswerContent;
 
 	@PutMapping()
 	public void updateAnswerContent(@Valid @RequestBody UpdateAnswerContentRequest request) {
-		answerManager.updateAnswerContent(request.id(), request.content());
+		updateAnswerContent.invoke(request.id(), request.content());
 	}
 }
