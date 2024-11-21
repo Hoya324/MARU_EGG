@@ -17,6 +17,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import mju.iphak.maru_egg.answerreference.domain.AnswerReference;
 import mju.iphak.maru_egg.common.entity.BaseEntity;
 import mju.iphak.maru_egg.question.domain.Question;
 

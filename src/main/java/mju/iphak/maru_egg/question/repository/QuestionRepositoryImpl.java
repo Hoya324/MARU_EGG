@@ -22,7 +22,7 @@ import lombok.RequiredArgsConstructor;
 import mju.iphak.maru_egg.admission.domain.AdmissionCategory;
 import mju.iphak.maru_egg.admission.domain.AdmissionType;
 import mju.iphak.maru_egg.common.dto.pagination.SliceQuestionResponse;
-import mju.iphak.maru_egg.question.dao.request.SelectQuestionCores;
+import mju.iphak.maru_egg.question.dao.request.QuestionCoreDAO;
 import mju.iphak.maru_egg.question.dao.request.SelectQuestions;
 import mju.iphak.maru_egg.question.dao.response.QuestionCore;
 import mju.iphak.maru_egg.question.domain.Question;
@@ -36,13 +36,13 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
 
 	private final JPAQueryFactory queryFactory;
 
-	public Optional<List<QuestionCore>> searchQuestions(final SelectQuestionCores selectQuestionCores) {
+	public Optional<List<QuestionCore>> searchQuestions(final QuestionCoreDAO questionCoreDAO) {
 		return Optional.of(
 			searchQuestionsByContentTokenAndType(
-				selectQuestionCores.content(),
-				selectQuestionCores.contentToken(),
-				selectQuestionCores.type(),
-				selectQuestionCores.category()
+				questionCoreDAO.content(),
+				questionCoreDAO.contentToken(),
+				questionCoreDAO.type(),
+				questionCoreDAO.category()
 			).orElse(Collections.emptyList())
 		);
 	}

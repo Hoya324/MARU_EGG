@@ -7,6 +7,7 @@ import java.util.Objects;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import mju.iphak.maru_egg.answer.domain.Answer;
+import mju.iphak.maru_egg.answerreference.dto.response.AnswerReferenceResponse;
 
 public record LLMAnswerResponse(
 

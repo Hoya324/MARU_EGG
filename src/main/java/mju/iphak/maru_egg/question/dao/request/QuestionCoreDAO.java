@@ -5,17 +5,17 @@ import mju.iphak.maru_egg.admission.domain.AdmissionCategory;
 import mju.iphak.maru_egg.admission.domain.AdmissionType;
 
 @Builder
-public record SelectQuestionCores(
+public record QuestionCoreDAO(
 	AdmissionType type,
 	AdmissionCategory category,
 	String content,
 	String contentToken
 ) {
 
-	public static SelectQuestionCores of(final AdmissionType type, final AdmissionCategory category,
+	public static QuestionCoreDAO of(final AdmissionType type, final AdmissionCategory category,
 		final String content,
 		final String contentToken) {
-		return SelectQuestionCores.builder()
+		return QuestionCoreDAO.builder()
 			.type(type)
 			.category(category)
 			.content(content)

@@ -15,21 +15,21 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.ResultMatcher;
 
-import mju.iphak.maru_egg.answer.application.AnswerManager;
+import mju.iphak.maru_egg.admission.domain.AdmissionCategory;
+import mju.iphak.maru_egg.admission.domain.AdmissionType;
+import mju.iphak.maru_egg.answer.application.update.UpdateAnswerContentService;
 import mju.iphak.maru_egg.answer.domain.Answer;
 import mju.iphak.maru_egg.answer.dto.request.UpdateAnswerContentRequest;
 import mju.iphak.maru_egg.answer.repository.AnswerRepository;
 import mju.iphak.maru_egg.common.IntegrationTest;
-import mju.iphak.maru_egg.admission.domain.AdmissionType;
 import mju.iphak.maru_egg.question.domain.Question;
-import mju.iphak.maru_egg.admission.domain.AdmissionCategory;
 import mju.iphak.maru_egg.question.repository.QuestionRepository;
 
 @WithMockUser(roles = "ADMIN")
 class AdminAnswerControllerTest extends IntegrationTest {
 
 	@Autowired
-	private AnswerManager answerManager;
+	private UpdateAnswerContentService updateAnswerContent;
 
 	@Autowired
 	private QuestionRepository questionRepository;

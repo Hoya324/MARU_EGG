@@ -9,7 +9,7 @@ import mju.iphak.maru_egg.admission.dto.response.AdmissionTypeStatusResponse;
 import mju.iphak.maru_egg.common.meta.CustomApiResponse;
 import mju.iphak.maru_egg.common.meta.CustomApiResponses;
 
-@Tag(name = "QuestionTypeStatus API", description = "질문타입 상태 관련 API 입니다.")
+@Tag(name = "AdmissionTypeStatus API", description = "질문타입 상태 관련 API 입니다.")
 public interface AdmissionTypeStatusControllerDocs {
 
 	@Operation(summary = "전체 질문타입과 상태 조회", description = "전체 질문타입과 상태를 조회합니다.", responses = {

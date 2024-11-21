@@ -3,7 +3,7 @@ package mju.iphak.maru_egg.admission.application.status.update;
 import static mju.iphak.maru_egg.common.exception.ErrorCode.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.BDDMockito.*;
 
 import java.util.Optional;
 
@@ -39,7 +39,7 @@ class UpdateAdmissionTypeStatusServiceTest extends MockTest {
 		// given
 		AdmissionType type = AdmissionType.SUSI;
 		AdmissionTypeStatus status = new AdmissionTypeStatus(type, true);
-		when(admissionTypeStatusRepository.findByAdmissionType(type)).thenReturn(Optional.of(status));
+		given(admissionTypeStatusRepository.findByAdmissionType(type)).willReturn(Optional.of(status));
 
 		// when
 		updateAdmissionTypeStatus.invoke(type);

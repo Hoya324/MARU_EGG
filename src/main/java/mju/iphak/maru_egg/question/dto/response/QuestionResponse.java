@@ -4,8 +4,8 @@ import java.util.List;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
-import mju.iphak.maru_egg.answer.dto.response.AnswerReferenceResponse;
 import mju.iphak.maru_egg.answer.dto.response.AnswerResponse;
+import mju.iphak.maru_egg.answerreference.dto.response.AnswerReferenceResponse;
 import mju.iphak.maru_egg.question.domain.Question;
 
 @Builder

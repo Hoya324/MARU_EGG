@@ -1,4 +1,4 @@
-package mju.iphak.maru_egg.answer.domain;
+package mju.iphak.maru_egg.answerreference.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -11,6 +11,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import mju.iphak.maru_egg.answer.domain.Answer;
 import mju.iphak.maru_egg.common.entity.BaseEntity;
 
 @Getter

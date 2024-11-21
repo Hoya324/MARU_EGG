@@ -2,7 +2,7 @@ package mju.iphak.maru_egg.answer.application.update;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.BDDMockito.*;
 
 import java.util.Optional;
 
@@ -35,7 +35,7 @@ class UpdateAnswerContentServiceTest extends MockTest {
 	void 답변_내용_수정_실패_NOTFOUND() {
 		// given
 		Long id = 1L;
-		when(answerRepository.findById(anyLong())).thenReturn(Optional.empty());
+		given(answerRepository.findById(anyLong())).willReturn(Optional.empty());
 
 		// when & then
 		EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> {
