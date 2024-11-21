@@ -15,8 +15,10 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import mju.iphak.maru_egg.common.dto.pagination.SliceQuestionResponse;
 import mju.iphak.maru_egg.question.api.swagger.QuestionControllerDocs;
-import mju.iphak.maru_egg.question.application.QuestionProcessingService;
-import mju.iphak.maru_egg.question.application.QuestionService;
+import mju.iphak.maru_egg.question.application.find.FindAllPagedQuestions;
+import mju.iphak.maru_egg.question.application.find.FindAllQuestionsService;
+import mju.iphak.maru_egg.question.application.find.FindQuestion;
+import mju.iphak.maru_egg.question.application.process.ProcessQuestion;
 import mju.iphak.maru_egg.question.dto.request.FindQuestionsRequest;
 import mju.iphak.maru_egg.question.dto.request.QuestionRequest;
 import mju.iphak.maru_egg.question.dto.request.SearchQuestionsRequest;
@@ -29,30 +31,30 @@ import mju.iphak.maru_egg.question.dto.response.SearchedQuestionsResponse;
 @RequestMapping("/api")
 public class QuestionController implements QuestionControllerDocs {
 
-	private final QuestionProcessingService questionProcessingService;
-	private final QuestionService questionService;
+	private final ProcessQuestion processQuestion;
+	private final FindAllQuestionsService findAllQuestionsService;
+	private final FindQuestion findQuestion;
+	private final FindAllPagedQuestions findAllPagedQuestions;
 
 	@PostMapping("/questions")
 	public QuestionResponse question(@Valid @RequestBody QuestionRequest request) {
-		return questionProcessingService.question(request.type(), request.category(), request.content());
+		return processQuestion.invoke(request.type(), request.category(), request.content());
 	}
 
 	@GetMapping("/questions")
 	public List<QuestionListItemResponse> getQuestions(@Valid @ModelAttribute FindQuestionsRequest request) {
-		return questionService.getQuestions(request.type(), request.category());
+		return findAllQuestionsService.invoke(request.type(), request.category());
 	}
 
 	@GetMapping("/questions/search")
 	public SliceQuestionResponse<SearchedQuestionsResponse> searchQuestions(
 		@Valid @ModelAttribute SearchQuestionsRequest request) {
-		return questionService.searchQuestionsOfCursorPaging(request.type(), request.category(), request.content(),
-			request.cursorViewCount(),
-			request.questionId(), request.size());
+		return findAllPagedQuestions.invoke(request);
 	}
 
 	@GetMapping("/question")
 	public QuestionResponse getQuestion(
 		@Parameter(description = "조회할 질문 아이디", example = "1") @RequestParam("questionId") Long questionId) {
-		return questionProcessingService.getQuestion(questionId);
+		return findQuestion.invoke(questionId);
 	}
 }
