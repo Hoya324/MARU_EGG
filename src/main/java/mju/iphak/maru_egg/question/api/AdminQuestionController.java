@@ -30,7 +30,7 @@ public class AdminQuestionController implements AdminQuestionControllerDocs {
 
 	@PutMapping("/check")
 	public void checkQuestion(@Valid @RequestBody CheckQuestionRequest request) {
-		questionService.checkQuestion(request.questionId());
+		checkQuestion.invoke(request.questionId());
 	}
 
 	@PostMapping("/new")
