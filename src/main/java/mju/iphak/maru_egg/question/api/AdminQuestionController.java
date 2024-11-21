@@ -25,7 +25,7 @@ public class AdminQuestionController implements AdminQuestionControllerDocs {
 
 	@PutMapping()
 	public void updateQuestionContent(@Valid @RequestBody UpdateQuestionContentRequest request) {
-		questionService.updateQuestionContent(request.id(), request.content());
+		updateQuestionContent.invoke(request.id(), request.content());
 	}
 
 	@PutMapping("/check")
