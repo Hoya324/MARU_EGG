@@ -16,15 +16,15 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.web.reactive.function.client.ExchangeFunction;
 
-import mju.iphak.maru_egg.answer.domain.Answer;
-import mju.iphak.maru_egg.answer.domain.AnswerReference;
-import mju.iphak.maru_egg.answer.repository.AnswerReferenceRepository;
-import mju.iphak.maru_egg.answer.repository.AnswerRepository;
-import mju.iphak.maru_egg.common.IntegrationTest;
-import mju.iphak.maru_egg.question.application.QuestionProcessingService;
-import mju.iphak.maru_egg.question.application.QuestionService;
 import mju.iphak.maru_egg.admission.domain.AdmissionCategory;
 import mju.iphak.maru_egg.admission.domain.AdmissionType;
+import mju.iphak.maru_egg.answer.domain.Answer;
+import mju.iphak.maru_egg.answer.repository.AnswerRepository;
+import mju.iphak.maru_egg.answerreference.domain.AnswerReference;
+import mju.iphak.maru_egg.answerreference.repository.AnswerReferenceRepository;
+import mju.iphak.maru_egg.common.IntegrationTest;
+import mju.iphak.maru_egg.question.application.find.FindAllQuestionsService;
+import mju.iphak.maru_egg.question.application.process.ProcessQuestionService;
 import mju.iphak.maru_egg.question.domain.Question;
 import mju.iphak.maru_egg.question.dto.request.FindQuestionsRequest;
 import mju.iphak.maru_egg.question.dto.request.QuestionRequest;
@@ -34,10 +34,10 @@ import mju.iphak.maru_egg.question.repository.QuestionRepository;
 class QuestionControllerTest extends IntegrationTest {
 
 	@Autowired
-	private QuestionProcessingService questionProcessingService;
+	private ProcessQuestionService processQuestion;
 
 	@Autowired
-	private QuestionService questionService;
+	private FindAllQuestionsService findAllQuestionsService;
 
 	@Autowired
 	private QuestionRepository questionRepository;
