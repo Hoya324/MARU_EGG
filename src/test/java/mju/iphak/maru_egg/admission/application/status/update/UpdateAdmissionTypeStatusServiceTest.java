@@ -39,7 +39,7 @@ class UpdateAdmissionTypeStatusServiceTest extends MockTest {
 		// given
 		AdmissionType type = AdmissionType.SUSI;
 		AdmissionTypeStatus status = new AdmissionTypeStatus(type, true);
-		given(admissionTypeStatusRepository.findByAdmissionType(type)).willReturn(Optional.of(status));
+		when(admissionTypeStatusRepository.findByAdmissionType(type)).thenReturn(Optional.of(status));
 
 		// when
 		updateAdmissionTypeStatus.invoke(type);

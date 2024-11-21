@@ -14,6 +14,8 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import jakarta.persistence.EntityNotFoundException;
+import mju.iphak.maru_egg.admission.domain.AdmissionCategory;
+import mju.iphak.maru_egg.admission.domain.AdmissionType;
 import mju.iphak.maru_egg.common.MockTest;
 import mju.iphak.maru_egg.question.domain.Question;
 import mju.iphak.maru_egg.question.repository.QuestionRepository;
@@ -31,7 +33,7 @@ class UpdateQuestionContentServiceTest extends MockTest {
 	@BeforeEach
 	void setUp() {
 		MockitoAnnotations.openMocks(this);
-		question = mock(Question.class);
+		question = Question.of("질문", "질문", AdmissionType.JEONGSI, AdmissionCategory.ADMISSION_GUIDELINE);
 	}
 
 	@DisplayName("[실패] 질문 내용 수정 실패 - 질문이 존재하지 않는 경우")
@@ -39,7 +41,7 @@ class UpdateQuestionContentServiceTest extends MockTest {
 	void 질문_내용_수정_실패_NOTFOUND() {
 		// given
 		Long invalidId = 1L;
-		given(questionRepository.findById(invalidId)).willReturn(Optional.empty());
+		when(questionRepository.findById(invalidId)).thenReturn(Optional.empty());
 
 		// when & then
 		EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> {
