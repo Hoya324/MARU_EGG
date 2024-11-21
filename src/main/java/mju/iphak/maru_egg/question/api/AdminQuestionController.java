@@ -35,7 +35,7 @@ public class AdminQuestionController implements AdminQuestionControllerDocs {
 
 	@PostMapping("/new")
 	public void createQuestion(@Valid @RequestBody CreateQuestionRequest request) {
-		questionService.createQuestion(request);
+		createCustomQuestion.invoke(request);
 	}
 
 	@DeleteMapping("/{questionId}")
