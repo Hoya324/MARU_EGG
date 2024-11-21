@@ -1,4 +1,4 @@
-package mju.iphak.maru_egg.answer.application;
+package mju.iphak.maru_egg.answer.application.rag;
 
 import static mju.iphak.maru_egg.common.exception.ErrorCode.*;
 
@@ -22,17 +22,19 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 @Service
 @Transactional
-public class AnswerApiClient {
+public class RagAnswerService implements RagAnswer {
+
+	private static final String DEFAULT_URL = "/maruegg/ask_question_api/";
 
 	private final WebClient webClient;
 
-	public Mono<LLMAnswerResponse> askQuestion(LLMAskQuestionRequest request) {
+	public Mono<LLMAnswerResponse> invoke(LLMAskQuestionRequest request) {
 		MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
 		formData.add("questionType", request.questionType());
 		formData.add("questionCategory", request.questionCategory());
 		formData.add("question", request.question());
 		return webClient.post()
-			.uri("/maruegg/ask_question_api/")
+			.uri(DEFAULT_URL)
 			.accept(MediaType.APPLICATION_JSON)
 			.contentType(MediaType.APPLICATION_FORM_URLENCODED)
 			.body(BodyInserters.fromFormData(formData))
