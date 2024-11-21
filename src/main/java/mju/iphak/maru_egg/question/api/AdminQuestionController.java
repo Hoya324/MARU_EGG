@@ -21,7 +21,10 @@ import mju.iphak.maru_egg.question.dto.request.UpdateQuestionContentRequest;
 @RequestMapping("/api/admin/questions")
 public class AdminQuestionController implements AdminQuestionControllerDocs {
 
-	private final QuestionService questionService;
+	private final DeleteQuestion deleteQuestion;
+	private final CreateCustomQuestion createCustomQuestion;
+	private final CheckQuestion checkQuestion;
+	private final UpdateQuestionContent updateQuestionContent;
 
 	@PutMapping()
 	public void updateQuestionContent(@Valid @RequestBody UpdateQuestionContentRequest request) {
