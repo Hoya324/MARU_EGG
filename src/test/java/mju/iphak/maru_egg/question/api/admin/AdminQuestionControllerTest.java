@@ -1,4 +1,4 @@
-package mju.iphak.maru_egg.question.api;
+package mju.iphak.maru_egg.question.api.admin;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
@@ -20,7 +20,6 @@ import mju.iphak.maru_egg.answer.domain.Answer;
 import mju.iphak.maru_egg.answer.dto.request.CreateAnswerRequest;
 import mju.iphak.maru_egg.answer.repository.AnswerRepository;
 import mju.iphak.maru_egg.common.IntegrationTest;
-import mju.iphak.maru_egg.question.application.QuestionService;
 import mju.iphak.maru_egg.question.domain.Question;
 import mju.iphak.maru_egg.question.dto.request.CheckQuestionRequest;
 import mju.iphak.maru_egg.question.dto.request.CreateQuestionRequest;
@@ -29,9 +28,6 @@ import mju.iphak.maru_egg.question.repository.QuestionRepository;
 
 @WithMockUser(roles = "ADMIN")
 class AdminQuestionControllerTest extends IntegrationTest {
-
-	@Autowired
-	private QuestionService questionService;
 
 	@Autowired
 	private QuestionRepository questionRepository;
