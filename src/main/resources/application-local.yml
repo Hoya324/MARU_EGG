@@ -24,5 +24,9 @@ logging:
         type:
           descriptor:
             sql: trace
+      springframework:
+        orm:
+          jpa: debug
+        transaction: info
 server:
   port: 8082
