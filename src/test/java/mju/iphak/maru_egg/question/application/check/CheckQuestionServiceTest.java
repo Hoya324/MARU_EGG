@@ -3,6 +3,7 @@ package mju.iphak.maru_egg.question.application.check;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -23,7 +24,8 @@ class CheckQuestionServiceTest extends MockTest {
 	@InjectMocks
 	private CheckQuestionService checkQuestionService;
 
-	public CheckQuestionServiceTest() {
+	@BeforeEach
+	public void setUp() throws Exception {
 		MockitoAnnotations.openMocks(this);
 	}
 
