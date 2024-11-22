@@ -26,6 +26,7 @@ import mju.iphak.maru_egg.question.application.find.FindQuestion;
 import mju.iphak.maru_egg.question.dao.request.QuestionCoreDAO;
 import mju.iphak.maru_egg.question.dao.response.QuestionCore;
 import mju.iphak.maru_egg.question.domain.Question;
+import mju.iphak.maru_egg.question.dto.request.QuestionRequest;
 import mju.iphak.maru_egg.question.dto.response.QuestionResponse;
 import mju.iphak.maru_egg.question.repository.QuestionRepository;
 
@@ -66,18 +67,19 @@ class ProcessQuestionServiceTest extends MockTest {
 		AdmissionType type = AdmissionType.SUSI;
 		AdmissionCategory category = AdmissionCategory.ADMISSION_GUIDELINE;
 		String content = "명지대학교 입시 결과";
-		String contentToken = PhraseExtractionUtils.extractPhrases(content); // 실제 호출
+		String contentToken = "명지대 학교 입시 결과";
+		QuestionRequest request = new QuestionRequest(type, category, content);
+		QuestionCoreDAO questionCoreDAO = QuestionCoreDAO.of(request, contentToken);
 
-		QuestionCoreDAO questionCoreDAO = QuestionCoreDAO.of(type, category, content, contentToken);
 		when(questionRepository.searchQuestions(questionCoreDAO)).thenReturn(Optional.empty());
-		when(processAnswer.invoke(type, category, content, contentToken))
-			.thenReturn(QuestionResponse.valueOfInvalidQuestion(content, "답변이 없습니다."));
+		when(processAnswer.invoke(request, contentToken))
+			.thenReturn(QuestionResponse.valueOfRAG(content, "답변이 없습니다."));
 
 		// when
-		QuestionResponse response = processQuestionService.invoke(type, category, content);
+		QuestionResponse response = processQuestionService.invoke(request);
 
 		// then
-		verify(processAnswer, times(1)).invoke(type, category, content, contentToken);
+		verify(processAnswer, times(1)).invoke(request, contentToken);
 		verify(questionRepository, times(1)).searchQuestions(questionCoreDAO);
 		assertThat(response).isNotNull();
 		assertThat(response.content()).isEqualTo(content);
@@ -92,19 +94,18 @@ class ProcessQuestionServiceTest extends MockTest {
 		AdmissionCategory category = AdmissionCategory.ADMISSION_GUIDELINE;
 		String content = "명지대학교 입시 결과";
 		String contentToken = PhraseExtractionUtils.extractPhrases(content);
-
-		QuestionCoreDAO questionCoreDAO = QuestionCoreDAO.of(type, category, content, contentToken);
-		QuestionCore similarQuestionCore = QuestionCore.of(1L, "명지대학교 입시 결과");
+		QuestionRequest request = new QuestionRequest(type, category, content);
+		QuestionCoreDAO questionCoreDAO = QuestionCoreDAO.of(request, contentToken);
+		QuestionCore similarQuestionCore = QuestionCore.of(1L, contentToken);
 		List<QuestionCore> questionCores = List.of(similarQuestionCore);
 
-		// Stubbing
 		when(questionRepository.searchQuestions(questionCoreDAO)).thenReturn(Optional.of(questionCores));
 		when(findMostSimilarQuestionId.invoke(questionCores, contentToken)).thenReturn(1L);
 		when(findQuestion.invoke(1L))
 			.thenReturn(QuestionResponse.of(question, answerResponse, Collections.emptyList()));
 
 		// when
-		QuestionResponse response = processQuestionService.invoke(type, category, content);
+		QuestionResponse response = processQuestionService.invoke(request);
 
 		// then
 		verify(findMostSimilarQuestionId, times(1)).invoke(questionCores, contentToken);
@@ -119,23 +120,23 @@ class ProcessQuestionServiceTest extends MockTest {
 		// given
 		AdmissionType type = AdmissionType.SUSI;
 		AdmissionCategory category = AdmissionCategory.ADMISSION_GUIDELINE;
-		String content = "입학 관련 정보";
-		String contentToken = PhraseExtractionUtils.extractPhrases(content); // 실제 호출
-
-		QuestionCoreDAO questionCoreDAO = QuestionCoreDAO.of(type, category, content, contentToken);
+		String content = "명지대학교 입시 결과";
+		String contentToken = "명지대 학교 입시 결과";
+		QuestionRequest request = new QuestionRequest(type, category, content);
+		QuestionCoreDAO questionCoreDAO = QuestionCoreDAO.of(request, content);
 		QuestionCore unrelatedQuestionCore = QuestionCore.of(2L, "다른 질문");
 		List<QuestionCore> questionCores = List.of(unrelatedQuestionCore);
 
 		when(questionRepository.searchQuestions(questionCoreDAO)).thenReturn(Optional.of(questionCores));
 		when(findMostSimilarQuestionId.invoke(questionCores, contentToken)).thenReturn(null);
-		when(processAnswer.invoke(type, category, content, contentToken))
-			.thenReturn(QuestionResponse.valueOfInvalidQuestion(content, "유사 질문이 없습니다."));
+		when(processAnswer.invoke(request, contentToken))
+			.thenReturn(QuestionResponse.valueOfRAG(content, "유사 질문이 없습니다."));
 
 		// when
-		QuestionResponse response = processQuestionService.invoke(type, category, content);
+		QuestionResponse response = processQuestionService.invoke(request);
 
 		// then
-		verify(processAnswer, times(1)).invoke(type, category, content, contentToken);
+		verify(processAnswer, times(1)).invoke(request, contentToken);
 		assertThat(response).isNotNull();
 		assertThat(response.content()).isEqualTo(content);
 		assertThat(response.answer().content()).isEqualTo("유사 질문이 없습니다.");

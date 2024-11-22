@@ -4,8 +4,6 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
-import java.util.Collections;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,11 +17,10 @@ import mju.iphak.maru_egg.answer.application.create.CreateRAGAnswer;
 import mju.iphak.maru_egg.answer.application.rag.RagAnswer;
 import mju.iphak.maru_egg.answer.domain.Answer;
 import mju.iphak.maru_egg.answer.dto.request.LLMAskQuestionRequest;
-import mju.iphak.maru_egg.answer.dto.response.AnswerResponse;
 import mju.iphak.maru_egg.answer.dto.response.LLMAnswerResponse;
 import mju.iphak.maru_egg.common.MockTest;
 import mju.iphak.maru_egg.question.domain.Question;
-import mju.iphak.maru_egg.question.dto.request.SaveRAGAnswerRequest;
+import mju.iphak.maru_egg.question.dto.request.QuestionRequest;
 import mju.iphak.maru_egg.question.dto.response.QuestionResponse;
 import reactor.core.publisher.Mono;
 
@@ -51,6 +48,7 @@ class ProcessAnswerServiceTest extends MockTest {
 		AdmissionCategory category = AdmissionCategory.ADMISSION_GUIDELINE;
 		String content = "수시 일정 알려주세요.";
 		String contentToken = "수시 일정";
+		QuestionRequest request = new QuestionRequest(type, category, content);
 
 		Question question = Question.of(content, contentToken, type, category);
 		Answer answer = Answer.of(
@@ -66,34 +64,15 @@ class ProcessAnswerServiceTest extends MockTest {
 			null
 		);
 
-		SaveRAGAnswerRequest expectedSaveRequest = SaveRAGAnswerRequest.builder()
-			.type(type)
-			.category(category)
-			.content(content)
-			.contentToken(contentToken)
-			.answerContent(answer.getContent())
-			.references(Collections.emptyList())
-			.build();
-
-		QuestionResponse mockQuestionResponse = QuestionResponse.builder()
-			.id(1L)
-			.content(content)
-			.answer(AnswerResponse.builder()
-				.content(answer.getContent())
-				.build())
-			.references(Collections.emptyList())
-			.build();
-
 		when(ragAnswer.invoke(any(LLMAskQuestionRequest.class))).thenReturn(Mono.just(mockRagResponse));
-		when(createRAGAnswer.invoke(expectedSaveRequest)).thenReturn(mockQuestionResponse);
 
 		// When
-		QuestionResponse result = processAnswerService.invoke(type, category, content, contentToken);
+		QuestionResponse result = processAnswerService.invoke(request, contentToken);
 
 		// Then
 		assertThat(result).isNotNull();
-		assertThat(result.id()).isEqualTo(1L);
 		assertThat(result.content()).isEqualTo(content);
 		assertThat(result.answer().content()).isEqualTo(answer.getContent());
 	}
+
 }

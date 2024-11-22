@@ -30,6 +30,7 @@ import mju.iphak.maru_egg.question.dao.request.SelectQuestions;
 import mju.iphak.maru_egg.question.dao.response.QuestionCore;
 import mju.iphak.maru_egg.question.domain.QQuestion;
 import mju.iphak.maru_egg.question.domain.Question;
+import mju.iphak.maru_egg.question.dto.request.QuestionRequest;
 import mju.iphak.maru_egg.question.dto.response.SearchedQuestionsResponse;
 
 class QuestionRepositoryImplTest extends RepositoryTest {
@@ -128,8 +129,11 @@ class QuestionRepositoryImplTest extends RepositoryTest {
 	void contentToken_type으로_질문_검색_실패() {
 		// given
 		String invalidContentToken = "잘못된 질문";
-		QuestionCoreDAO questionCoreDAO = QuestionCoreDAO.of(AdmissionType.SUSI, null, invalidContentToken,
-			invalidContentToken);
+		AdmissionType type = AdmissionType.SUSI;
+		AdmissionCategory category = AdmissionCategory.ADMISSION_GUIDELINE;
+		String content = "수시 일정 알려주세요.";
+		QuestionRequest request = new QuestionRequest(type, category, content);
+		QuestionCoreDAO questionCoreDAO = QuestionCoreDAO.of(request, invalidContentToken);
 
 		// when
 		Optional<List<QuestionCore>> result = questionRepositoryImpl.searchQuestions(questionCoreDAO);
@@ -167,9 +171,11 @@ class QuestionRepositoryImplTest extends RepositoryTest {
 	void contentToken_type_Category로_질문_검색_실패() {
 		// given
 		String invalidContentToken = "잘못된 질문";
-		QuestionCoreDAO questionCoreDAO = QuestionCoreDAO.of(AdmissionType.SUSI,
-			AdmissionCategory.ADMISSION_GUIDELINE, invalidContentToken,
-			invalidContentToken);
+		AdmissionType type = AdmissionType.SUSI;
+		AdmissionCategory category = AdmissionCategory.ADMISSION_GUIDELINE;
+		String content = "수시 일정 알려주세요.";
+		QuestionRequest request = new QuestionRequest(type, category, content);
+		QuestionCoreDAO questionCoreDAO = QuestionCoreDAO.of(request, invalidContentToken);
 
 		// when
 		Optional<List<QuestionCore>> result = questionRepositoryImpl.searchQuestions(questionCoreDAO);
