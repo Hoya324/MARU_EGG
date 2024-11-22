@@ -27,5 +27,33 @@ services:
       - maru-egg-dev
     user: '65534:65534'
 
+  nginx:
+    depends_on:
+      - maru-egg-app
+    image: nginx:latest
+    container_name: maru-egg-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/conf.d/nginx.conf:/etc/nginx/conf.d/default.conf
+      - /etc/letsencrypt:/etc/letsencrypt
+    networks:
+      - maru-egg-dev
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana_container
+    ports:
+      - 3000:3000
+    volumes:
+      - ./grafana/config/grafana.ini:/etc/grafana/grafana.ini
+      - ./grafana/volume:/var/lib/grafana
+    environment:
+      - GRAFANA_ADMIN_USER=${GRAFANA_USER}
+      - GRAFANA_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
+    restart: always
+    networks:
+      - maru-egg-dev
 networks:
   maru-egg-dev:
