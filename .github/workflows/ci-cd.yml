@@ -15,14 +15,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Java JDK 설정
       - name: Setup Java JDK
         uses: actions/setup-java@v3
         with:
           java-version: 17
           distribution: 'temurin'
 
-      # 환경별 yml 파일 생성
       - name: make application.yml
         if: contains(github.ref, 'develop')
         run: |
@@ -30,7 +28,6 @@ jobs:
           touch ./application.yml
           echo "${{ secrets.YML }}" > ./application.yml
 
-      # 환경별 yml 파일 생성 - dev
       - name: make application-dev.yml
         if: contains(github.ref, 'develop')
         run: |
@@ -45,31 +42,26 @@ jobs:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
 
-      # gradlew 실행 권한 부여
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      # Spring Boot 애플리케이션 빌드
       - name: Build with Gradle
         uses: gradle/gradle-build-action@v3
         with:
           arguments: clean bootJar
 
-      # Docker Hub에 로그인
       - name: Log in to Docker Hub
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      # Metadata action
       - name: Metadata action
         id: meta
         uses: docker/metadata-action@v4
         with:
           images: ${{ secrets.DOCKER_REPO }}
 
-      # Docker image Build & push
       - name: Build and push Docker image
         if: contains(github.ref, 'develop')
         id: docker_build
@@ -92,11 +84,6 @@ jobs:
       - name: Get GitHub Actions IP Address
         id: get_ip
         run: echo "ip=$(curl -s ifconfig.me)" >> $GITHUB_ENV
-
-      - name: Set environment variables for Docker Compose
-        run: |
-          echo "DOCKER_REPO=${{ secrets.DOCKER_REPO }}" >> $GITHUB_ENV
-          echo "GITHUB_RUN_NUMBER=${{ github.run_number }}" >> $GITHUB_ENV
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -152,8 +139,16 @@ jobs:
             echo "GITHUB_RUN_NUMBER=${GITHUB_RUN_NUMBER}"
             envsubst < <(echo "${{ secrets.DOCKER_COMPOSE_DEV }}") > docker-compose.yml
             echo ${{ secrets.DOCKER_PASSWORD }} | sudo docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
-            if [ "$(sudo docker ps -q)" ]; then sudo docker stop $(sudo docker ps -q); fi
-            if [ "$(sudo docker ps -a -q)" ]; then sudo docker rm $(sudo docker ps -a -q); fi
+            SERVICES_TO_STOP=$(sudo docker ps --format '{{.Names}}' | grep -Ev '(nginx|grafana)')
+            if [ ! -z "$SERVICES_TO_STOP" ]; then
+              echo "Stopping services: $SERVICES_TO_STOP"
+              sudo docker stop $SERVICES_TO_STOP
+            fi
+            SERVICES_TO_REMOVE=$(sudo docker ps -a --format '{{.Names}}' | grep -Ev '(nginx|grafana)')
+            if [ ! -z "$SERVICES_TO_REMOVE" ]; then
+              echo "Removing services: $SERVICES_TO_REMOVE"
+              sudo docker rm $SERVICES_TO_REMOVE
+            fi
             sudo docker pull ${{ secrets.DOCKER_REPO }}:develop-${{ github.run_number }}
             sudo docker-compose -f docker-compose.yml up -d
             sudo docker image prune -f
