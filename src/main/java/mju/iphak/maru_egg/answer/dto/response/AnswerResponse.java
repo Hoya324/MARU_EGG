@@ -1,5 +1,7 @@
 package mju.iphak.maru_egg.answer.dto.response;
 
+import java.time.LocalDate;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import mju.iphak.maru_egg.answer.domain.Answer;
@@ -28,11 +30,12 @@ public record AnswerResponse(
 			.build();
 	}
 
-	public static AnswerResponse valueOfInvalidAnswer(String content) {
+	public static AnswerResponse valueOfRAG(String content) {
+		LocalDate nowDate = LocalDate.now();
 		return AnswerResponse.builder()
 			.id(null)
 			.content(content)
-			.renewalYear(0)
+			.renewalYear(Integer.parseInt(String.valueOf(nowDate.getYear())))
 			.dateInformation(null)
 			.build();
 	}

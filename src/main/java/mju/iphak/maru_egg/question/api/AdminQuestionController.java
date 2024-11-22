@@ -11,7 +11,10 @@ import org.springframework.web.bind.annotation.RestController;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import mju.iphak.maru_egg.question.api.swagger.AdminQuestionControllerDocs;
-import mju.iphak.maru_egg.question.application.QuestionService;
+import mju.iphak.maru_egg.question.application.check.CheckQuestion;
+import mju.iphak.maru_egg.question.application.create.CreateCustomQuestion;
+import mju.iphak.maru_egg.question.application.delete.DeleteQuestion;
+import mju.iphak.maru_egg.question.application.update.UpdateQuestionContent;
 import mju.iphak.maru_egg.question.dto.request.CheckQuestionRequest;
 import mju.iphak.maru_egg.question.dto.request.CreateQuestionRequest;
 import mju.iphak.maru_egg.question.dto.request.UpdateQuestionContentRequest;
@@ -21,25 +24,28 @@ import mju.iphak.maru_egg.question.dto.request.UpdateQuestionContentRequest;
 @RequestMapping("/api/admin/questions")
 public class AdminQuestionController implements AdminQuestionControllerDocs {
 
-	private final QuestionService questionService;
+	private final DeleteQuestion deleteQuestion;
+	private final CreateCustomQuestion createCustomQuestion;
+	private final CheckQuestion checkQuestion;
+	private final UpdateQuestionContent updateQuestionContent;
 
 	@PutMapping()
 	public void updateQuestionContent(@Valid @RequestBody UpdateQuestionContentRequest request) {
-		questionService.updateQuestionContent(request.id(), request.content());
+		updateQuestionContent.invoke(request.id(), request.content());
 	}
 
 	@PutMapping("/check")
 	public void checkQuestion(@Valid @RequestBody CheckQuestionRequest request) {
-		questionService.checkQuestion(request.questionId());
+		checkQuestion.invoke(request.questionId());
 	}
 
 	@PostMapping("/new")
 	public void createQuestion(@Valid @RequestBody CreateQuestionRequest request) {
-		questionService.createQuestion(request);
+		createCustomQuestion.invoke(request);
 	}
 
 	@DeleteMapping("/{questionId}")
 	public void deleteQuestion(@PathVariable("questionId") Long id) {
-		questionService.deleteQuestion(id);
+		deleteQuestion.invoke(id);
 	}
 }

@@ -2,7 +2,7 @@ spring:
   application:
     name: MARU_EGG_BE
   jpa:
-    open-in-view: true
+    open-in-view: false
     hibernate:
       ddl-auto: validate
     show-sql: true
@@ -24,5 +24,9 @@ logging:
         type:
           descriptor:
             sql: trace
+      springframework:
+        orm:
+          jpa: debug
+        transaction: info
 server:
   port: 8082
