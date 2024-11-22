@@ -37,8 +37,8 @@ public record QuestionResponse(
 			.build();
 	}
 
-	public static QuestionResponse valueOfInvalidQuestion(String content, String answer) {
-		AnswerResponse answerResponse = AnswerResponse.valueOfInvalidAnswer(answer);
+	public static QuestionResponse valueOfRAG(String content, String answer) {
+		AnswerResponse answerResponse = AnswerResponse.valueOfRAG(answer);
 		return QuestionResponse.builder()
 			.id(null)
 			.content(content)

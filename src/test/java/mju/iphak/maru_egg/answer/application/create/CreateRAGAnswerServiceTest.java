@@ -1,9 +1,9 @@
 package mju.iphak.maru_egg.answer.application.create;
 
-import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import java.util.Collections;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -21,7 +21,6 @@ import mju.iphak.maru_egg.common.MockTest;
 import mju.iphak.maru_egg.question.application.create.CreateQuestionByTypeAndCategory;
 import mju.iphak.maru_egg.question.domain.Question;
 import mju.iphak.maru_egg.question.dto.request.SaveRAGAnswerRequest;
-import mju.iphak.maru_egg.question.dto.response.QuestionResponse;
 
 class CreateRAGAnswerServiceTest extends MockTest {
 
@@ -38,83 +37,56 @@ class CreateRAGAnswerServiceTest extends MockTest {
 	private CreateRAGAnswerService createRAGAnswerService;
 
 	@BeforeEach
-	public void setUp() throws Exception {
+	public void setUp() {
 		MockitoAnnotations.openMocks(this);
 	}
-
-	@DisplayName("[성공] 질문, 답변, 참고자료를 생성하고 QuestionResponse 반환")
+	
+	@DisplayName("[성공] 질문과 답변 생성")
 	@Test
-	void testCreateRAGAnswerSuccess() {
-		// Given
-		AdmissionType type = AdmissionType.SUSI;
-		AdmissionCategory category = AdmissionCategory.ADMISSION_GUIDELINE;
-		String content = "수시 일정 알려주세요.";
-		String contentToken = "수시 일정";
-		String answerContent = "수시 일정은 2024년 12월 19일부터 시작됩니다.";
+	void 질문_답변_생성() {
+		// given
+		List<AnswerReferenceResponse> references = Collections.emptyList();
+		SaveRAGAnswerRequest request = createRequest(references);
+		Question mockQuestion = createMockQuestion(request);
+		Answer mockAnswer = createMockAnswer(mockQuestion, request.answerContent());
 
-		SaveRAGAnswerRequest request = SaveRAGAnswerRequest.builder()
-			.type(type)
-			.category(category)
-			.content(content)
-			.contentToken(contentToken)
-			.answerContent(answerContent)
-			.references(Collections.emptyList()) // 참고자료 없음
-			.build();
+		when(createQuestionByTypeAndCategory.invoke(
+			request.type(), request.category(), request.content(), request.contentToken())
+		).thenReturn(mockQuestion);
+		when(createAnswer.invoke(mockQuestion, request.answerContent())).thenReturn(mockAnswer);
 
-		Question mockQuestion = Question.of(content, contentToken, type, category);
-		Answer mockAnswer = Answer.of(mockQuestion, answerContent);
+		// when
+		createRAGAnswerService.invoke(request);
 
-		when(createQuestionByTypeAndCategory.invoke(type, category, content, contentToken)).thenReturn(mockQuestion);
-		when(createAnswer.invoke(mockQuestion, answerContent)).thenReturn(mockAnswer);
-
-		// When
-		QuestionResponse result = createRAGAnswerService.invoke(request);
-
-		// Then
-		assertThat(result).isNotNull();
-		assertThat(result.id()).isEqualTo(mockQuestion.getId());
-		assertThat(result.content()).isEqualTo(content);
-		assertThat(result.answer().content()).isEqualTo(answerContent);
-		assertThat(result.references()).isEmpty();
+		// then
+		verify(createQuestionByTypeAndCategory, times(1)).invoke(
+			request.type(), request.category(), request.content(), request.contentToken()
+		);
+		verify(createAnswer, times(1)).invoke(mockQuestion, request.answerContent());
+		verify(createAnswerReference, times(1)).invoke(mockAnswer, request.references());
 	}
 
-	@DisplayName("[성공] 질문, 답변, 참고자료 생성 및 참고자료 포함된 QuestionResponse 반환")
-	@Test
-	void testCreateRAGAnswerWithReferences() {
-		// Given
-		AdmissionType type = AdmissionType.SUSI;
-		AdmissionCategory category = AdmissionCategory.ADMISSION_GUIDELINE;
-		String content = "수시 일정 알려주세요.";
-		String contentToken = "수시 일정";
-		String answerContent = "수시 일정은 2024년 12월 19일부터 시작됩니다.";
-		var references = Collections.singletonList(
-			AnswerReferenceResponse.of("수시 일정 안내", "http://example.com")
-		);
-
-		SaveRAGAnswerRequest request = SaveRAGAnswerRequest.builder()
-			.type(type)
-			.category(category)
-			.content(content)
-			.contentToken(contentToken)
-			.answerContent(answerContent)
+	private SaveRAGAnswerRequest createRequest(List<AnswerReferenceResponse> references) {
+		return SaveRAGAnswerRequest.builder()
+			.type(AdmissionType.SUSI)
+			.category(AdmissionCategory.ADMISSION_GUIDELINE)
+			.content("수시 일정 알려주세요.")
+			.contentToken("수시 일정")
+			.answerContent("수시 일정은 2024년 12월 19일부터 시작됩니다.")
 			.references(references)
 			.build();
+	}
 
-		Question mockQuestion = Question.of(content, contentToken, type, category);
-		Answer mockAnswer = Answer.of(mockQuestion, answerContent);
+	private Question createMockQuestion(SaveRAGAnswerRequest request) {
+		return Question.of(
+			request.content(),
+			request.contentToken(),
+			request.type(),
+			request.category()
+		);
+	}
 
-		when(createQuestionByTypeAndCategory.invoke(type, category, content, contentToken)).thenReturn(mockQuestion);
-		when(createAnswer.invoke(mockQuestion, answerContent)).thenReturn(mockAnswer);
-
-		// When
-		QuestionResponse result = createRAGAnswerService.invoke(request);
-
-		// Then
-		assertThat(result).isNotNull();
-		assertThat(result.id()).isEqualTo(mockQuestion.getId());
-		assertThat(result.content()).isEqualTo(content);
-		assertThat(result.answer().content()).isEqualTo(answerContent);
-		assertThat(result.references()).hasSize(1);
-		assertThat(result.references().get(0).title()).isEqualTo("수시 일정 안내");
+	private Answer createMockAnswer(Question question, String answerContent) {
+		return Answer.of(question, answerContent);
 	}
 }

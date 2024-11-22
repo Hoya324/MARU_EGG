@@ -8,14 +8,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import mju.iphak.maru_egg.admission.domain.AdmissionCategory;
-import mju.iphak.maru_egg.admission.domain.AdmissionType;
 import mju.iphak.maru_egg.answer.application.process.ProcessAnswer;
 import mju.iphak.maru_egg.common.utils.PhraseExtractionUtils;
 import mju.iphak.maru_egg.question.application.find.FindMostSimilarQuestionId;
 import mju.iphak.maru_egg.question.application.find.FindQuestion;
 import mju.iphak.maru_egg.question.dao.request.QuestionCoreDAO;
 import mju.iphak.maru_egg.question.dao.response.QuestionCore;
+import mju.iphak.maru_egg.question.dto.request.QuestionRequest;
 import mju.iphak.maru_egg.question.dto.response.QuestionResponse;
 import mju.iphak.maru_egg.question.repository.QuestionRepository;
 
@@ -30,16 +29,16 @@ public class ProcessQuestionService implements ProcessQuestion {
 	private final FindQuestion findQuestion;
 	private final FindMostSimilarQuestionId findMostSimilarQuestionId;
 
-	public QuestionResponse invoke(final AdmissionType type, final AdmissionCategory category, final String content) {
-		String contentToken = PhraseExtractionUtils.extractPhrases(content);
+	public QuestionResponse invoke(final QuestionRequest request) {
+		String contentToken = PhraseExtractionUtils.extractPhrases(request.content());
 
-		QuestionCoreDAO questionCoreDAO = QuestionCoreDAO.of(type, category, content, contentToken);
+		QuestionCoreDAO questionCoreDAO = QuestionCoreDAO.of(request, contentToken);
 
 		List<QuestionCore> questionCores = questionRepository.searchQuestions(questionCoreDAO)
 			.orElse(Collections.emptyList());
 		if (questionCores.isEmpty()) {
 			log.info("저장된 질문이 없어 새롭게 LLM서버에 질문을 요청합니다.");
-			return processAnswer.invoke(type, category, content, contentToken);
+			return processAnswer.invoke(request, contentToken);
 		}
 
 		Long mostSimilarQuestionId = findMostSimilarQuestionId.invoke(questionCores, contentToken);
@@ -49,6 +48,6 @@ public class ProcessQuestionService implements ProcessQuestion {
 		}
 
 		log.info("유사한 질문이 없어 새롭게 LLM서버에 질문을 요청합니다.");
-		return processAnswer.invoke(type, category, content, contentToken);
+		return processAnswer.invoke(request, contentToken);
 	}
 }

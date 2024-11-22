@@ -38,7 +38,7 @@ public class QuestionController implements QuestionControllerDocs {
 
 	@PostMapping("/questions")
 	public QuestionResponse question(@Valid @RequestBody QuestionRequest request) {
-		return processQuestion.invoke(request.type(), request.category(), request.content());
+		return processQuestion.invoke(request);
 	}
 
 	@GetMapping("/questions")

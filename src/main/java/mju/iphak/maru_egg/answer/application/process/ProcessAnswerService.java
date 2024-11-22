@@ -7,15 +7,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import mju.iphak.maru_egg.admission.domain.AdmissionCategory;
-import mju.iphak.maru_egg.admission.domain.AdmissionType;
 import mju.iphak.maru_egg.answer.application.create.CreateRAGAnswer;
 import mju.iphak.maru_egg.answer.application.rag.RagAnswer;
-import mju.iphak.maru_egg.answer.domain.Answer;
 import mju.iphak.maru_egg.answer.dto.request.LLMAskQuestionRequest;
-import mju.iphak.maru_egg.answer.dto.response.AnswerResponse;
 import mju.iphak.maru_egg.answer.dto.response.LLMAnswerResponse;
-import mju.iphak.maru_egg.question.domain.Question;
+import mju.iphak.maru_egg.question.dto.request.QuestionRequest;
 import mju.iphak.maru_egg.question.dto.request.SaveRAGAnswerRequest;
 import mju.iphak.maru_egg.question.dto.response.QuestionResponse;
 
@@ -28,43 +24,27 @@ public class ProcessAnswerService implements ProcessAnswer {
 	private final RagAnswer ragAnswer;
 	private final CreateRAGAnswer createRAGAnswer;
 
-	public QuestionResponse invoke(AdmissionType type, AdmissionCategory category, String content,
-		String contentToken) {
-		LLMAskQuestionRequest askQuestionRequest = getLlmAskQuestionRequest(type,
-			category, content);
+	public QuestionResponse invoke(QuestionRequest request, String contentToken) {
+		LLMAskQuestionRequest askQuestionRequest = getLlmAskQuestionRequest(request);
 
 		LLMAnswerResponse llmAnswerResponse = ragAnswer.invoke(askQuestionRequest).block();
 
 		if (isInvalidAnswer(llmAnswerResponse)) {
-			QuestionResponse.valueOfInvalidQuestion(content, generateGuideAnswer(llmAnswerResponse.references()));
+			return QuestionResponse.valueOfRAG(request.content(), generateGuideAnswer(llmAnswerResponse.references()));
 		}
 
-		SaveRAGAnswerRequest saveRAGAnswerRequest = SaveRAGAnswerRequest.builder()
-			.type(type)
-			.category(category)
-			.content(content)
-			.contentToken(contentToken)
-			.answerContent(llmAnswerResponse.answer())
-			.references(llmAnswerResponse.references())
-			.build();
+		SaveRAGAnswerRequest saveRAGAnswerRequest = SaveRAGAnswerRequest.of(request, contentToken, llmAnswerResponse);
 
 		createRAGAnswer.invoke(saveRAGAnswerRequest);
 		return QuestionResponse.valueOfRAG(request.content(), llmAnswerResponse.answer());
 	}
 
-	private LLMAskQuestionRequest getLlmAskQuestionRequest(final AdmissionType type,
-		final AdmissionCategory category, final String content) {
-		String questionCategory = category == null ? "" : category.getCategory();
+	private LLMAskQuestionRequest getLlmAskQuestionRequest(final QuestionRequest request) {
+		String questionCategory = request.category() == null ? "" : request.category().getCategory();
 		return LLMAskQuestionRequest.of(
-			type.getType(),
+			request.type().getType(),
 			questionCategory,
-			content
+			request.content()
 		);
-	}
-
-	private QuestionResponse getQuestionResponse(final Answer answer, final Question newQuestion,
-		final LLMAnswerResponse llmAnswerResponse) {
-		AnswerResponse answerResponse = AnswerResponse.from(answer);
-		return QuestionResponse.of(newQuestion, answerResponse, llmAnswerResponse.references());
 	}
 }
