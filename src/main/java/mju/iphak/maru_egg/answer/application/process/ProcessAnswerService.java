@@ -48,7 +48,8 @@ public class ProcessAnswerService implements ProcessAnswer {
 			.references(llmAnswerResponse.references())
 			.build();
 
-		return createRAGAnswer.invoke(saveRAGAnswerRequest);
+		createRAGAnswer.invoke(saveRAGAnswerRequest);
+		return QuestionResponse.valueOfRAG(request.content(), llmAnswerResponse.answer());
 	}
 
 	private LLMAskQuestionRequest getLlmAskQuestionRequest(final AdmissionType type,
