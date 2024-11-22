@@ -10,8 +10,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import mju.iphak.maru_egg.admission.domain.AdmissionCategory;
 import mju.iphak.maru_egg.admission.domain.AdmissionType;
+import mju.iphak.maru_egg.answer.application.process.ProcessAnswer;
 import mju.iphak.maru_egg.common.utils.PhraseExtractionUtils;
-import mju.iphak.maru_egg.question.application.create.CreateRAGQuestion;
 import mju.iphak.maru_egg.question.application.find.FindMostSimilarQuestionId;
 import mju.iphak.maru_egg.question.application.find.FindQuestion;
 import mju.iphak.maru_egg.question.dao.request.QuestionCoreDAO;
@@ -26,7 +26,7 @@ import mju.iphak.maru_egg.question.repository.QuestionRepository;
 public class ProcessQuestionService implements ProcessQuestion {
 
 	private final QuestionRepository questionRepository;
-	private final CreateRAGQuestion createRAGQuestion;
+	private final ProcessAnswer processAnswer;
 	private final FindQuestion findQuestion;
 	private final FindMostSimilarQuestionId findMostSimilarQuestionId;
 
@@ -39,7 +39,7 @@ public class ProcessQuestionService implements ProcessQuestion {
 			.orElse(Collections.emptyList());
 		if (questionCores.isEmpty()) {
 			log.info("저장된 질문이 없어 새롭게 LLM서버에 질문을 요청합니다.");
-			return createRAGQuestion.invoke(type, category, content, contentToken);
+			return processAnswer.invoke(type, category, content, contentToken);
 		}
 
 		Long mostSimilarQuestionId = findMostSimilarQuestionId.invoke(questionCores, contentToken);
@@ -49,6 +49,6 @@ public class ProcessQuestionService implements ProcessQuestion {
 		}
 
 		log.info("유사한 질문이 없어 새롭게 LLM서버에 질문을 요청합니다.");
-		return createRAGQuestion.invoke(type, category, content, contentToken);
+		return processAnswer.invoke(type, category, content, contentToken);
 	}
 }

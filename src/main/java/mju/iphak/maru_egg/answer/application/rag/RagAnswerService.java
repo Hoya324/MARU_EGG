@@ -5,6 +5,7 @@ import static mju.iphak.maru_egg.common.exception.ErrorCode.*;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -19,9 +20,9 @@ import mju.iphak.maru_egg.common.exception.custom.webClient.InternalServerErrorW
 import mju.iphak.maru_egg.common.exception.custom.webClient.NotFoundWebClientException;
 import reactor.core.publisher.Mono;
 
-@RequiredArgsConstructor
 @Service
-@Transactional
+@RequiredArgsConstructor
+@Transactional(propagation = Propagation.NOT_SUPPORTED)
 public class RagAnswerService implements RagAnswer {
 
 	private static final String DEFAULT_URL = "/maruegg/ask_question_api/";

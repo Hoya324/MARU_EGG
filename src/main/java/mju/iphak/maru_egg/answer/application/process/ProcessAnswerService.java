@@ -9,27 +9,24 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import mju.iphak.maru_egg.admission.domain.AdmissionCategory;
 import mju.iphak.maru_egg.admission.domain.AdmissionType;
-import mju.iphak.maru_egg.answer.application.create.CreateAnswer;
+import mju.iphak.maru_egg.answer.application.create.CreateRAGAnswer;
 import mju.iphak.maru_egg.answer.application.rag.RagAnswer;
 import mju.iphak.maru_egg.answer.domain.Answer;
 import mju.iphak.maru_egg.answer.dto.request.LLMAskQuestionRequest;
 import mju.iphak.maru_egg.answer.dto.response.AnswerResponse;
 import mju.iphak.maru_egg.answer.dto.response.LLMAnswerResponse;
-import mju.iphak.maru_egg.answerreference.application.create.BatchCreateAnswerReference;
-import mju.iphak.maru_egg.question.application.create.CreateQuestionByTypeAndCategory;
 import mju.iphak.maru_egg.question.domain.Question;
+import mju.iphak.maru_egg.question.dto.request.SaveRAGAnswerRequest;
 import mju.iphak.maru_egg.question.dto.response.QuestionResponse;
 
 @Slf4j
-@RequiredArgsConstructor
 @Service
-@Transactional
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ProcessAnswerService implements ProcessAnswer {
 
 	private final RagAnswer ragAnswer;
-	private final CreateQuestionByTypeAndCategory createQuestionByTypeAndCategory;
-	private final CreateAnswer createAnswer;
-	private final BatchCreateAnswerReference createAnswerReference;
+	private final CreateRAGAnswer createRAGAnswer;
 
 	public QuestionResponse invoke(AdmissionType type, AdmissionCategory category, String content,
 		String contentToken) {
@@ -38,15 +35,20 @@ public class ProcessAnswerService implements ProcessAnswer {
 
 		LLMAnswerResponse llmAnswerResponse = ragAnswer.invoke(askQuestionRequest).block();
 
-		if (isInvalidAnswer(llmAnswerResponse))
+		if (isInvalidAnswer(llmAnswerResponse)) {
 			QuestionResponse.valueOfInvalidQuestion(content, generateGuideAnswer(llmAnswerResponse.references()));
+		}
 
-		Question newQuestion = createQuestionByTypeAndCategory.invoke(type,
-			AdmissionCategory.convertToCategory(llmAnswerResponse.questionCategory()), content, contentToken);
-		Answer answer = createAnswer.invoke(newQuestion, llmAnswerResponse.answer());
-		createAnswerReference.invoke(answer, llmAnswerResponse.references());
+		SaveRAGAnswerRequest saveRAGAnswerRequest = SaveRAGAnswerRequest.builder()
+			.type(type)
+			.category(category)
+			.content(content)
+			.contentToken(contentToken)
+			.answerContent(llmAnswerResponse.answer())
+			.references(llmAnswerResponse.references())
+			.build();
 
-		return getQuestionResponse(answer, newQuestion, llmAnswerResponse);
+		return createRAGAnswer.invoke(saveRAGAnswerRequest);
 	}
 
 	private LLMAskQuestionRequest getLlmAskQuestionRequest(final AdmissionType type,
