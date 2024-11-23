@@ -13,6 +13,7 @@ import org.mockito.MockitoAnnotations;
 import jakarta.persistence.EntityNotFoundException;
 import mju.iphak.maru_egg.common.MockTest;
 import mju.iphak.maru_egg.common.exception.ErrorCode;
+import mju.iphak.maru_egg.question.application.command.check.CheckQuestionService;
 import mju.iphak.maru_egg.question.domain.Question;
 import mju.iphak.maru_egg.question.repository.QuestionRepository;
 

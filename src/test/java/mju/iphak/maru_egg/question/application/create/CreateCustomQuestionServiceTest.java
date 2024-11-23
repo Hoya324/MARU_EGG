@@ -16,12 +16,13 @@ import org.mockito.MockitoAnnotations;
 
 import mju.iphak.maru_egg.admission.domain.AdmissionCategory;
 import mju.iphak.maru_egg.admission.domain.AdmissionType;
-import mju.iphak.maru_egg.answer.application.create.CreateCustomAnswerService;
-import mju.iphak.maru_egg.answer.application.find.FindAnswerByQuestionIdService;
+import mju.iphak.maru_egg.answer.application.command.create.CreateCustomAnswerService;
+import mju.iphak.maru_egg.answer.application.query.find.FindAnswerByQuestionIdService;
 import mju.iphak.maru_egg.answer.domain.Answer;
 import mju.iphak.maru_egg.answer.dto.request.CreateAnswerRequest;
 import mju.iphak.maru_egg.answer.repository.AnswerRepository;
 import mju.iphak.maru_egg.common.MockTest;
+import mju.iphak.maru_egg.question.application.command.create.CreateCustomQuestionService;
 import mju.iphak.maru_egg.question.dao.request.QuestionCoreDAO;
 import mju.iphak.maru_egg.question.dao.response.QuestionCore;
 import mju.iphak.maru_egg.question.domain.Question;

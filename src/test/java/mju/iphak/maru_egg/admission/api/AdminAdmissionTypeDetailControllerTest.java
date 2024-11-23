@@ -12,10 +12,10 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.ResultActions;
 
-import mju.iphak.maru_egg.admission.application.detail.create.CreateAdmissionTypeDetailService;
-import mju.iphak.maru_egg.admission.application.detail.find.FindAllAdmissionTypeDetailService;
-import mju.iphak.maru_egg.admission.application.status.find.FindAdmissionTypeStatusService;
-import mju.iphak.maru_egg.admission.application.status.init.InitAdmissionTypeStatusService;
+import mju.iphak.maru_egg.admission.application.detail.command.create.CreateAdmissionTypeDetailService;
+import mju.iphak.maru_egg.admission.application.detail.query.find.FindAllAdmissionTypeDetailService;
+import mju.iphak.maru_egg.admission.application.status.command.init.InitAdmissionTypeStatusService;
+import mju.iphak.maru_egg.admission.application.status.query.find.FindAdmissionTypeStatusService;
 import mju.iphak.maru_egg.admission.domain.AdmissionType;
 import mju.iphak.maru_egg.admission.dto.request.CreateAdmissionTypeDetailRequest;
 import mju.iphak.maru_egg.admission.dto.request.UpdateAdmissionTypeDetailRequest;

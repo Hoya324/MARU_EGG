@@ -10,9 +10,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
 import mju.iphak.maru_egg.admission.api.swagger.AdminAdmissionTypeDetailControllerDocs;
-import mju.iphak.maru_egg.admission.application.detail.create.CreateAdmissionTypeDetail;
-import mju.iphak.maru_egg.admission.application.detail.delete.DeleteAdmissionTypeDetail;
-import mju.iphak.maru_egg.admission.application.detail.update.UpdateAdmissionTypeDetail;
+import mju.iphak.maru_egg.admission.application.detail.command.create.CreateAdmissionTypeDetail;
+import mju.iphak.maru_egg.admission.application.detail.command.delete.DeleteAdmissionTypeDetail;
+import mju.iphak.maru_egg.admission.application.detail.command.update.UpdateAdmissionTypeDetail;
 import mju.iphak.maru_egg.admission.dto.request.CreateAdmissionTypeDetailRequest;
 import mju.iphak.maru_egg.admission.dto.request.UpdateAdmissionTypeDetailRequest;
 

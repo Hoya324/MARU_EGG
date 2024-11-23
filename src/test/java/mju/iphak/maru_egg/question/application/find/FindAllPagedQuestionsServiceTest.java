@@ -18,6 +18,7 @@ import mju.iphak.maru_egg.admission.domain.AdmissionCategory;
 import mju.iphak.maru_egg.admission.domain.AdmissionType;
 import mju.iphak.maru_egg.common.MockTest;
 import mju.iphak.maru_egg.common.dto.pagination.SliceQuestionResponse;
+import mju.iphak.maru_egg.question.application.query.find.FindAllPagedQuestionsService;
 import mju.iphak.maru_egg.question.dao.request.SelectQuestions;
 import mju.iphak.maru_egg.question.dto.request.SearchQuestionsRequest;
 import mju.iphak.maru_egg.question.dto.response.SearchedQuestionsResponse;

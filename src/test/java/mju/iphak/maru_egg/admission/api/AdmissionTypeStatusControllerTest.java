@@ -11,8 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
 
-import mju.iphak.maru_egg.admission.application.status.find.FindAdmissionTypeStatusService;
-import mju.iphak.maru_egg.admission.application.status.init.InitAdmissionTypeStatusService;
+import mju.iphak.maru_egg.admission.application.status.query.find.FindAdmissionTypeStatusService;
+import mju.iphak.maru_egg.admission.application.status.command.init.InitAdmissionTypeStatusService;
 import mju.iphak.maru_egg.common.IntegrationTest;
 
 class AdmissionTypeStatusControllerTest extends IntegrationTest {

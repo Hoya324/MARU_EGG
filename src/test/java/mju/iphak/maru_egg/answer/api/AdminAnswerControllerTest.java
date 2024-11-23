@@ -17,7 +17,7 @@ import org.springframework.test.web.servlet.ResultMatcher;
 
 import mju.iphak.maru_egg.admission.domain.AdmissionCategory;
 import mju.iphak.maru_egg.admission.domain.AdmissionType;
-import mju.iphak.maru_egg.answer.application.update.UpdateAnswerContentService;
+import mju.iphak.maru_egg.answer.application.command.update.UpdateAnswerContentService;
 import mju.iphak.maru_egg.answer.domain.Answer;
 import mju.iphak.maru_egg.answer.dto.request.UpdateAnswerContentRequest;
 import mju.iphak.maru_egg.answer.repository.AnswerRepository;

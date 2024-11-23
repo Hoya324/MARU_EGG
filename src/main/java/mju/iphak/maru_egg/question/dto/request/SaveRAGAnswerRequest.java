@@ -7,6 +7,7 @@ import mju.iphak.maru_egg.admission.domain.AdmissionCategory;
 import mju.iphak.maru_egg.admission.domain.AdmissionType;
 import mju.iphak.maru_egg.answer.dto.response.LLMAnswerResponse;
 import mju.iphak.maru_egg.answerreference.dto.response.AnswerReferenceResponse;
+import mju.iphak.maru_egg.question.domain.Question;
 
 @Builder
 public record SaveRAGAnswerRequest(
@@ -28,5 +29,9 @@ public record SaveRAGAnswerRequest(
 			.answerContent(llmAnswerResponse.answer())
 			.references(llmAnswerResponse.references())
 			.build();
+	}
+
+	public Question toQuestionEntity() {
+		return Question.of(content, contentToken, type, category);
 	}
 }
