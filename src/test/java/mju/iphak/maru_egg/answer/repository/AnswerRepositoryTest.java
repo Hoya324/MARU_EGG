@@ -12,11 +12,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import jakarta.persistence.EntityNotFoundException;
+import mju.iphak.maru_egg.admission.domain.AdmissionCategory;
+import mju.iphak.maru_egg.admission.domain.AdmissionType;
 import mju.iphak.maru_egg.answer.domain.Answer;
 import mju.iphak.maru_egg.common.RepositoryTest;
 import mju.iphak.maru_egg.question.domain.Question;
-import mju.iphak.maru_egg.admission.domain.AdmissionCategory;
-import mju.iphak.maru_egg.admission.domain.AdmissionType;
 import mju.iphak.maru_egg.question.repository.QuestionRepository;
 
 class AnswerRepositoryTest extends RepositoryTest {
@@ -36,7 +36,7 @@ class AnswerRepositoryTest extends RepositoryTest {
 		answerRepository.save(answer);
 	}
 
-	@DisplayName("답변을 조회하는데 실패한 경우-questionId을 못 찾은 경우")
+	@DisplayName("[실패] 답변 조회 실패 - questionId를 찾을 수 없는 경우")
 	@Test
 	void 답변_조회_실패() {
 		// given
@@ -49,7 +49,7 @@ class AnswerRepositoryTest extends RepositoryTest {
 		assertThat(answerOptional).isEmpty();
 	}
 
-	@DisplayName("답변을 조회하는데 실패한 경우-questionId을 못 찾은 경우 예외 메세지 확인")
+	@DisplayName("[실패] 답변 조회 실패 - questionId를 찾을 수 없는 경우 예외 메시지 확인")
 	@Test
 	void 답변_조회_실패_NotFound() {
 		// given
