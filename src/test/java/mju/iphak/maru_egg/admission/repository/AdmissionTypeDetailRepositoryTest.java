@@ -27,15 +27,15 @@ class AdmissionTypeDetailRepositoryTest extends RepositoryTest {
 	@BeforeEach
 	void setUp() {
 		AdmissionType type = AdmissionType.SUSI;
-		AdmissionTypeStatus admissionTypeStatus = AdmissionTypeStatus.of(AdmissionType.SUSI);
+		AdmissionTypeStatus admissionTypeStatus = AdmissionTypeStatus.of(type);
 		admissionTypeStatusRepository.save(admissionTypeStatus);
 		admissionTypeDetail = AdmissionTypeDetail.of("학교장추천전형", admissionTypeStatus);
 		admissionTypeDetailRepository.save(admissionTypeDetail);
 	}
 
-	@DisplayName("AdmissionType으로 상세정보 조회 성공")
+	@DisplayName("[성공] AdmissionType으로 상세정보 조회")
 	@Test
-	void findAllByAdmissionType_Success() {
+	void 전형유형으로_상세정보_조회_성공() {
 		// given
 		AdmissionType type = AdmissionType.SUSI;
 
@@ -43,6 +43,8 @@ class AdmissionTypeDetailRepositoryTest extends RepositoryTest {
 		List<AdmissionTypeDetail> result = admissionTypeDetailRepository.findAllByAdmissionType(type);
 
 		// then
-		assertThat(result).isNotEmpty();
+		assertThat(result)
+			.isNotEmpty()
+			.contains(admissionTypeDetail);
 	}
 }
