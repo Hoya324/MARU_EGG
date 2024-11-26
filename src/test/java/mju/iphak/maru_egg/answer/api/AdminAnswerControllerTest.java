@@ -8,11 +8,11 @@ import java.util.List;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.ResultMatcher;
 
 import mju.iphak.maru_egg.admission.domain.AdmissionCategory;
@@ -48,48 +48,51 @@ class AdminAnswerControllerTest extends IntegrationTest {
 		questionRepository.deleteAllInBatch();
 	}
 
+	@DisplayName("[성공] 답변 수정 요청")
 	@Test
-	void 답변_수정_API_정상적인_요청() throws Exception {
+	void 답변_수정_성공() throws Exception {
 		// given
 		Long questionId = getFirstQuestionId();
 		UpdateAnswerContentRequest request = new UpdateAnswerContentRequest(questionId, "새로운 답변 내용");
 
 		// when & then
-		performRequestAndExpectStatus(request, status().isOk());
+		UpdateAnswerContent(request, status().isOk());
 	}
 
+	@DisplayName("[실패] 답변 수정 요청 - 잘못된 JSON 형식")
 	@Test
-	void 답변_수정_API_잘못된_JSON_형식() throws Exception {
+	void 답변_수정_실패_잘못된_JSON_형식() throws Exception {
 		// given
 		String invalidJson = "{\"id\": \"ㅇㅇ\", \"content\": \"새로운 답변 내용\"}";
 
 		// when & then
-		performRequestAndExpectStatus(invalidJson, status().isBadRequest());
+		UpdateAnswerContent(invalidJson, status().isBadRequest());
 	}
 
+	@DisplayName("[실패] 답변 수정 요청 - 존재하지 않는 답변 ID")
 	@Test
-	void 답변_수정_API_존재하지_않는_답변_ID() throws Exception {
+	void 답변_수정_실패_존재하지_않는_답변_ID() throws Exception {
 		// given
 		UpdateAnswerContentRequest request = new UpdateAnswerContentRequest(999L, "새로운 답변 내용");
 
 		// when & then
-		performRequestAndExpectStatus(request, status().isNotFound());
+		UpdateAnswerContent(request, status().isNotFound());
 	}
 
-	private void performRequestAndExpectStatus(Object content, ResultMatcher expectedStatus) throws Exception {
-		ResultActions resultActions = mvc.perform(put("/api/admin/answers")
-			.contentType(MediaType.APPLICATION_JSON)
-			.content(objectMapper.writeValueAsString(content)));
-
-		resultActions.andExpect(expectedStatus).andDo(print());
+	private void UpdateAnswerContent(Object content, ResultMatcher expectedStatus) throws Exception {
+		mvc.perform(put("/api/admin/answers")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(content)))
+			.andExpect(expectedStatus)
+			.andDo(print());
 	}
 
-	private void performRequestAndExpectStatus(String content, ResultMatcher expectedStatus) throws Exception {
-		ResultActions resultActions = mvc.perform(put("/api/admin/answers")
-			.contentType(MediaType.APPLICATION_JSON)
-			.content(content));
-
-		resultActions.andExpect(expectedStatus).andDo(print());
+	private void UpdateAnswerContent(String content, ResultMatcher expectedStatus) throws Exception {
+		mvc.perform(put("/api/admin/answers")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(content))
+			.andExpect(expectedStatus)
+			.andDo(print());
 	}
 
 	private void initializeTestData() {
