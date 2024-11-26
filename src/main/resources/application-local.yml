@@ -19,6 +19,14 @@ spring:
 
 logging:
   level:
+    com:
+      zaxxer:
+        hikari:
+          pool:
+            debug
+          util:
+            trace
+
     org:
       hibernate:
         type:
@@ -27,6 +35,6 @@ logging:
       springframework:
         orm:
           jpa: debug
-        transaction: info
+        transaction: debug
 server:
   port: 8082
