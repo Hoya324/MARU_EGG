@@ -106,8 +106,9 @@ class QuestionRepositoryImplTest extends RepositoryTest {
 		answerRepository.save(answer);
 	}
 
+	@DisplayName("[성공] 타입과 카테고리로 질문을 조회한다.")
 	@Test
-	void contentToken_type_질문_검색_성공() {
+	void 타입과_카테고리로_질문_조회_성공() {
 		// given
 		QQuestion question = QQuestion.question;
 		String contentToken = "수시 입학 요강 대해";
@@ -124,9 +125,9 @@ class QuestionRepositoryImplTest extends RepositoryTest {
 		assertThat(results.get(0).getContent()).contains("수시 입학 요강");
 	}
 
-	@DisplayName("contentToken, type으로 질문을 검색하는데 실패한 경우")
+	@DisplayName("[실패] 타입과 카테고리로 질문을 조회할 수 없다.")
 	@Test
-	void contentToken_type으로_질문_검색_실패() {
+	void 타입과_카테고리로_질문_조회_실패() {
 		// given
 		String invalidContentToken = "잘못된 질문";
 		AdmissionType type = AdmissionType.SUSI;
@@ -143,9 +144,9 @@ class QuestionRepositoryImplTest extends RepositoryTest {
 		assertThat(result.get()).isEmpty();
 	}
 
-	@DisplayName("contentToken, type, Category로 질문을 검색하는데 성공")
+	@DisplayName("[성공] contentToken, type, Category로 질문을 검색")
 	@Test
-	void contentToken_type_Category로_질문_검색_성공() {
+	void 내용토큰_유형_카테고리로_질문_검색_성공() {
 		// given
 		QQuestion question = QQuestion.question;
 		String contentToken = "수시 입학 요강 대해";
@@ -166,9 +167,9 @@ class QuestionRepositoryImplTest extends RepositoryTest {
 		assertThat(results).isNotEmpty();
 	}
 
-	@DisplayName("contentToken, type, Category로 질문을 검색하는데 실패한 경우")
+	@DisplayName("[실패] contentToken, type, Category로 질문 검색")
 	@Test
-	void contentToken_type_Category로_질문_검색_실패() {
+	void 내용토큰_유형_카테고리로_질문_검색_실패() {
 		// given
 		String invalidContentToken = "잘못된 질문";
 		AdmissionType type = AdmissionType.SUSI;
@@ -185,9 +186,9 @@ class QuestionRepositoryImplTest extends RepositoryTest {
 		assertThat(result.get()).isEmpty();
 	}
 
-	@DisplayName("content로 질문을 페이지네이션 조회 - 실패")
+	@DisplayName("[실패] content로 질문을 페이지네이션 조회")
 	@Test
-	void content로_질문_페이지네이션_조회_실패() {
+	void 내용으로_질문_페이지네이션_조회_실패() {
 		// given
 		String content = "존재하지 않는 질문";
 		Pageable pageable = PageRequest.of(0, 3);
@@ -202,8 +203,9 @@ class QuestionRepositoryImplTest extends RepositoryTest {
 		assertThat(result.data()).isEmpty();
 	}
 
+	@DisplayName("[성공] contentToken과 type으로 질문 검색")
 	@Test
-	void contentToken_type() {
+	void 내용토큰과_유형으로_질문_검색_성공() {
 		QQuestion question = QQuestion.question;
 		String contentToken = "수시 입학 요강 대해";
 		AdmissionType type = AdmissionType.SUSI;
@@ -217,7 +219,7 @@ class QuestionRepositoryImplTest extends RepositoryTest {
 		assertThat(results).isNotEmpty();
 	}
 
-	@DisplayName("Full Text Search를 사용하여 content로 질문 검색 - 성공")
+	@DisplayName("[성공] Full Text Search를 사용하여 content로 질문 검색 - 성공")
 	@Test
 	void fullTextSearch_content_질문_검색_성공() {
 		// given
@@ -235,7 +237,7 @@ class QuestionRepositoryImplTest extends RepositoryTest {
 		assertThat(results.get(0).getContentToken()).contains(contentToken);
 	}
 
-	@DisplayName("Full Text Search를 사용하여 content로 질문 검색 - 실패")
+	@DisplayName("[실패] Full Text Search를 사용하여 content로 질문 검색 - 실패")
 	@Test
 	void fullTextSearch_content_질문_검색_실패() {
 		// given
