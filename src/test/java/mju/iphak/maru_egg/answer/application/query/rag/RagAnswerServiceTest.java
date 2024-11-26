@@ -38,7 +38,7 @@ class RagAnswerServiceTest extends MockTest {
 	private Answer answer;
 
 	@BeforeEach
-	public void setUp() throws Exception {
+	void setUp() throws Exception {
 		this.mockWebServer = new MockWebServer();
 		this.mockWebServer.start();
 
@@ -53,15 +53,15 @@ class RagAnswerServiceTest extends MockTest {
 	}
 
 	@AfterEach
-	public void tearDown() throws Exception {
+	void tearDown() throws Exception {
 		if (mockWebServer != null) {
 			mockWebServer.shutdown();
 		}
 	}
 
-	@DisplayName("[성공 case1] LLM 서버에 질문을 요청합니다.")
+	@DisplayName("[성공] LLM 서버에 질문 요청 성공")
 	@Test
-	void LLM_질문_요청() {
+	void LLM_질문_요청_성공() {
 		// given
 		LLMAskQuestionRequest request = LLMAskQuestionRequest.of(
 			AdmissionType.SUSI.getType(),

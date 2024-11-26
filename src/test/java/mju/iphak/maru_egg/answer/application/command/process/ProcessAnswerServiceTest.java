@@ -36,21 +36,22 @@ class ProcessAnswerServiceTest extends MockTest {
 	private ProcessAnswerService processAnswerService;
 
 	@BeforeEach
-	public void setUp() throws Exception {
+	void setUp() {
 		MockitoAnnotations.openMocks(this);
 	}
 
-	@DisplayName("[성공] RAG 서버에서 유효한 답변을 받아 질문과 답변 저장")
+	@DisplayName("[성공] RAG 서버에서 유효한 답변을 받아 질문과 답변 저장 요청")
 	@Test
-	void testValidRagResponse() {
-		// Given
+	void RAG_답변_성공_질문_답변_저장() {
+		// given
 		AdmissionType type = AdmissionType.SUSI;
 		AdmissionCategory category = AdmissionCategory.ADMISSION_GUIDELINE;
 		String content = "수시 일정 알려주세요.";
 		String contentToken = "수시 일정";
-		QuestionRequest request = new QuestionRequest(type, category, content);
 
+		QuestionRequest request = new QuestionRequest(type, category, content);
 		Question question = Question.of(content, contentToken, type, category);
+
 		Answer answer = Answer.of(
 			question,
 			"수시 일정은 2024년 12월 19일부터 12월 26일까지 최초합격자 발표가 있습니다. "
@@ -66,13 +67,12 @@ class ProcessAnswerServiceTest extends MockTest {
 
 		when(ragAnswer.invoke(any(LLMAskQuestionRequest.class))).thenReturn(Mono.just(mockRagResponse));
 
-		// When
+		// when
 		QuestionResponse result = processAnswerService.invoke(request, contentToken);
 
-		// Then
+		// then
 		assertThat(result).isNotNull();
 		assertThat(result.content()).isEqualTo(content);
 		assertThat(result.answer().content()).isEqualTo(answer.getContent());
 	}
-
 }

@@ -38,13 +38,13 @@ class CreateRAGAnswerServiceTest extends MockTest {
 	private CreateRAGAnswerService createRAGAnswerService;
 
 	@BeforeEach
-	public void setUp() {
+	void setUp() {
 		MockitoAnnotations.openMocks(this);
 	}
 
-	@DisplayName("[성공] 질문과 답변 생성")
+	@DisplayName("[성공] 질문과 답변 생성 요청")
 	@Test
-	void 질문_답변_생성() {
+	void 질문_답변_생성_성공() {
 		// given
 		List<AnswerReferenceResponse> references = Collections.emptyList();
 		SaveRAGAnswerRequest request = createRequest(references);
@@ -59,6 +59,8 @@ class CreateRAGAnswerServiceTest extends MockTest {
 
 		// then
 		verify(createAnswerReference, times(1)).invoke(mockAnswer, request.references());
+		verify(questionRepository, times(1)).save(any(Question.class));
+		verify(answerRepository, times(1)).save(any(Answer.class));
 	}
 
 	private SaveRAGAnswerRequest createRequest(List<AnswerReferenceResponse> references) {

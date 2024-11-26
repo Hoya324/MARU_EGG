@@ -37,14 +37,14 @@ class CreateCustomAnswerServiceTest extends MockTest {
 		answer = mock(Answer.class);
 	}
 
-	@DisplayName("답변 생성에 성공한 경우")
+	@DisplayName("[성공] 답변 생성 요청")
 	@Test
-	public void 답변_생성_성공() {
+	void 답변_생성_성공() {
 		// given
 		CreateAnswerRequest answerRequest = new CreateAnswerRequest("example answer content", 2024);
-		CreateQuestionRequest request = new CreateQuestionRequest("example content", AdmissionType.SUSI,
+		CreateQuestionRequest questionRequest = new CreateQuestionRequest("example content", AdmissionType.SUSI,
 			AdmissionCategory.ADMISSION_GUIDELINE, answerRequest);
-		Question question = request.toEntity();
+		Question question = questionRequest.toEntity();
 		Answer answer = answerRequest.toEntity(question);
 
 		when(answerRepository.save(any(Answer.class))).thenReturn(answer);
@@ -55,5 +55,4 @@ class CreateCustomAnswerServiceTest extends MockTest {
 		// then
 		verify(answerRepository, times(1)).save(any(Answer.class));
 	}
-
 }

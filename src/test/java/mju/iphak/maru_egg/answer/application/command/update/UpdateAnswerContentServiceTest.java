@@ -30,18 +30,19 @@ class UpdateAnswerContentServiceTest extends MockTest {
 		MockitoAnnotations.openMocks(this);
 	}
 
-	@DisplayName("[실패] 답변 내용을 수정할 때, 답변을 찾을 수 없으면 예외가 발생한다.")
+	@DisplayName("[실패] 답변 수정 요청 - 답변을 찾을 수 없음")
 	@Test
-	void 답변_내용_수정_실패_NOTFOUND() {
+	void 답변_수정_실패_답변_없음() {
 		// given
 		Long id = 1L;
-		given(answerRepository.findById(anyLong())).willReturn(Optional.empty());
+		String newContent = "새로운 내용";
+		given(answerRepository.findById(id)).willReturn(Optional.empty());
 
-		// when & then
-		EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> {
-			updateAnswerContent.invoke(id, "새로운 내용");
-		});
+		// when
+		EntityNotFoundException exception = assertThrows(EntityNotFoundException.class,
+			() -> updateAnswerContent.invoke(id, newContent));
 
-		assertThat(exception.getMessage()).isEqualTo("답변 id가 1인 답변을 찾을 수 없습니다.");
+		// Then
+		assertThat(exception.getMessage()).isEqualTo(String.format("답변 id가 %d인 답변을 찾을 수 없습니다.", id));
 	}
 }

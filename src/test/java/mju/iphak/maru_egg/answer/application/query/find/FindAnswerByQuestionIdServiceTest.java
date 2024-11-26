@@ -1,5 +1,6 @@
 package mju.iphak.maru_egg.answer.application.query.find;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -17,15 +18,11 @@ import mju.iphak.maru_egg.answer.domain.Answer;
 import mju.iphak.maru_egg.answer.repository.AnswerRepository;
 import mju.iphak.maru_egg.common.MockTest;
 import mju.iphak.maru_egg.question.domain.Question;
-import mju.iphak.maru_egg.question.repository.QuestionRepository;
 
 class FindAnswerByQuestionIdServiceTest extends MockTest {
 
 	@Mock
 	private AnswerRepository answerRepository;
-
-	@Mock
-	private QuestionRepository questionRepository;
 
 	@InjectMocks
 	private FindAnswerByQuestionIdService findAnswerByQuestionId;
@@ -40,30 +37,33 @@ class FindAnswerByQuestionIdServiceTest extends MockTest {
 		answer = mock(Answer.class);
 	}
 
-	@DisplayName("questionId로 답변 조회에 실패한 경우.")
+	@DisplayName("[실패] questionId로 답변 조회 요청 - 답변 없음")
 	@Test
-	public void 답변_조회_실패_NOTFOUND() {
+	void 답변_조회_실패_답변_없음() {
 		// given
-		when(answerRepository.findByQuestionId(1L)).thenReturn(Optional.empty());
+		Long questionId = 1L;
+		when(answerRepository.findByQuestionId(questionId)).thenReturn(Optional.empty());
 
-		// when & then
-		EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> {
-			findAnswerByQuestionId.invoke(1L);
-		});
+		// when
+		EntityNotFoundException exception = assertThrows(EntityNotFoundException.class,
+			() -> findAnswerByQuestionId.invoke(questionId));
 
-		assertEquals("질문 id가 1인 답변을 찾을 수 없습니다.", exception.getMessage());
+		// then
+		assertThat(exception.getMessage()).isEqualTo(String.format("질문 id가 %d인 답변을 찾을 수 없습니다.", questionId));
 	}
 
-	@DisplayName("질문 조회 시 존재하지 않는 질문 ID로 인한 예외 처리")
+	@DisplayName("[실패] 질문 ID 조회 요청 - 존재하지 않는 질문 ID")
 	@Test
-	void 질문_ID로_조회_시_존재하지_않는_질문_ID() {
+	void 질문_ID로_조회_실패_질문_없음() {
 		// given
 		Long invalidQuestionId = 999L;
-		when(questionRepository.findById(invalidQuestionId)).thenReturn(Optional.empty());
+		when(answerRepository.findByQuestionId(invalidQuestionId)).thenReturn(Optional.empty());
 
-		// when & then
-		assertThrows(EntityNotFoundException.class, () -> {
-			findAnswerByQuestionId.invoke(invalidQuestionId);
-		});
+		// when
+		EntityNotFoundException exception = assertThrows(EntityNotFoundException.class,
+			() -> findAnswerByQuestionId.invoke(invalidQuestionId));
+
+		// then
+		assertThat(exception.getMessage()).isEqualTo(String.format("질문 id가 %d인 답변을 찾을 수 없습니다.", invalidQuestionId));
 	}
 }
