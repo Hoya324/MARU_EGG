@@ -2,6 +2,9 @@ package mju.iphak.maru_egg.answer.application.command.process;
 
 import static mju.iphak.maru_egg.answer.utils.AnswerGuideUtils.*;
 
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,7 +30,8 @@ public class ProcessAnswerService implements ProcessAnswer {
 	public QuestionResponse invoke(QuestionRequest request, String contentToken) {
 		LLMAskQuestionRequest askQuestionRequest = getLlmAskQuestionRequest(request);
 
-		LLMAnswerResponse llmAnswerResponse = ragAnswer.invoke(askQuestionRequest).block();
+		LLMAnswerResponse llmAnswerResponse = ragAnswer.invoke(askQuestionRequest)
+			.block(Duration.of(20L, ChronoUnit.SECONDS));
 
 		if (isInvalidAnswer(llmAnswerResponse)) {
 			return QuestionResponse.valueOfRAG(request.content(), generateGuideAnswer(llmAnswerResponse.references()));
