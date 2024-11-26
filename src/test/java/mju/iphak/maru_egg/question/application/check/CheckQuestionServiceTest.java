@@ -26,11 +26,11 @@ class CheckQuestionServiceTest extends MockTest {
 	private CheckQuestionService checkQuestionService;
 
 	@BeforeEach
-	public void setUp() throws Exception {
+	void setUp() {
 		MockitoAnnotations.openMocks(this);
 	}
 
-	@DisplayName("[성공 case1] Question ID가 존재할 때 isChecked가 업데이트된다.")
+	@DisplayName("[성공] Question ID가 존재할 때 isChecked가 업데이트된다")
 	@Test
 	void 질문_ID_존재() {
 		// given
@@ -46,7 +46,7 @@ class CheckQuestionServiceTest extends MockTest {
 		verify(mockQuestion, times(1)).updateIsChecked();
 	}
 
-	@DisplayName("[실패] 존재하지 않는 Question ID를 호출했을 때 EntityNotFoundException이 발생한다.")
+	@DisplayName("[실패] 존재하지 않는 Question ID를 호출했을 때 EntityNotFoundException 발생")
 	@Test
 	void 질문_ID_존재하지_않음() {
 		// given
@@ -59,6 +59,7 @@ class CheckQuestionServiceTest extends MockTest {
 			.isInstanceOf(EntityNotFoundException.class)
 			.hasMessage(String.format(ErrorCode.NOT_FOUND_QUESTION_BY_ID.getMessage(), questionId));
 
+		// then
 		verify(questionRepository, times(1)).findById(questionId);
 	}
 }

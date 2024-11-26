@@ -89,7 +89,7 @@ class FindAllPagedQuestionsServiceTest extends MockTest {
 		verify(questionRepository, times(1)).searchQuestionsOfCursorPaging(selectQuestions);
 	}
 
-	@DisplayName("[성공] 빈 결과 반환")
+	@DisplayName("[성공] 질문 자동완성 - 빈 결과 반환")
 	@Test
 	void 질문_자동완성_빈결과() {
 		// given

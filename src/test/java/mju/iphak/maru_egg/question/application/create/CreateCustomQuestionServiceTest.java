@@ -1,7 +1,6 @@
 package mju.iphak.maru_egg.question.application.create;
 
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.anyLong;
 import static org.mockito.Mockito.*;
 
 import java.util.List;
@@ -64,13 +63,17 @@ class CreateCustomQuestionServiceTest extends MockTest {
 		when(questionRepository.findById(1L)).thenReturn(Optional.of(question));
 	}
 
-	@DisplayName("질문 생성에 성공한 경우")
+	@DisplayName("[성공] 질문 생성 요청")
 	@Test
 	void 질문_생성_성공() {
 		// given
 		CreateAnswerRequest answerRequest = new CreateAnswerRequest("example answer content", 2024);
-		CreateQuestionRequest request = new CreateQuestionRequest("example content", AdmissionType.SUSI,
-			AdmissionCategory.ADMISSION_GUIDELINE, answerRequest);
+		CreateQuestionRequest request = new CreateQuestionRequest(
+			"example content",
+			AdmissionType.SUSI,
+			AdmissionCategory.ADMISSION_GUIDELINE,
+			answerRequest
+		);
 		Question question = request.toEntity();
 
 		when(questionRepository.save(question)).thenReturn(question);
@@ -82,5 +85,4 @@ class CreateCustomQuestionServiceTest extends MockTest {
 		verify(questionRepository, times(1)).save(any(Question.class));
 		verify(createAnswer, times(1)).invoke(any(Question.class), eq(answerRequest));
 	}
-
 }

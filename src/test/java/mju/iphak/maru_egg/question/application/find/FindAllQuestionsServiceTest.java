@@ -1,7 +1,6 @@
 package mju.iphak.maru_egg.question.application.find;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
@@ -53,10 +52,9 @@ class FindAllQuestionsServiceTest extends MockTest {
 		when(questionRepository.searchQuestions(any(QuestionCoreDAO.class)))
 			.thenReturn(Optional.of(List.of(QuestionCore.of(1L, "테스트 질문입니다."))));
 		when(questionRepository.findById(1L)).thenReturn(Optional.of(question));
-		findAllQuestionsService = new FindAllQuestionsService(questionRepository, findAnswerByQuestionId);
 	}
 
-	@DisplayName("질문 목록을 조회하는데 성공한 경우")
+	@DisplayName("[성공] 질문 목록 조회")
 	@Test
 	void 질문_목록_조회_성공() {
 		// given
@@ -71,13 +69,13 @@ class FindAllQuestionsServiceTest extends MockTest {
 		List<QuestionListItemResponse> result = findAllQuestionsService.invoke(type, category);
 
 		// then
-		assertNotNull(result);
-		assertFalse(result.isEmpty());
+		assertThat(result).isNotNull();
+		assertThat(result).isNotEmpty();
 		assertThat(result.get(0).content()).isEqualTo(question.getContent());
 		assertThat(result.get(0).answer().content()).isEqualTo(answer.getContent());
 	}
 
-	@DisplayName("질문 목록을 조회하는데 성공한 경우 - 카테고리 없이 타입으로 조회")
+	@DisplayName("[성공] 질문 목록 조회 - 카테고리 없이")
 	@Test
 	void 질문_목록_조회_성공_카테고리_없이() {
 		// given
@@ -91,10 +89,9 @@ class FindAllQuestionsServiceTest extends MockTest {
 		List<QuestionListItemResponse> result = findAllQuestionsService.invoke(type, null);
 
 		// then
-		assertNotNull(result);
-		assertFalse(result.isEmpty());
+		assertThat(result).isNotNull();
+		assertThat(result).isNotEmpty();
 		assertThat(result.get(0).content()).isEqualTo(question.getContent());
 		assertThat(result.get(0).answer().content()).isEqualTo(answer.getContent());
 	}
-
 }
