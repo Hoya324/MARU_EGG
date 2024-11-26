@@ -15,10 +15,11 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import jakarta.persistence.EntityNotFoundException;
+import mju.iphak.maru_egg.common.MockTest;
 import mju.iphak.maru_egg.user.domain.User;
 import mju.iphak.maru_egg.user.repository.UserRepository;
 
-class AuthServiceTest {
+class AuthServiceTest extends MockTest {
 
 	@Mock
 	private UserRepository userRepository;
@@ -34,7 +35,7 @@ class AuthServiceTest {
 		MockitoAnnotations.openMocks(this);
 	}
 
-	@DisplayName("회원 가입에 성공한 경우")
+	@DisplayName("[성공] 회원 가입 요청")
 	@Test
 	void 회원_가입_성공() {
 		// given
@@ -51,7 +52,7 @@ class AuthServiceTest {
 		verify(userRepository, times(1)).save(any(User.class));
 	}
 
-	@DisplayName("이미 존재하는 이메일로 회원 가입 시도")
+	@DisplayName("[실패] 이미 존재하는 이메일로 회원 가입 시도")
 	@Test
 	void 이미_존재하는_이메일로_회원_가입() {
 		// given
@@ -67,7 +68,7 @@ class AuthServiceTest {
 			.hasMessageContaining("이미 존재하는 이메일입니다.");
 	}
 
-	@DisplayName("로그인에 성공한 경우")
+	@DisplayName("[성공] 로그인 요청")
 	@Test
 	void 로그인_성공() {
 		// given
@@ -85,10 +86,10 @@ class AuthServiceTest {
 
 		// then
 		verify(passwordEncoder, times(1)).matches(password, encodedPassword);
-		verify(userRepository, times(1)).findByEmail(email); // 추가적인 검증
+		verify(userRepository, times(1)).findByEmail(email);
 	}
 
-	@DisplayName("존재하지 않는 이메일로 로그인 시도")
+	@DisplayName("[실패] 존재하지 않는 이메일로 로그인 요청")
 	@Test
 	void 존재하지_않는_이메일로_로그인() {
 		// given
@@ -103,7 +104,7 @@ class AuthServiceTest {
 			.hasMessageContaining("유저 이메일이 nonexistent@example.com인 유저를 찾을 수 없습니다.");
 	}
 
-	@DisplayName("잘못된 비밀번호로 로그인 시도")
+	@DisplayName("[실패] 잘못된 비밀번호로 로그인 요청")
 	@Test
 	void 잘못된_비밀번호로_로그인() {
 		// given
