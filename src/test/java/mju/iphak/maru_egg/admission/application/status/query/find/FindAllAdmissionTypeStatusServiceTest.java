@@ -31,9 +31,9 @@ class FindAllAdmissionTypeStatusServiceTest extends MockTest {
 		MockitoAnnotations.openMocks(this);
 	}
 
-	@DisplayName("입학 전형 상태 목록 조회 성공")
+	@DisplayName("[성공] 입학 전형 상태 목록 조회 요청")
 	@Test
-	void getAdmissionTypeStatus_Success() {
+	void 입학_전형_상태_목록_조회_성공() {
 		// given
 		AdmissionTypeStatus status1 = new AdmissionTypeStatus(AdmissionType.SUSI, true);
 		AdmissionTypeStatus status2 = new AdmissionTypeStatus(AdmissionType.JEONGSI, false);
@@ -44,11 +44,11 @@ class FindAllAdmissionTypeStatusServiceTest extends MockTest {
 
 		// then
 		verify(admissionTypeStatusRepository, times(1)).findAll();
-		assertThat(result).hasSize(2);
-		assertThat(result.get(0).type()).isEqualTo(AdmissionType.SUSI);
-		assertThat(result.get(0).isActivated()).isTrue();
-		assertThat(result.get(1).type()).isEqualTo(AdmissionType.JEONGSI);
-		assertThat(result.get(1).isActivated()).isFalse();
+		assertThat(result).hasSize(2)
+			.extracting("type", "activated")
+			.containsExactlyInAnyOrder(
+				tuple(AdmissionType.SUSI, true),
+				tuple(AdmissionType.JEONGSI, false)
+			);
 	}
-
 }

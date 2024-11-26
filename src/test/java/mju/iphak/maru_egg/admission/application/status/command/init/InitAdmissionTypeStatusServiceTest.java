@@ -26,9 +26,9 @@ class InitAdmissionTypeStatusServiceTest extends MockTest {
 		MockitoAnnotations.openMocks(this);
 	}
 
-	@DisplayName("입학 전형 상태 초기화 성공")
+	@DisplayName("[성공] 입학 전형 상태 초기화 요청")
 	@Test
-	void invoke_Success() {
+	void 입학_전형_상태_초기화_성공() {
 		// given
 		when(admissionTypeStatusRepository.count()).thenReturn(1L);
 
@@ -39,5 +39,4 @@ class InitAdmissionTypeStatusServiceTest extends MockTest {
 		verify(admissionTypeStatusRepository, times(1)).deleteAll();
 		verify(admissionTypeStatusRepository, times(1)).saveAll(any());
 	}
-
 }

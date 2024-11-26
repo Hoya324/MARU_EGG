@@ -12,8 +12,9 @@ import org.mockito.MockitoAnnotations;
 
 import mju.iphak.maru_egg.admission.domain.AdmissionType;
 import mju.iphak.maru_egg.admission.repository.AdmissionTypeStatusRepository;
+import mju.iphak.maru_egg.common.MockTest;
 
-class DeleteAdmissionTypeStatusServiceTest {
+class DeleteAdmissionTypeStatusServiceTest extends MockTest {
 
 	@Mock
 	private AdmissionTypeStatusRepository admissionTypeStatusRepository;
@@ -26,9 +27,9 @@ class DeleteAdmissionTypeStatusServiceTest {
 		MockitoAnnotations.openMocks(this);
 	}
 
-	@DisplayName("입학 전형 상태 삭제 성공")
+	@DisplayName("[성공] 입학 전형 상태 삭제 요청")
 	@Test
-	void deleteAdmissionTypeStatus_Success() {
+	void 입학_전형_상태_삭제_성공() {
 		// given
 		AdmissionType type = AdmissionType.SUSI;
 
@@ -38,5 +39,4 @@ class DeleteAdmissionTypeStatusServiceTest {
 		// then
 		verify(admissionTypeStatusRepository, times(1)).deleteByAdmissionType(eq(type));
 	}
-
 }

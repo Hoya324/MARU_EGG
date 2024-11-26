@@ -3,7 +3,7 @@ package mju.iphak.maru_egg.admission.application.status.command.update;
 import static mju.iphak.maru_egg.common.exception.ErrorCode.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.BDDMockito.*;
+import static org.mockito.Mockito.*;
 
 import java.util.Optional;
 
@@ -33,9 +33,9 @@ class UpdateAdmissionTypeStatusServiceTest extends MockTest {
 		MockitoAnnotations.openMocks(this);
 	}
 
-	@DisplayName("입학 전형 상태 업데이트 성공")
+	@DisplayName("[성공] 입학 전형 상태 업데이트 요청")
 	@Test
-	void updateStatus_Success() {
+	void 입학_전형_상태_업데이트_성공() {
 		// given
 		AdmissionType type = AdmissionType.SUSI;
 		AdmissionTypeStatus status = new AdmissionTypeStatus(type, true);
@@ -49,9 +49,9 @@ class UpdateAdmissionTypeStatusServiceTest extends MockTest {
 		assertThat(status.isActivated()).isFalse();
 	}
 
-	@DisplayName("입학 전형 상태 업데이트 실패 - 타입 상태 없음")
+	@DisplayName("[실패] 입학 전형 상태 업데이트 요청 - 상태 없음")
 	@Test
-	void updateStatus_Failure_EntityNotFound() {
+	void 입학_전형_상태_업데이트_실패_상태_없음() {
 		// given
 		AdmissionType type = AdmissionType.SUSI;
 		when(admissionTypeStatusRepository.findByAdmissionType(type)).thenReturn(Optional.empty());
@@ -59,7 +59,9 @@ class UpdateAdmissionTypeStatusServiceTest extends MockTest {
 		// when & then
 		EntityNotFoundException exception = assertThrows(EntityNotFoundException.class,
 			() -> updateAdmissionTypeStatus.invoke(type));
-		assertThat(exception.getMessage()).isEqualTo(String.format(NOT_FOUND_ADMISSION_TYPE_STATUS.getMessage(), type));
-	}
 
+		// then
+		assertThat(exception.getMessage())
+			.isEqualTo(String.format(NOT_FOUND_ADMISSION_TYPE_STATUS.getMessage(), type));
+	}
 }

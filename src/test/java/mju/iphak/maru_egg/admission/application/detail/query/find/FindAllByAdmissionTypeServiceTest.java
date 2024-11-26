@@ -32,9 +32,9 @@ class FindAllByAdmissionTypeServiceTest extends MockTest {
 		MockitoAnnotations.openMocks(this);
 	}
 
-	@DisplayName("상세 정보 조회 성공")
+	@DisplayName("[성공] 상세 정보 조회 요청")
 	@Test
-	void invokeByAdmissionType_Success() {
+	void 상세정보_조회_성공() {
 		// given
 		AdmissionType type = AdmissionType.SUSI;
 		AdmissionTypeStatus admissionTypeStatus = AdmissionTypeStatus.of(AdmissionType.SUSI);
@@ -46,6 +46,9 @@ class FindAllByAdmissionTypeServiceTest extends MockTest {
 		List<AdmissionTypeDetailResponse> result = findAllByAdmissionTypeService.invoke(type);
 
 		// then
-		assertThat(result).isNotEmpty();
+		assertThat(result).isNotEmpty()
+			.hasSize(1)
+			.extracting(AdmissionTypeDetailResponse::name)
+			.contains("학교장추천전형");
 	}
 }
