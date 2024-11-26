@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import mju.iphak.maru_egg.answer.api.swagger.AdminAnswerControllerDocs;
-import mju.iphak.maru_egg.answer.application.update.UpdateAnswerContent;
+import mju.iphak.maru_egg.answer.application.command.update.UpdateAnswerContent;
 import mju.iphak.maru_egg.answer.dto.request.UpdateAnswerContentRequest;
 
 @RequiredArgsConstructor

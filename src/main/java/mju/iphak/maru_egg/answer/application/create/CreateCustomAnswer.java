@@ -1,9 +1,0 @@
-package mju.iphak.maru_egg.answer.application.create;
-
-import mju.iphak.maru_egg.answer.dto.request.CreateAnswerRequest;
-import mju.iphak.maru_egg.question.domain.Question;
-
-public interface CreateCustomAnswer {
-
-	void invoke(final Question question, final CreateAnswerRequest request);
-}

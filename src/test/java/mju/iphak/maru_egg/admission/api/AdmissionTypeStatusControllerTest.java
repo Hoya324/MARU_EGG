@@ -11,8 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
 
-import mju.iphak.maru_egg.admission.application.status.find.FindAdmissionTypeStatusService;
-import mju.iphak.maru_egg.admission.application.status.init.InitAdmissionTypeStatusService;
+import mju.iphak.maru_egg.admission.application.status.command.init.InitAdmissionTypeStatusService;
+import mju.iphak.maru_egg.admission.application.status.query.find.FindAdmissionTypeStatusService;
 import mju.iphak.maru_egg.common.IntegrationTest;
 
 class AdmissionTypeStatusControllerTest extends IntegrationTest {
@@ -28,11 +28,11 @@ class AdmissionTypeStatusControllerTest extends IntegrationTest {
 		initAdmissionTypeStatusService.invoke();
 	}
 
-	@DisplayName("200 전체 질문타입과 상태 조회")
+	@DisplayName("[성공] 전체 질문타입과 상태 조회 요청")
 	@Test
-	public void 전체_질문타입과_상태_조회_정상적인_요청() throws Exception {
-		// given & when
-		ResultActions resultActions = performGetQuestionTypeStatus();
+	void 전체_질문타입과_상태_조회_성공() throws Exception {
+		// when
+		ResultActions resultActions = GetQuestionTypeStatus();
 
 		// then
 		resultActions
@@ -41,7 +41,7 @@ class AdmissionTypeStatusControllerTest extends IntegrationTest {
 			.andExpect(jsonPath("$").isNotEmpty());
 	}
 
-	private ResultActions performGetQuestionTypeStatus() throws Exception {
+	private ResultActions GetQuestionTypeStatus() throws Exception {
 		return mvc.perform(get("/api/admissions/status")
 				.contentType(MediaType.APPLICATION_JSON))
 			.andDo(print());

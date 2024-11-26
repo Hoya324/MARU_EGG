@@ -18,6 +18,7 @@ import mju.iphak.maru_egg.admission.domain.AdmissionCategory;
 import mju.iphak.maru_egg.admission.domain.AdmissionType;
 import mju.iphak.maru_egg.common.MockTest;
 import mju.iphak.maru_egg.common.dto.pagination.SliceQuestionResponse;
+import mju.iphak.maru_egg.question.application.query.find.FindAllPagedQuestionsService;
 import mju.iphak.maru_egg.question.dao.request.SelectQuestions;
 import mju.iphak.maru_egg.question.dto.request.SearchQuestionsRequest;
 import mju.iphak.maru_egg.question.dto.response.SearchedQuestionsResponse;
@@ -88,7 +89,7 @@ class FindAllPagedQuestionsServiceTest extends MockTest {
 		verify(questionRepository, times(1)).searchQuestionsOfCursorPaging(selectQuestions);
 	}
 
-	@DisplayName("[성공] 빈 결과 반환")
+	@DisplayName("[성공] 질문 자동완성 - 빈 결과 반환")
 	@Test
 	void 질문_자동완성_빈결과() {
 		// given

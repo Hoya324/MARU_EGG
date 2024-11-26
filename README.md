@@ -131,6 +131,7 @@
 
 ## 프로젝트를 진행하면서 공유한 글
 
+- [DB Connection 점유 줄이기: OSIV와 단계적 CQRS 그리고 트랜잭션 설계](https://hoya324.tistory.com/entry/DB-Connection-%EC%A0%90%EC%9C%A0-%EC%A4%84%EC%9D%B4%EA%B8%B0-OSIV%EC%99%80-%EB%8B%A8%EA%B3%84%EC%A0%81-CQRS-%EA%B7%B8%EB%A6%AC%EA%B3%A0-%ED%8A%B8%EB%9E%9C%EC%9E%AD%EC%85%98-%EC%84%A4%EA%B3%84)
 - [프로젝트 & DB | MySQL의 Full Text Index와 TF-IDF, Cosine Similarity로 DB 내 유사한 Text 추출하기(without Elasticsearch)](https://hoya324.tistory.com/56)
 - [프로젝트 & BDP | Java(Spring)에서 TF-IDF와 Cosine Similarity를 활용한 문장간 유사도 측정 방법](https://hoya324.tistory.com/57)
 - [Java & Spring | Swagger 커스텀 ApiResponse 어노테이션 사용기](https://hoya324.tistory.com/58)

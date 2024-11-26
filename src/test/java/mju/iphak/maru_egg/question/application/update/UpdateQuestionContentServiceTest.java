@@ -17,6 +17,7 @@ import jakarta.persistence.EntityNotFoundException;
 import mju.iphak.maru_egg.admission.domain.AdmissionCategory;
 import mju.iphak.maru_egg.admission.domain.AdmissionType;
 import mju.iphak.maru_egg.common.MockTest;
+import mju.iphak.maru_egg.question.application.command.update.UpdateQuestionContentService;
 import mju.iphak.maru_egg.question.domain.Question;
 import mju.iphak.maru_egg.question.repository.QuestionRepository;
 

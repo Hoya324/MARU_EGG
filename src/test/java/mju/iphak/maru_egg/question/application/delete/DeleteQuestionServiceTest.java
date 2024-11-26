@@ -3,7 +3,6 @@ package mju.iphak.maru_egg.question.application.delete;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.anyLong;
 import static org.mockito.Mockito.*;
 
 import java.util.List;
@@ -19,10 +18,11 @@ import org.mockito.MockitoAnnotations;
 import jakarta.persistence.EntityNotFoundException;
 import mju.iphak.maru_egg.admission.domain.AdmissionCategory;
 import mju.iphak.maru_egg.admission.domain.AdmissionType;
-import mju.iphak.maru_egg.answer.application.find.FindAnswerByQuestionIdService;
+import mju.iphak.maru_egg.answer.application.query.find.FindAnswerByQuestionIdService;
 import mju.iphak.maru_egg.answer.domain.Answer;
 import mju.iphak.maru_egg.answer.repository.AnswerRepository;
 import mju.iphak.maru_egg.common.MockTest;
+import mju.iphak.maru_egg.question.application.command.delete.DeleteQuestionService;
 import mju.iphak.maru_egg.question.dao.request.QuestionCoreDAO;
 import mju.iphak.maru_egg.question.dao.response.QuestionCore;
 import mju.iphak.maru_egg.question.domain.Question;
@@ -60,7 +60,7 @@ class DeleteQuestionServiceTest extends MockTest {
 		when(questionRepository.findById(1L)).thenReturn(Optional.of(question));
 	}
 
-	@DisplayName("질문 삭제에 성공한 경우")
+	@DisplayName("[성공] 질문 삭제 요청")
 	@Test
 	void 질문_삭제_성공() {
 		// given
@@ -76,9 +76,9 @@ class DeleteQuestionServiceTest extends MockTest {
 		verify(questionRepository, times(1)).delete(any(Question.class));
 	}
 
-	@DisplayName("질문 삭제시에 조회 실패")
+	@DisplayName("[실패] 질문 삭제 시 조회 실패")
 	@Test
-	public void 질문_삭제시_조회_실패_NOTFOUND() {
+	void 질문_삭제_조회_실패_NOTFOUND() {
 		// given
 		Long id = 1L;
 		when(questionRepository.findById(id)).thenReturn(Optional.empty());
@@ -88,7 +88,7 @@ class DeleteQuestionServiceTest extends MockTest {
 			deleteQuestion.invoke(id);
 		});
 
-		assertThat("id: 1인 질문을 찾을 수 없습니다.").isEqualTo(exception.getMessage());
+		// then
+		assertThat(exception.getMessage()).isEqualTo("id: 1인 질문을 찾을 수 없습니다.");
 	}
-
 }

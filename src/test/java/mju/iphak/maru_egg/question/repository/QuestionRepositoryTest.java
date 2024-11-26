@@ -32,34 +32,25 @@ class QuestionRepositoryTest extends RepositoryTest {
 		question = Question.of("테스트 질문 예시 예시입니다.", "테스트 질문 예시", AdmissionType.SUSI,
 			AdmissionCategory.ADMISSION_GUIDELINE);
 		questionRepository.save(question);
-		Question additionalQuestion1 = Question.of("추가1 테스트 질문 예시입니다.", "추가 테스트 질문 예시", AdmissionType.SUSI,
-			AdmissionCategory.ADMISSION_GUIDELINE);
-		questionRepository.save(additionalQuestion1);
-		Question additionalQuestion2 = Question.of("추가2 테스트 질문 예시입니다.", "추가 테스트 질문 예시", AdmissionType.SUSI,
-			AdmissionCategory.ADMISSION_GUIDELINE);
-		questionRepository.save(additionalQuestion2);
-		Question additionalQuestion3 = Question.of("추가3 테스트 질문 예시입니다.", "추가 테스트 질문 예시", AdmissionType.SUSI,
-			AdmissionCategory.ADMISSION_GUIDELINE);
-		questionRepository.save(additionalQuestion3);
-		Question additionalQuestionUNCLASSIFIED = Question.of("추가4 테스트 질문 예시입니다.", "추가 테스트 질문 예시", AdmissionType.SUSI,
-			null);
-		questionRepository.save(additionalQuestionUNCLASSIFIED);
-
+		questionRepository.saveAll(List.of(
+			Question.of("추가1 테스트 질문 예시입니다.", "추가 테스트 질문 예시", AdmissionType.SUSI, AdmissionCategory.ADMISSION_GUIDELINE),
+			Question.of("추가2 테스트 질문 예시입니다.", "추가 테스트 질문 예시", AdmissionType.SUSI, AdmissionCategory.ADMISSION_GUIDELINE),
+			Question.of("추가3 테스트 질문 예시입니다.", "추가 테스트 질문 예시", AdmissionType.SUSI, AdmissionCategory.ADMISSION_GUIDELINE),
+			Question.of("추가4 테스트 질문 예시입니다.", "추가 테스트 질문 예시", AdmissionType.SUSI, null)
+		));
 		answer = Answer.of(question, "테스트 답변입니다.");
 		answerRepository.save(answer);
 	}
 
-	@DisplayName("질문을 조회하는데 성공")
+	@DisplayName("[성공] 타입과 카테고리로 질문을 조회한다.")
 	@Test
-	void 질문_조회_성공() {
+	void 타입과_카테고리로_질문_조회_성공() {
 		// given
 		AdmissionType type = AdmissionType.SUSI;
 		AdmissionCategory category = AdmissionCategory.ADMISSION_GUIDELINE;
 
 		// when
-		List<Question> questions = questionRepository.findAllByAdmissionTypeAndAdmissionCategoryOrderByViewCountDesc(
-			type,
-			category);
+		List<Question> questions = executeFindByTypeAndCategory(type, category);
 
 		// then
 		assertThat(questions).isNotEmpty();
@@ -67,29 +58,28 @@ class QuestionRepositoryTest extends RepositoryTest {
 		assertThat(questions.get(0)).isEqualTo(question);
 	}
 
-	@DisplayName("질문을 조회하는데 실패한 경우 - type, category를 못 찾은 경우")
+	@DisplayName("[실패] 타입과 카테고리로 질문을 조회할 수 없다.")
 	@Test
-	void 질문_조회_실패() {
+	void 타입과_카테고리로_질문_조회_실패() {
 		// given
 		AdmissionType invalidType = AdmissionType.JEONGSI;
 		AdmissionCategory category = AdmissionCategory.ADMISSION_GUIDELINE;
 
 		// when
-		List<Question> questions = questionRepository.findAllByAdmissionTypeAndAdmissionCategoryOrderByViewCountDesc(
-			invalidType, category);
+		List<Question> questions = executeFindByTypeAndCategory(invalidType, category);
 
 		// then
 		assertThat(questions.isEmpty()).isTrue();
 	}
 
-	@DisplayName("질문을 조회하는데 성공 - category 없이 type으로 조회")
+	@DisplayName("[성공] 카테고리 없이 타입으로 질문을 조회한다.")
 	@Test
-	void 질문_조회_성공_카테고리_없이() {
+	void 카테고리_없이_타입으로_질문_조회_성공() {
 		// given
 		AdmissionType type = AdmissionType.SUSI;
 
 		// when
-		List<Question> questions = questionRepository.findAllByAdmissionTypeOrderByViewCountDesc(type);
+		List<Question> questions = executeFindByTypeOnly(type);
 
 		// then
 		assertThat(questions).isNotEmpty();
@@ -97,16 +87,24 @@ class QuestionRepositoryTest extends RepositoryTest {
 		assertThat(questions.get(0)).isEqualTo(question);
 	}
 
-	@DisplayName("질문을 조회하는데 실패한 경우 - type만으로 조회할 때")
+	@DisplayName("[실패] 타입으로만 질문을 조회할 수 없다.")
 	@Test
-	void 질문_조회_실패_타입만으로() {
+	void 타입으로만_질문_조회_실패() {
 		// given
 		AdmissionType invalidType = AdmissionType.JEONGSI;
 
 		// when
-		List<Question> questions = questionRepository.findAllByAdmissionTypeOrderByViewCountDesc(invalidType);
+		List<Question> questions = executeFindByTypeOnly(invalidType);
 
 		// then
 		assertThat(questions.isEmpty()).isTrue();
+	}
+
+	private List<Question> executeFindByTypeAndCategory(AdmissionType type, AdmissionCategory category) {
+		return questionRepository.findAllByAdmissionTypeAndAdmissionCategoryOrderByViewCountDesc(type, category);
+	}
+
+	private List<Question> executeFindByTypeOnly(AdmissionType type) {
+		return questionRepository.findAllByAdmissionTypeOrderByViewCountDesc(type);
 	}
 }

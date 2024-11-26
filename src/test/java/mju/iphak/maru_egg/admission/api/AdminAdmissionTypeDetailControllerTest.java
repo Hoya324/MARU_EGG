@@ -12,10 +12,10 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.ResultActions;
 
-import mju.iphak.maru_egg.admission.application.detail.create.CreateAdmissionTypeDetailService;
-import mju.iphak.maru_egg.admission.application.detail.find.FindAllAdmissionTypeDetailService;
-import mju.iphak.maru_egg.admission.application.status.find.FindAdmissionTypeStatusService;
-import mju.iphak.maru_egg.admission.application.status.init.InitAdmissionTypeStatusService;
+import mju.iphak.maru_egg.admission.application.detail.command.create.CreateAdmissionTypeDetailService;
+import mju.iphak.maru_egg.admission.application.detail.query.find.FindAllAdmissionTypeDetailService;
+import mju.iphak.maru_egg.admission.application.status.command.init.InitAdmissionTypeStatusService;
+import mju.iphak.maru_egg.admission.application.status.query.find.FindAdmissionTypeStatusService;
 import mju.iphak.maru_egg.admission.domain.AdmissionType;
 import mju.iphak.maru_egg.admission.dto.request.CreateAdmissionTypeDetailRequest;
 import mju.iphak.maru_egg.admission.dto.request.UpdateAdmissionTypeDetailRequest;
@@ -42,26 +42,23 @@ class AdminAdmissionTypeDetailControllerTest extends IntegrationTest {
 		createAdmissionTypeDetail.invoke("학교장추천전형", AdmissionType.SUSI);
 	}
 
-	@DisplayName("POST /api/admin/admissions/detail - 전형 유형 세부정보 생성")
+	@DisplayName("[성공] 전형 유형 세부정보 생성 요청")
 	@Test
-	void createAdmissionTypeDetail() throws Exception {
+	void 전형_유형_세부정보_생성_성공() throws Exception {
 		// given
-		CreateAdmissionTypeDetailRequest request = new CreateAdmissionTypeDetailRequest("New Detail",
-			AdmissionType.SUSI);
+		CreateAdmissionTypeDetailRequest request = new CreateAdmissionTypeDetailRequest(
+			"New Detail", AdmissionType.SUSI);
 
 		// when
-		ResultActions result = mvc.perform(post("/api/admin/admissions/detail")
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(request)))
-			.andDo(print());
+		ResultActions result = PostAdmissionTypeDetail(request);
 
 		// then
 		result.andExpect(status().isOk());
 	}
 
-	@DisplayName("PUT /api/admin/admissions/{id} - 전형 유형 세부정보 수정")
+	@DisplayName("[성공] 전형 유형 세부정보 수정 요청")
 	@Test
-	void updateAdmissionTypeDetail() throws Exception {
+	void 전형_유형_세부정보_수정_성공() throws Exception {
 		// given
 		Long admissionTypeDetailId = findAllAdmissionTypeDetail.invoke().get(0).id();
 		String updatedName = "UpdatedName";
@@ -69,27 +66,42 @@ class AdminAdmissionTypeDetailControllerTest extends IntegrationTest {
 			updatedName);
 
 		// when
-		ResultActions result = mvc.perform(put("/api/admin/admissions/{id}", admissionTypeDetailId)
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(updateAdmissionTypeDetailRequest)))
-			.andDo(print());
+		ResultActions result = PutAdmissionTypeDetail(admissionTypeDetailId, updateAdmissionTypeDetailRequest);
 
 		// then
 		result.andExpect(status().isOk());
 	}
 
-	@DisplayName("DELETE /api/admin/admissions/{id} - 전형 유형 세부정보 삭제")
+	@DisplayName("[성공] 전형 유형 세부정보 삭제 요청")
 	@Test
-	void deleteAdmissionTypeDetail() throws Exception {
+	void 전형_유형_세부정보_삭제_성공() throws Exception {
 		// given
 		Long admissionTypeDetailId = findAllAdmissionTypeDetail.invoke().get(0).id();
 
 		// when
-		ResultActions result = mvc.perform(delete("/api/admin/admissions/" + admissionTypeDetailId)
-				.contentType(MediaType.APPLICATION_JSON))
-			.andDo(print());
+		ResultActions result = DeleteAdmissionTypeDetail(admissionTypeDetailId);
 
 		// then
 		result.andExpect(status().isOk());
+	}
+
+	private ResultActions PostAdmissionTypeDetail(CreateAdmissionTypeDetailRequest request) throws Exception {
+		return mvc.perform(post("/api/admin/admissions/detail")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(request)))
+			.andDo(print());
+	}
+
+	private ResultActions PutAdmissionTypeDetail(Long id, UpdateAdmissionTypeDetailRequest request) throws Exception {
+		return mvc.perform(put("/api/admin/admissions/{id}", id)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(request)))
+			.andDo(print());
+	}
+
+	private ResultActions DeleteAdmissionTypeDetail(Long id) throws Exception {
+		return mvc.perform(delete("/api/admin/admissions/{id}", id)
+				.contentType(MediaType.APPLICATION_JSON))
+			.andDo(print());
 	}
 }

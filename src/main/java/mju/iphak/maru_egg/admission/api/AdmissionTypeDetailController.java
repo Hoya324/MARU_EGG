@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
 import mju.iphak.maru_egg.admission.api.swagger.AdmissionTypeDetailControllerDocs;
-import mju.iphak.maru_egg.admission.application.detail.find.FindAllAdmissionTypeDetail;
-import mju.iphak.maru_egg.admission.application.detail.find.FindAllByAdmissionType;
+import mju.iphak.maru_egg.admission.application.detail.query.find.FindAllAdmissionTypeDetail;
+import mju.iphak.maru_egg.admission.application.detail.query.find.FindAllByAdmissionType;
 import mju.iphak.maru_egg.admission.domain.AdmissionType;
 import mju.iphak.maru_egg.admission.dto.response.AdmissionTypeDetailResponse;
 
