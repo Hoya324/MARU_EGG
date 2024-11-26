@@ -1,7 +1,6 @@
 package mju.iphak.maru_egg.question.domain;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -19,28 +18,29 @@ class QuestionTest {
 		question = Question.of("질문입니다.", "질문", AdmissionType.SUSI, AdmissionCategory.ADMISSION_GUIDELINE);
 	}
 
-	@DisplayName("질문이 확인 되었을 때 상태 변화 성공한 경우")
+	@DisplayName("[성공] 질문 확인 상태를 변경")
 	@Test
-	public void 질문_체크_변경_성공() {
-		// given // when
+	void 질문_상태_변경_성공() {
+		// when
 		question.updateIsChecked();
 
 		// then
-		assertThat(question.isChecked()).isTrue();
+		verifyCheckedState(true);
 	}
 
-	@DisplayName("질문이 확인 되었을 때 상태 변화 실패한 경우")
+	@DisplayName("[실패] 질문 확인 상태 변경 후 상태가 false가 아님")
 	@Test
-	public void 질문_체크_변경_실패() {
-		// given // when
+	void 질문_상태_변경_실패() {
+		// when
 		question.updateIsChecked();
 
 		// then
-		assertThat(question.isChecked()).isNotEqualTo(false);
+		verifyCheckedStateNot(false);
 	}
 
+	@DisplayName("[성공] 질문 내용을 새 내용으로 업데이트")
 	@Test
-	void updateContent_새로운_content로_업데이트() {
+	void 질문_내용_업데이트_성공() {
 		// given
 		String newContent = "새로운 답변 내용";
 
@@ -48,11 +48,12 @@ class QuestionTest {
 		question.updateContent(newContent);
 
 		// then
-		assertEquals(newContent, question.getContent());
+		verifyContent(newContent);
 	}
 
+	@DisplayName("[실패] null 값으로 질문 내용을 업데이트하지 않음")
 	@Test
-	void updateContent_null_content로_업데이트하지_않음() {
+	void 질문_내용_업데이트_실패_null() {
 		// given
 		String originalContent = question.getContent();
 
@@ -60,6 +61,19 @@ class QuestionTest {
 		question.updateContent(null);
 
 		// then
-		assertEquals(originalContent, question.getContent());
+		verifyContent(originalContent);
+	}
+
+	// 공통 검증 메서드
+	private void verifyCheckedState(boolean expected) {
+		assertThat(question.isChecked()).isEqualTo(expected);
+	}
+
+	private void verifyCheckedStateNot(boolean unexpected) {
+		assertThat(question.isChecked()).isNotEqualTo(unexpected);
+	}
+
+	private void verifyContent(String expectedContent) {
+		assertThat(question.getContent()).isEqualTo(expectedContent);
 	}
 }
