@@ -74,7 +74,7 @@ class ProcessQuestionServiceTest extends MockTest {
 
 		when(questionRepository.searchQuestions(questionCoreDAO)).thenReturn(Optional.empty());
 		when(processAnswer.invoke(request, contentToken))
-			.thenReturn(QuestionResponse.valueOfRAG(content, "답변이 없습니다."));
+			.thenReturn(QuestionResponse.valueOfNotFoundRAG(content, "답변이 없습니다."));
 
 		// when
 		QuestionResponse response = processQuestionService.invoke(request);
@@ -131,7 +131,7 @@ class ProcessQuestionServiceTest extends MockTest {
 		when(questionRepository.searchQuestions(questionCoreDAO)).thenReturn(Optional.of(questionCores));
 		when(findMostSimilarQuestionId.invoke(questionCores, contentToken)).thenReturn(null);
 		when(processAnswer.invoke(request, contentToken))
-			.thenReturn(QuestionResponse.valueOfRAG(content, "유사 질문이 없습니다."));
+			.thenReturn(QuestionResponse.valueOfNotFoundRAG(content, "유사 질문이 없습니다."));
 
 		// when
 		QuestionResponse response = processQuestionService.invoke(request);

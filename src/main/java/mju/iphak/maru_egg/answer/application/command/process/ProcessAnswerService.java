@@ -34,13 +34,14 @@ public class ProcessAnswerService implements ProcessAnswer {
 			.block(Duration.of(20L, ChronoUnit.SECONDS));
 
 		if (isInvalidAnswer(llmAnswerResponse)) {
-			return QuestionResponse.valueOfRAG(request.content(), generateGuideAnswer(llmAnswerResponse.references()));
+			return QuestionResponse.valueOfNotFoundRAG(request.content(),
+				generateGuideAnswer(llmAnswerResponse.references()));
 		}
 
 		SaveRAGAnswerRequest saveRAGAnswerRequest = SaveRAGAnswerRequest.of(request, contentToken, llmAnswerResponse);
 
 		createRAGAnswer.invoke(saveRAGAnswerRequest);
-		return QuestionResponse.valueOfRAG(request.content(), llmAnswerResponse.answer());
+		return QuestionResponse.valueOfRAG(request.content(), llmAnswerResponse);
 	}
 
 	private LLMAskQuestionRequest getLlmAskQuestionRequest(final QuestionRequest request) {

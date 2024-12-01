@@ -5,6 +5,7 @@ import java.util.List;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import mju.iphak.maru_egg.answer.dto.response.AnswerResponse;
+import mju.iphak.maru_egg.answer.dto.response.LLMAnswerResponse;
 import mju.iphak.maru_egg.answerreference.dto.response.AnswerReferenceResponse;
 import mju.iphak.maru_egg.question.domain.Question;
 
@@ -37,7 +38,7 @@ public record QuestionResponse(
 			.build();
 	}
 
-	public static QuestionResponse valueOfRAG(String content, String answer) {
+	public static QuestionResponse valueOfNotFoundRAG(String content, String answer) {
 		AnswerResponse answerResponse = AnswerResponse.valueOfRAG(answer);
 		return QuestionResponse.builder()
 			.id(null)
@@ -45,6 +46,17 @@ public record QuestionResponse(
 			.dateInformation(null)
 			.answer(answerResponse)
 			.references(null)
+			.build();
+	}
+
+	public static QuestionResponse valueOfRAG(String content, LLMAnswerResponse llmAnswerResponse) {
+		AnswerResponse answerResponse = AnswerResponse.valueOfRAG(llmAnswerResponse.answer());
+		return QuestionResponse.builder()
+			.id(null)
+			.content(content)
+			.dateInformation(null)
+			.answer(answerResponse)
+			.references(llmAnswerResponse.references())
 			.build();
 	}
 }
