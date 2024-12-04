@@ -21,7 +21,7 @@ import mju.iphak.maru_egg.question.repository.QuestionRepository;
 @Slf4j
 @RequiredArgsConstructor
 @Service
-@Transactional(readOnly = true)
+@Transactional
 public class ProcessQuestionService implements ProcessQuestion {
 
 	private final QuestionRepository questionRepository;
