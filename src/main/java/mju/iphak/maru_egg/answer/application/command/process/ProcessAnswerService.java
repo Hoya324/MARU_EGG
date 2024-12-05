@@ -34,7 +34,7 @@ public class ProcessAnswerService implements ProcessAnswer {
 			.block(Duration.of(20L, ChronoUnit.SECONDS));
 
 		if (isInvalidAnswer(llmAnswerResponse)) {
-			log.info("!!==질문 {}에 대해 답변하지 못했습니다.==!!", request.content());
+			log.info("!!==질문: \"{}\"에 대해 답변하지 못했습니다.==!!", request.content());
 			return QuestionResponse.valueOfNotFoundRAG(request.content(),
 				generateGuideAnswer(llmAnswerResponse.references()));
 		}
