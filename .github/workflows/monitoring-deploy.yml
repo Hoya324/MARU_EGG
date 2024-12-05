@@ -1,0 +1,46 @@
+name: Monitoring CI/CD Workflow
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy-monitor:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: 'ap-northeast-2'
+
+      - name: Copy docker-compose-monitor.yml into monitor instance
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.MONITOR_PUBLIC_DNS }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.PEM_KEY }}
+          source: "docker/docker-compose-monitor.yml"
+          target: "/home/${{ secrets.USERNAME }}/docker/docker-compose-monitor.yml"
+          strip_components: 3
+          overwrite: true
+          debug: true
+
+      - name: Deploy to EC2 monitor server
+        uses: appleboy/ssh-action@v0.1.0
+        with:
+          host: ${{ secrets.MONITOR_PUBLIC_DNS }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.PEM_KEY }}
+          script: |
+            cd /home/${{ secrets.USERNAME }}
+            echo ${{ secrets.DOCKER_PASSWORD }} | sudo docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+            sudo docker-compose -f docker-compose-monitor.yml up -d
+            sudo docker image prune -f
