@@ -9,24 +9,6 @@ services:
     volumes:
       - /home/ec2-user/logs:/logs
 
-  prometheus:
-    image: prom/prometheus
-    container_name: prometheus
-    volumes:
-      - ./prometheus/config/prometheus.yml:/etc/prometheus/prometheus.yml
-      - ./prometheus/prometheus-volume:/prometheus
-    ports:
-      - '9090:9090'
-    command:
-      - '--web.enable-lifecycle'
-      - '--config.file=/etc/prometheus/prometheus.yml'
-    restart: on-failure
-    depends_on:
-      - maru-egg-app
-    networks:
-      - maru-egg-dev
-    user: '65534:65534'
-
   nginx:
     depends_on:
       - maru-egg-app
@@ -41,19 +23,5 @@ services:
     networks:
       - maru-egg-dev
 
-  grafana:
-    image: grafana/grafana:latest
-    container_name: grafana_container
-    ports:
-      - 3000:3000
-    volumes:
-      - ./grafana/config/grafana.ini:/etc/grafana/grafana.ini
-      - ./grafana/volume:/var/lib/grafana
-    environment:
-      - GRAFANA_ADMIN_USER=${GRAFANA_USER}
-      - GRAFANA_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
-    restart: always
-    networks:
-      - maru-egg-dev
 networks:
   maru-egg-dev:

@@ -1,0 +1,33 @@
+services:
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    volumes:
+      - ./prometheus/config/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./prometheus/prometheus-volume:/prometheus
+    ports:
+      - '9090:9090'
+    command:
+      - '--web.enable-lifecycle'
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    restart: on-failure
+    networks:
+      - monitor-net
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana_container
+    ports:
+      - 3000:3000
+    volumes:
+      - ./grafana/config/grafana.ini:/etc/grafana/grafana.ini
+      - ./grafana/volume:/var/lib/grafana
+    environment:
+      - GRAFANA_ADMIN_USER=${GRAFANA_USER}
+      - GRAFANA_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
+    restart: always
+    networks:
+      - monitor-net
+
+networks:
+  monitor-net:
