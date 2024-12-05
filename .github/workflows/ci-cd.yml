@@ -82,6 +82,7 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+
       - name: Get GitHub Actions IP Address
         id: get_ip
         run: echo "ip=$(curl -s ifconfig.me)" >> $GITHUB_ENV
@@ -153,3 +154,9 @@ jobs:
             sudo docker pull ${{ secrets.DOCKER_REPO }}:develop-${{ github.run_number }}
             sudo docker-compose -f docker-compose.yml up -d
             sudo docker image prune -f
+
+      - name: Remove GitHub Actions IP
+        run: |
+          aws ec2 revoke-security-group-ingress \
+              --group-id ${{ secrets.EC2_SECURITY_GROUP_ID }} \
+              --protocol tcp --port 22 --cidr "${{ env.ip }}/32"
