@@ -77,20 +77,13 @@ public class SecurityConfig {
 					.permitAll()
 					.requestMatchers(new MvcRequestMatcher(introspector, ADMIN_API_PREFIX + "/**"))
 					.hasRole("ADMIN")
-					.requestMatchers(new MvcRequestMatcher(introspector, "/maru-egg/api-docs/**"))
-					.permitAll()
 					.requestMatchers(new MvcRequestMatcher(introspector, "/actuator/**"))
 					.permitAll()
 					.requestMatchers(new MvcRequestMatcher(introspector, "/grafana/**"))
 					.permitAll()
+					.requestMatchers(new MvcRequestMatcher(introspector, String.format("/%s/api-docs/**", swaggerKey)))
+					.permitAll()
 					.requestMatchers(
-						new MvcRequestMatcher(introspector, String.format("/%s/swagger-ui**", swaggerKey)))
-					.permitAll()
-					.requestMatchers(new MvcRequestMatcher(introspector, "/api-docs/**"))
-					.permitAll()
-					.requestMatchers(new MvcRequestMatcher(introspector, "/v3/api-docs/**"))
-					.permitAll().
-					requestMatchers(
 						new MvcRequestMatcher(introspector, String.format("/%s/swagger-ui/**", swaggerKey)))
 					.permitAll()
 					.anyRequest()
