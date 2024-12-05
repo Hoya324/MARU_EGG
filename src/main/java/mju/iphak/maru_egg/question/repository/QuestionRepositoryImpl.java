@@ -164,8 +164,8 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
 		NumberTemplate<Double> booleanTemplate, BooleanExpression cursorPredicate, int pageSize) {
 
 		BooleanBuilder whereClause = new BooleanBuilder();
+		whereClause.and(question.isChecked.eq(true));
 		whereClause.and(booleanTemplate.gt(MIN_MATCHING_POINT));
-
 		if (cursorPredicate != null) {
 			whereClause.and(cursorPredicate);
 		}
@@ -188,6 +188,7 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
 	private BooleanBuilder buildWhereClause(final AdmissionType type, final AdmissionCategory category,
 		final String content) {
 		BooleanBuilder whereClause = new BooleanBuilder();
+		whereClause.and(question.isChecked.eq(true));
 		if (content != null && !content.isEmpty()) {
 			whereClause.and(question.content.contains(content));
 		}
