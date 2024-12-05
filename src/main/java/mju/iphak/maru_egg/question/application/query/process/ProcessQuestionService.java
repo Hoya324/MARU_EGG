@@ -37,17 +37,16 @@ public class ProcessQuestionService implements ProcessQuestion {
 		List<QuestionCore> questionCores = questionRepository.searchQuestions(questionCoreDAO)
 			.orElse(Collections.emptyList());
 		if (questionCores.isEmpty()) {
-			log.info("저장된 질문이 없어 새롭게 LLM서버에 질문을 요청합니다.");
 			return processAnswer.invoke(request, contentToken);
 		}
 
 		Long mostSimilarQuestionId = findMostSimilarQuestionId.invoke(questionCores, contentToken);
 		if (mostSimilarQuestionId != null) {
-			log.info("유사한 질문이 있어 DB에서 질문을 재사용합니다.");
+			log.info("유사한 질문{ 전형 타입: \"{}\", 전형: \"{}\", 질문: \"{}\" }이 있어 DB에서 불러옵니다.", request.type(),
+				request.category(), request.content());
 			return findQuestion.invoke(mostSimilarQuestionId);
 		}
 
-		log.info("유사한 질문이 없어 새롭게 LLM서버에 질문을 요청합니다.");
 		return processAnswer.invoke(request, contentToken);
 	}
 }

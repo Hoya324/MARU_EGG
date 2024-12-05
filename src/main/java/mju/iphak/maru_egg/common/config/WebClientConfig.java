@@ -20,29 +20,27 @@ public class WebClientConfig {
 	public WebClient webClient(WebClient.Builder builder) {
 		return builder
 			.baseUrl(baseUrl)
-			.filter(logRequest())
-			.filter(logResponse())
 			.filter(logError())
 			.build();
 	}
-
-	private ExchangeFilterFunction logRequest() {
-		return ExchangeFilterFunction.ofRequestProcessor(clientRequest -> {
-			log.info("Request: {} {}", clientRequest.method(), clientRequest.url());
-			clientRequest.headers().forEach((name, values) -> values.forEach(value -> log.info("{}={}", name, value)));
-			return Mono.just(clientRequest);
-		});
-	}
-
-	private ExchangeFilterFunction logResponse() {
-		return ExchangeFilterFunction.ofResponseProcessor(clientResponse -> {
-			log.info("Response Status: {}", clientResponse.statusCode());
-			clientResponse.headers()
-				.asHttpHeaders()
-				.forEach((name, values) -> values.forEach(value -> log.info("{}={}", name, value)));
-			return Mono.just(clientResponse);
-		});
-	}
+	//
+	// private ExchangeFilterFunction logRequest() {
+	// 	return ExchangeFilterFunction.ofRequestProcessor(clientRequest -> {
+	// 		log.info("Request: {} {}", clientRequest.method(), clientRequest.url());
+	// 		clientRequest.headers().forEach((name, values) -> values.forEach(value -> log.info("{}={}", name, value)));
+	// 		return Mono.just(clientRequest);
+	// 	});
+	// }
+	//
+	// private ExchangeFilterFunction logResponse() {
+	// 	return ExchangeFilterFunction.ofResponseProcessor(clientResponse -> {
+	// 		log.info("Response Status: {}", clientResponse.statusCode());
+	// 		clientResponse.headers()
+	// 			.asHttpHeaders()
+	// 			.forEach((name, values) -> values.forEach(value -> log.info("{}={}", name, value)));
+	// 		return Mono.just(clientResponse);
+	// 	});
+	// }
 
 	private ExchangeFilterFunction logError() {
 		return ExchangeFilterFunction.ofResponseProcessor(clientResponse -> {

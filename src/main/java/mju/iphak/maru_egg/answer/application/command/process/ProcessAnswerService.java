@@ -34,14 +34,16 @@ public class ProcessAnswerService implements ProcessAnswer {
 			.block(Duration.of(20L, ChronoUnit.SECONDS));
 
 		if (isInvalidAnswer(llmAnswerResponse)) {
-			log.info("!!==질문: \"{}\"에 대해 답변하지 못했습니다.==!!", request.content());
+			log.info("[INVALID ANSWER] 전형 타입: \"{}\", 전형: \"{}\", 질문: \"{}\" 에 대해 답변하지 못했습니다.", request.type(),
+				request.category(), request.content());
 			return QuestionResponse.valueOfNotFoundRAG(request.content(),
 				generateGuideAnswer(llmAnswerResponse.references()));
 		}
-
 		SaveRAGAnswerRequest saveRAGAnswerRequest = SaveRAGAnswerRequest.of(request, contentToken, llmAnswerResponse);
 
 		createRAGAnswer.invoke(saveRAGAnswerRequest);
+		log.info("[NEW ANSWER] { 전형 타입: \"{}\", 전형: \"{}\", 질문: \"{}\" }", request.type(),
+			request.category(), request.content());
 		return QuestionResponse.valueOfRAG(request.content(), llmAnswerResponse);
 	}
 
