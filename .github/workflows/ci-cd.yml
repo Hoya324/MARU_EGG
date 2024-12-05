@@ -3,6 +3,7 @@ name: MARU EGG CI-CD Workflow
 on:
   push:
     branches: [ "main", "develop" ]
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -139,12 +140,12 @@ jobs:
             echo "GITHUB_RUN_NUMBER=${GITHUB_RUN_NUMBER}"
             envsubst < <(echo "${{ secrets.DOCKER_COMPOSE_DEV }}") > docker-compose.yml
             echo ${{ secrets.DOCKER_PASSWORD }} | sudo docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
-            SERVICES_TO_STOP=$(sudo docker ps --format '{{.Names}}' | grep -Ev '(nginx|grafana)')
+            SERVICES_TO_STOP=$(sudo docker ps --format '{{.Names}}' | grep -Ev '(nginx)')
             if [ ! -z "$SERVICES_TO_STOP" ]; then
               echo "Stopping services: $SERVICES_TO_STOP"
               sudo docker stop $SERVICES_TO_STOP
             fi
-            SERVICES_TO_REMOVE=$(sudo docker ps -a --format '{{.Names}}' | grep -Ev '(nginx|grafana)')
+            SERVICES_TO_REMOVE=$(sudo docker ps -a --format '{{.Names}}' | grep -Ev '(nginx)')
             if [ ! -z "$SERVICES_TO_REMOVE" ]; then
               echo "Removing services: $SERVICES_TO_REMOVE"
               sudo docker rm $SERVICES_TO_REMOVE
@@ -153,8 +154,42 @@ jobs:
             sudo docker-compose -f docker-compose.yml up -d
             sudo docker image prune -f
 
-      - name: Remove GitHub Actions IP
-        run: |
-          aws ec2 revoke-security-group-ingress \
-              --group-id ${{ secrets.EC2_SECURITY_GROUP_ID }} \
-              --protocol tcp --port 22 --cidr "${{ env.ip }}/32"
+  deploy-monitor:
+    runs-on: ubuntu-latest
+
+    if: github.event_name == 'workflow_dispatch'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: 'ap-northeast-2'
+
+      - name: Copy docker-compose-monitor.yml into monitor instance
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.MONITOR_PUBLIC_DNS }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.PEM_KEY }}
+          source: "docker/docker-compose-monitor.yml"
+          target: "/home/${{ secrets.MONITOR_USERNAME }}/docker/docker-compose-monitor.yml"
+          strip_components: 3
+          overwrite: true
+          debug: true
+
+      - name: Deploy to EC2 monitor server
+        uses: appleboy/ssh-action@v0.1.0
+        with:
+          host: ${{ secrets.MONITOR_PUBLIC_DNS }}
+          username: ${{ secrets.MONITOR_USERNAME }}
+          key: ${{ secrets.MONITOR_PEM_KEY }}
+          script: |
+            cd /home/${{ secrets.MONITOR_USERNAME }}
+            echo ${{ secrets.DOCKER_PASSWORD }} | sudo docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+            sudo docker-compose -f docker-compose-monitor.yml up -d
+            sudo docker image prune -f
