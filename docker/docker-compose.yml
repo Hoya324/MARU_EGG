@@ -23,5 +23,24 @@ services:
     networks:
       - maru-egg-dev
 
+  promtail:
+    depends_on:
+      - maru-egg-app
+      - loki
+    container_name: promtail
+    image: grafana/promtail:latest
+    restart: always
+    ports:
+      - '9080:9080'
+    volumes:
+      - ./promtail/config/promtail-config.yml:/etc/promtail/promtail-config.yml
+      - ./logs/all:/var/logs/all
+      - ./logs/warn:/var/logs/warn
+      - ./logs/error:/var/logs/error
+    command:
+      - -config.file=/etc/promtail/promtail-config.yml
+    networks:
+      - monitor-net
+
 networks:
   maru-egg-dev:

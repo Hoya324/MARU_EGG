@@ -29,5 +29,19 @@ services:
     networks:
       - monitor-net
 
+  loki:
+    image: grafana/loki:latest
+    container_name: loki
+    ports:
+      - "3100:3100"
+    command:
+      - '--config.file=/etc/loki/loki-config.yml'
+      - '--config.expand-env=true'
+    volumes:
+      - ./loki/config/loki-config.yml:/etc/loki/loki-config.yml
+    restart: always
+    networks:
+      - monitor-net
+
 networks:
   monitor-net:
