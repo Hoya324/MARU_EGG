@@ -18,5 +18,4 @@ scrape_configs:
     scheme: 'https'
     static_configs:
       - targets:
-          - 'marueggserver.com:8080'
-          - { MONITOR_SERVER_IP }:8080
+          - 'marueggserver.com'
