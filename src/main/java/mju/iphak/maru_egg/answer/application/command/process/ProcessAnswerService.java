@@ -43,7 +43,7 @@ public class ProcessAnswerService implements ProcessAnswer {
 
 		createRAGAnswer.invoke(saveRAGAnswerRequest);
 		log.info("[NEW ANSWER] 답변: \"{}\"", llmAnswerResponse.answer());
-		log.info("[NEW QUESTION] 전형 타입: \"{}\", 전형: \"{}\" \n 질문: \"{}\"",
+		log.info("[NEW QUESTION] 전형 타입: \"{}\", 전형: \"{}\" 질문: \"{}\"",
 			llmAnswerResponse.questionType(),
 			llmAnswerResponse.questionCategory(), request.content());
 		return QuestionResponse.valueOfRAG(request.content(), llmAnswerResponse);
