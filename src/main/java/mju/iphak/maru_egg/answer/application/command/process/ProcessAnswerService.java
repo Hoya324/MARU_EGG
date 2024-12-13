@@ -42,8 +42,9 @@ public class ProcessAnswerService implements ProcessAnswer {
 		SaveRAGAnswerRequest saveRAGAnswerRequest = SaveRAGAnswerRequest.of(request, contentToken, llmAnswerResponse);
 
 		createRAGAnswer.invoke(saveRAGAnswerRequest);
-		log.info("[NEW ANSWER] { 전형 타입: \"{}\", 전형: \"{}\", 질문: \"{}\" }", request.type(),
-			request.category(), request.content());
+		log.info("[NEW ANSWER] { 전형 타입: \"{}\", 전형: \"{}\" \n 질문: \"{}\" \n 답변: \"{}\" }",
+			llmAnswerResponse.questionType(),
+			llmAnswerResponse.questionCategory(), request.content(), llmAnswerResponse.answer());
 		return QuestionResponse.valueOfRAG(request.content(), llmAnswerResponse);
 	}
 
