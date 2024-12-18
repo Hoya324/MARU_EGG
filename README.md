@@ -123,7 +123,7 @@
 
 ### BackEnd
 
-![image](https://github.com/user-attachments/assets/1c563b76-1fb3-43c8-aadf-d41e87353434)
+<img width="635" alt="스크린샷 2024-12-18 11 03 51" src="https://github.com/user-attachments/assets/49e2caae-b9ac-40cb-b185-3419090dfde4" />
 
 ### CI/CD
 
