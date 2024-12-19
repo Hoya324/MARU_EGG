@@ -17,6 +17,22 @@ scrape_configs:
           job: all_logs
           __path__: /var/logs/all/*.log
 
+  - job_name: new_qna
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: new_qna_logs
+          __path__: /var/logs/new_qna/*.log
+
+  - job_name: invalid_qna
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: invalid_qna_logs
+          __path__: /var/logs/invalid_qna/*.log
+
   - job_name: warn
     static_configs:
       - targets:

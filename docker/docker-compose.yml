@@ -36,6 +36,8 @@ services:
       - ./logs/all:/var/logs/all
       - ./logs/warn:/var/logs/warn
       - ./logs/error:/var/logs/error
+      - ./logs/invalid_qna:/var/logs/invalid_qna
+      - ./logs/new_qna:/var/logs/new_qna
     command:
       - -config.file=/etc/promtail/promtail-config.yml
     networks:

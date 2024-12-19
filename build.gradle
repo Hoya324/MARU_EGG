@@ -146,6 +146,7 @@ dependencies {
     // 모니터링
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'io.micrometer:micrometer-registry-prometheus'
+    implementation 'org.codehaus.janino:janino:3.1.9'
 }
 
 tasks.named('test') {
