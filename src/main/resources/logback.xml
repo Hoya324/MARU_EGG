@@ -1,6 +1,51 @@
 <configuration>
     <!-- 전체 설정의 시작 -->
 
+    <!-- 새로운 질문 Appender -->
+    <appender name="NEW_QNA_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/specific/logFile.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>logs/new_qna/logFile.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>100MB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%-4relative [%thread] %-5level %logger{35} - %msg%n</pattern>
+        </encoder>
+
+        <!-- 메시지 필터 설정 -->
+        <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
+            <evaluator class="ch.qos.logback.classic.boolex.JaninoEventEvaluator">
+                <expression>message.contains("[NEW")</expression>
+            </evaluator>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+
+    <!-- 답변 못한 질문 Appender -->
+    <appender name="INVALID_QNA_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/specific/logFile.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>logs/invalid_qna/logFile.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>100MB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%-4relative [%thread] %-5level %logger{35} - %msg%n</pattern>
+        </encoder>
+
+        <!-- 메시지 필터 설정 -->
+        <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
+            <evaluator class="ch.qos.logback.classic.boolex.JaninoEventEvaluator">
+                <expression>message.contains("[INVALID")</expression>
+            </evaluator>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+
+
     <!-- INFO 이상 모든 로그를 기록할 Appender -->
     <appender name="ALL_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>logs/all/logFile.log</file>
@@ -51,5 +96,7 @@
         <appender-ref ref="ALL_LOG"/>
         <appender-ref ref="WARN_LOG"/>
         <appender-ref ref="ERROR_LOG"/>
+        <appender-ref ref="NEW_QNA_LOG"/>
+        <appender-ref ref="INVALID_QNA_LOG"/>
     </root>
 </configuration>
