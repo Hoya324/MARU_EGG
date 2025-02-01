@@ -82,6 +82,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
       - name: Get GitHub Actions IP Address
         id: get_ip
@@ -113,6 +115,20 @@ jobs:
             echo "Error: docker/docker-compose.yml not found."
             exit 1
           fi
+
+      - name: Check if nginx.conf has changed
+        id: check_nginx
+        run: |
+          git fetch origin develop 
+          CHANGED_FILES=$(git diff --name-only origin/develop...HEAD)
+          echo "Changed files: $CHANGED_FILES"
+
+          if echo "$CHANGED_FILES" | grep -q "nginx/conf.d/nginx.conf"; then
+            echo "NGINX_CHANGED=true" >> $GITHUB_ENV
+          else
+            echo "NGINX_CHANGED=false" >> $GITHUB_ENV
+          fi
+      
 
       - name: Copy docker-compose into instance
         uses: appleboy/scp-action@master
@@ -154,6 +170,38 @@ jobs:
             sudo docker pull ${{ secrets.DOCKER_REPO }}:develop-${{ github.run_number }}
             sudo docker-compose -f docker-compose.yml up -d
             sudo docker image prune -f
+
+      - name: Copy nginx.conf into instance
+        if: env.NGINX_CHANGED == 'true'
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.PUBLIC_DNS }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.PEM_KEY }}
+          source: "nginx/conf.d/nginx.conf"
+          target: "/home/${{ secrets.USERNAME }}/nginx/conf.d/nginx.conf"
+          strip_components: 2
+          overwrite: true
+          debug: true
+
+      - name: Update Nginx configuration inside Docker container
+        if: env.NGINX_CHANGED == 'true'
+        uses: appleboy/ssh-action@v0.1.0
+        with:
+          host: ${{ secrets.PUBLIC_DNS }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.PEM_KEY }}
+          script: |
+            echo "Copying new nginx.conf into running Nginx container..."
+            sudo docker cp /home/${{ secrets.USERNAME }}/nginx/conf.d/nginx.conf nginx:/etc/nginx/conf.d/default.conf
+            echo "Checking Nginx configuration..."
+            if sudo docker exec nginx nginx -t; then
+              echo "Reloading Nginx..."
+              sudo docker restart nginx
+            else
+              echo "Nginx configuration error detected. Rolling back..."
+              sudo docker cp /etc/nginx/conf.d/default.conf /home/${{ secrets.USERNAME }}/nginx/conf.d/nginx.conf
+            fi
 
       - name: Remove GitHub Actions IP
         run: |
