@@ -18,25 +18,25 @@ import mju.iphak.maru_egg.user.repository.UserRepository;
 @Transactional
 public class AuthService {
 
-	private final UserRepository userRepository;
-	private final PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-	public void signUp(String email, String password) {
-		if (userRepository.findByEmail(email).isPresent()) {
-			throw new IllegalArgumentException("[Error] 이미 존재하는 이메일입니다.");
-		}
-		User user = User.of(email, password);
-		user.passwordEncode(passwordEncoder);
-		userRepository.save(user);
-		log.info("회원 저장 성공");
-	}
+    public void signUp(String email, String password) {
+        if (userRepository.findByEmail(email).isPresent()) {
+            throw new IllegalArgumentException("[Error] 이미 존재하는 이메일입니다.");
+        }
+        User user = User.of(email, password);
+        user.passwordEncode(passwordEncoder);
+        userRepository.save(user);
+        log.info("회원 저장 성공");
+    }
 
-	public void signIn(String email, String password) {
-		User user = userRepository.findByEmail(email)
-			.orElseThrow(() -> new EntityNotFoundException(
-				String.format(NOT_FOUND_USER.getMessage(), email)));
-		if (!passwordEncoder.matches(password, user.getPassword())) {
-			throw new IllegalArgumentException("[Error] 로그인에 실패했습니다.");
-		}
-	}
+    public void signIn(String email, String password) {
+        User user = userRepository.findByEmail(email)
+            .orElseThrow(() -> new EntityNotFoundException(
+                String.format(NOT_FOUND_USER.getMessage(), email)));
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            throw new IllegalArgumentException("[Error] 로그인에 실패했습니다.");
+        }
+    }
 }
