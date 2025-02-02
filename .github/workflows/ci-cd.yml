@@ -119,16 +119,19 @@ jobs:
       - name: Check if nginx.conf has changed
         id: check_nginx
         run: |
-          git fetch origin develop 
-          CHANGED_FILES=$(git diff --name-only origin/develop...HEAD)
-          echo "Changed files: $CHANGED_FILES"
-
+          git fetch origin develop
+          CHANGED_FILES=$(git diff --name-only origin/develop..HEAD)
+          
+          echo "Changed files:"
+          echo "$CHANGED_FILES"
+          
           if echo "$CHANGED_FILES" | grep -q "nginx/conf.d/nginx.conf"; then
             echo "NGINX_CHANGED=true" >> $GITHUB_ENV
           else
             echo "NGINX_CHANGED=false" >> $GITHUB_ENV
           fi
-      
+          
+          echo "NGINX_CHANGED=$(cat $GITHUB_ENV | grep NGINX_CHANGED)"
 
       - name: Copy docker-compose into instance
         uses: appleboy/scp-action@master
